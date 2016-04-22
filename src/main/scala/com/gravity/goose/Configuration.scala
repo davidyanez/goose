@@ -50,7 +50,7 @@ class Configuration {
   * image extractor to implement the ImageExtractor interface to build your own
   */
   @BeanProperty
-  var enableImageFetching: Boolean = true
+  var enableImageFetching: Boolean = false
   /**
   * path to your imagemagick convert executable, on the mac using mac ports this is the default listed
   */
