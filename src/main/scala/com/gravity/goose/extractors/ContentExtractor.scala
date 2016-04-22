@@ -508,6 +508,26 @@ trait ContentExtractor {
     node
   }
 
+  def postExtractionCleanup2(targetNode: Element): Element = {
+
+    trace(logPrefix + "Starting cleanup Node")
+    val node = addSiblings(targetNode)
+    for {
+      e <- node.children
+      if (e.tagName != "p" && e.tagName != "img")
+    } {
+      trace(logPrefix + "CLEANUP  NODE: " + e.id + " class: " + e.attr("class"))
+      if (isHighLinkDensity(e) || isTableTagAndNoParagraphsExist(e) || !isNodeScoreThreshholdMet(node, e)) {
+        try {
+          e.remove()
+        } catch {
+          case ex: IllegalArgumentException => trace("Cannot remove node: " + ex.toString)
+        }
+      }
+    }
+    node
+  }
+
 
   def isNodeScoreThreshholdMet(node: Element, e: Element): Boolean = {
     val topNodeScore: Int = getScore(node)
