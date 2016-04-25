@@ -554,9 +554,19 @@ class StandardImageExtractor(httpClient: HttpClient, article: Article, config: C
         if (continueVar) {
           image.attr("tempImagePath", localSrcPath)
           try {
-            var imageDims: ImageDetails = ImageUtils.getImageDimensions(config.imagemagickIdentifyPath, localSrcPath)
-            width = imageDims.getWidth
-            height = imageDims.getHeight
+
+            if (config.useImageMagic){
+              var imageDims: ImageDetails = ImageUtils.getImageDimensions(config.imagemagickIdentifyPath, localSrcPath)
+              width = imageDims.getWidth
+              height = imageDims.getHeight
+            }
+            else{
+              var imageDims = ImageUtils.getImageDimensionsJava(localSrcPath)
+              width = imageDims("width")
+              height = imageDims("height")
+            }
+
+
             if (depthLevel > 1) {
               if (width < 300) {
                 if (logger.isDebugEnabled) {
@@ -663,6 +673,10 @@ class StandardImageExtractor(httpClient: HttpClient, article: Article, config: C
 
   def setTempStoragePath(tempStoragePath: String) {
     this.tempStoragePath = tempStoragePath
+  }
+
+  def RemoveBadImages(article: Article) {
+
   }
 
 
