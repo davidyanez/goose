@@ -102,7 +102,6 @@ class Crawler(config: Configuration) {
 
           article.cleanedArticleText = outputFormatter.getFormattedText(article.topNode)
 
-
         }
         case _ => trace("NO ARTICLE FOUND")
       }
