@@ -68,7 +68,7 @@ class Crawler(config: Configuration) {
       article.canonicalLink = extractor.getCanonicalLink(article)
       article.tags = extractor.extractTags(article)
       // before we do any calcs on the body itself let's clean up the document
-//      article.doc =  docCleaner.clean(article)
+      article.doc =  docCleaner.clean(article)
 
       extractor.calculateBestNodeBasedOnClustering(article) match {
         case Some(node: Element) => {
