@@ -120,7 +120,12 @@ trait OutputFormatter {
             s"<p>${StringEscapeUtils.unescapeHtml(e.text).trim}</p>"
           }
           else if (e.tagName() == "img") {
-            "<img src=\"" + e.attr("src") + "\">"
+            if (e.hasAttr("srcset"))
+            "<img srcset=\"" + e.attr("srcset")  + "\">"
+            else if (e.hasAttr("src"))
+              "<img src=\"" + e.attr("src")  + "\">"
+            else
+              ""
           } else {
             ""
           }
