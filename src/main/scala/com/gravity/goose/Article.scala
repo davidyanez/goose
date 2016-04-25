@@ -43,6 +43,12 @@ class Article {
   var cleanedArticleText: String = ""
 
   /**
+    * stores paragraph text from the article, stripped of html, formatting, etc...
+    * by storing it in a map with the raw html absolute position and the paragraph
+    */
+  var cleanedArticleSimpleHTML:  String = ""
+
+  /**
   * meta description field in HTML source
   */
   var metaDescription: String = ""
