@@ -40,6 +40,8 @@ import org.apache.http.util.EntityUtils
 import org.apache.commons.io.IOUtils
 import com.gravity.goose.network.{ImageFetchException, HtmlFetcher}
 
+import javax.imageio.ImageIO
+
 object ImageUtils extends Logging {
   val spaceRegex = " ".r
   val xRegex = "x".r
@@ -79,6 +81,7 @@ object ImageUtils extends Logging {
     imageDetails.setHeight(height)
     imageDetails
   }
+
 
   /**
   * gets the image dimensions for an image file, pass in the path to the image who's dimensions you want to get, uses the built in java commands
@@ -217,9 +220,17 @@ object ImageUtils extends Logging {
     if (imageFile.exists()) {
       try {
         trace("Reading image from disk: " + localImageName)
-        val imageDetails = getImageDimensions(config.imagemagickIdentifyPath, localImageName)
-        val fileExtension = getFileExtensionName(imageDetails)
-        Some(LocallyStoredImage(imageSrc, localImageName, linkhash, imageFile.length(), fileExtension, imageDetails.getHeight, imageDetails.getWidth))
+
+        if (config.getUserImageMagic){
+          val imageDetails = getImageDimensions(config.imagemagickIdentifyPath, localImageName)
+          val fileExtension = getFileExtensionName(imageDetails)
+          Some(LocallyStoredImage(imageSrc, localImageName, linkhash, imageFile.length(), fileExtension, imageDetails.getHeight, imageDetails.getWidth))
+
+        } else{
+          val Dimensions = getImageDimensionsJava(localImageName)
+          Some(LocallyStoredImage(imageSrc, localImageName, linkhash, imageFile.length(), "jpg", Dimensions.get("height") , Dimensions.get("width")))
+        }
+
       } catch {
         case e: Exception => {
           trace(e, "Unable to get image file dimensions & extension name!")
@@ -252,7 +263,7 @@ object ImageUtils extends Logging {
         case e: Exception => info(e, e.toString)
       }
     }
-    //    entity.writeTo(outstream)
+
     EntityUtils.consume(entity)
     trace("Content Length: " + entity.getContentLength)
     readExistingFileInfo(linkhash, imageSrc, config)
