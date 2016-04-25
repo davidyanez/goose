@@ -1,5 +1,7 @@
 package com.gravity.goose
 
+import java.io.{File, PrintWriter}
+
 import extractors.PublishDateExtractor
 import org.junit.Test
 import org.junit.Assert._
@@ -391,6 +393,20 @@ class ExtractionsTest {
     TestUtils.runArticleAssertions(article = article,
       expectedStart = "Opposition to a proposal to remove certain personal data",
       expectedImage = null)
+  }
+
+
+  @Test
+  def custom_test() {
+    implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+    val url = "http://www.dailymail.co.uk/tvshowbiz/article-3546267/Jennifer-Lopez-reduces-price-spectacular-Hidden-Hills-mansion-12-5-million.html"
+    val article = TestUtils.getArticle(url = url)
+    println(article.cleanedArticleSimpleHTML)
+    val out_html = new PrintWriter(new File("output3.html" ))
+    out_html.write(article.cleanedArticleSimpleHTML)
+    out_html.close()
+
   }
 
 
