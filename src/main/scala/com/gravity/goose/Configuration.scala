@@ -50,17 +50,20 @@ class Configuration {
   * image extractor to implement the ImageExtractor interface to build your own
   */
   @BeanProperty
-  var enableImageFetching: Boolean = false
+  var enableImageFetching: Boolean = true
   /**
   * path to your imagemagick convert executable, on the mac using mac ports this is the default listed
   */
   @BeanProperty
-  var imagemagickConvertPath: String = "/opt/local/bin/convert"
+  var imagemagickConvertPath: String = "D:\\Program Files\\ImageMagick\\convert.exe"
   /**
   *  path to your imagemagick identify executable
   */
   @BeanProperty
-  var imagemagickIdentifyPath: String = "/opt/local/bin/identify"
+  var imagemagickIdentifyPath: String = "D:\\Program Files\\ImageMagick\\identify.exe"
+
+  @BeanProperty
+  var useImageMagic: Boolean = false
 
   @BeanProperty
   var connectionTimeout: Int = 10000
@@ -123,6 +126,7 @@ class Configuration {
 
   /**
   * Pass in to extract article publish dates.
+    *
     * @param extractor a concrete instance of {@link PublishDateExtractor}
   * @throws IllegalArgumentException if the instance passed in is <code>null</code>
   */
@@ -137,6 +141,7 @@ class Configuration {
 
   /**
   * Pass in to extract any additional data not defined within {@link Article}
+    *
     * @param extractor a concrete instance of {@link AdditionalDataExtractor}
   * @throws IllegalArgumentException if the instance passed in is <code>null</code>
   */
