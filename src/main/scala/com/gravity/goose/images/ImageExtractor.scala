@@ -19,6 +19,7 @@ package com.gravity.goose.images
 
 import org.jsoup.nodes.{Element, Document}
 import com.gravity.goose.utils.{Logging, CanLog}
+import com.gravity.goose.Article
 
 /**
 * Created by Jim Plush
@@ -32,6 +33,8 @@ case class LocallyStoredImage(imgSrc: String, localFileName: String, linkhash: S
 trait ImageExtractor extends CanLog {
 
   def getBestImage(doc: Document, topNode: Element): Image
+
+  def RemoveBadImages(article: Article)
 
   def logPrefix: String = ImageExtractor.loggingPrefix
 
