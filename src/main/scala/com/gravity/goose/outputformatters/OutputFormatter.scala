@@ -46,7 +46,8 @@ trait OutputFormatter {
   
   /**
   * Depricated use {@link #getFormattedText(Element)}
-  * @param topNode the top most node to format
+    *
+    * @param topNode the top most node to format
   * @return the prepared Element
   */
   @Deprecated def getFormattedElement(topNode: Element): Element = {
@@ -59,7 +60,8 @@ trait OutputFormatter {
 
   /**
   * Removes all unnecessarry elements and formats the selected text nodes
-  * @param topNode the top most node to format
+    *
+    * @param topNode the top most node to format
   * @return a formatted string with all HTML removed
   */
   def getFormattedText(topNode: Element): String = {
@@ -71,20 +73,60 @@ trait OutputFormatter {
   }
 
   /**
+  * Removes all unnecessarry elements and formats the selected text nodes ...
+    *
+    * @param topNode the top most node to format
+  * @return a formatted string with all HTML removed
+  */
+  def getFormattedHTML(topNode: Element, title: String): String = {
+
+    removeNodesWithNegativeScores(topNode)
+    convertLinksToText(topNode)
+    replaceTagsWithText(topNode)
+    removeParagraphsWithFewWords(topNode)
+    val header_meta = "<meta http-equiv='Content-Type' content='text/html;charset=utf-8'/>"
+    val style = "<style>" +
+      "h1 {font-size: 2.5em;}" +
+      "p {font-size:1.25em;}" +
+      "</style>"
+
+    s"<html><head>$header_meta$style</head><body><h1>$title</h1>${convertToSimpleHTML(topNode)}</ body></ html>"
+  }
+
+  /**
   * Depricated use {@link #getFormattedText(Element)}
   * takes an element and turns the P tags into \n\n
   *
   * @return
   */
   def convertToText(topNode: Element): String = topNode match {
-    case null => ""
-    case node => {
-      (node.children().map((e: Element) => {
-        StringEscapeUtils.unescapeHtml(e.text).trim
-      })).toList.mkString("\n\n")
+      case null => ""
+      case node => {
+        (node.children().map((e: Element) => {
+          StringEscapeUtils.unescapeHtml(e.text).trim
+        })).toList.mkString("\n\n")
+      }
+
     }
 
-  }
+  def convertToSimpleHTML(topNode: Element): String = topNode match {
+
+      case null => ""
+
+      case node => {
+//        (node.children().map((e: Element) => {
+        node.getAllElements.map((e: Element) => {
+          if (e.tagName() == "p") {
+            s"<p>${StringEscapeUtils.unescapeHtml(e.text).trim}</p>"
+          }
+          else if (e.tagName() == "img") {
+            "<img src=\"" + e.attr("src") + "\">"
+          } else {
+            ""
+          }
+        }).toList.mkString("")
+      }
+    }
 
   /**
   * cleans up and converts any nodes that should be considered text into text
@@ -178,13 +220,14 @@ trait OutputFormatter {
       if (logger.isDebugEnabled) {
         logger.debug("removeParagraphsWithFewWords starting...")
       }
+      val IGNORE_TAGS = Array("img")
 
       val allNodes = topNode.getAllElements
 
       for (el <- allNodes) {
         try {
           val stopWords = StopWords.getStopWordCount(el.text)
-          if (stopWords.getStopWordCount < 3 && el.getElementsByTag("object").size == 0 && el.getElementsByTag("embed").size == 0) {
+          if ( (!IGNORE_TAGS.contains(el.tagName()) && IGNORE_TAGS.forall(tag => el.getElementsByTag(tag).isEmpty)) && stopWords.getStopWordCount < 3 && el.getElementsByTag("object").size == 0 && el.getElementsByTag("embed").size == 0) {
             logger.debug("removeParagraphsWithFewWords - swcnt: %d removing text: %s".format(stopWords.getStopWordCount, el.text()))
             el.remove()
           }
