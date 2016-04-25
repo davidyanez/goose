@@ -397,17 +397,32 @@ class ExtractionsTest {
 
 
   @Test
-  def custom_test() {
+  def jlo_home_test() {
     implicit val config = TestUtils.NO_IMAGE_CONFIG
 
     val url = "http://www.dailymail.co.uk/tvshowbiz/article-3546267/Jennifer-Lopez-reduces-price-spectacular-Hidden-Hills-mansion-12-5-million.html"
     val article = TestUtils.getArticle(url = url)
     println(article.cleanedArticleSimpleHTML)
-    val out_html = new PrintWriter(new File("output3.html" ))
+    val out_html = new PrintWriter(new File("jlo_home.html" ))
     out_html.write(article.cleanedArticleSimpleHTML)
     out_html.close()
 
   }
+
+  @Test
+   def bloomberg_test() {
+     implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+     val url = "http://www.bloomberg.com/news/articles/2016-04-21/tesla-changed-cars-forever-now-it-must-deliver"  // "http://www.theverge.com/2016/4/20/11466636/nasa-aerojet-rocketdyne-solar-electric-propulsion-contract" //
+     val article = TestUtils.getArticle(url = url)
+     println(article.cleanedArticleSimpleHTML)
+     val out_html = new PrintWriter(new File("bloomberg.html" ))
+     out_html.write(article.cleanedArticleSimpleHTML)
+     out_html.close()
+
+   }
+
+
 
 
 }
