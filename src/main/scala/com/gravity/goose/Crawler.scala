@@ -68,9 +68,7 @@ class Crawler(config: Configuration) {
       article.canonicalLink = extractor.getCanonicalLink(article)
       article.tags = extractor.extractTags(article)
       // before we do any calcs on the body itself let's clean up the document
-      article.doc = docCleaner.clean(article)
-
-
+//      article.doc =  docCleaner.clean(article)
 
       extractor.calculateBestNodeBasedOnClustering(article) match {
         case Some(node: Element) => {
@@ -84,6 +82,7 @@ class Crawler(config: Configuration) {
               if (article.rawDoc == null) {
                 article.topImage = new Image
               } else {
+
                 article.topImage = imageExtractor.getBestImage(article.rawDoc, article.topNode)
               }
             } catch {
@@ -92,12 +91,18 @@ class Crawler(config: Configuration) {
               }
             }
           }
-          article.topNode = extractor.postExtractionCleanup(article.topNode)
 
 
+          val imageExtractor = getImageExtractor(article)
+          imageExtractor.RemoveBadImages(article)
 
+          article.cleanedArticleSimpleHTML = outputFormatter.getFormattedHTML(article.topNode, extractor.getTitle(article))
+
+          //article.topNode = extractor.postExtractionCleanup(article.topNode)
 
           article.cleanedArticleText = outputFormatter.getFormattedText(article.topNode)
+
+
         }
         case _ => trace("NO ARTICLE FOUND")
       }
