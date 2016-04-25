@@ -221,7 +221,7 @@ object ImageUtils extends Logging {
       try {
         trace("Reading image from disk: " + localImageName)
 
-        if (config.getUserImageMagic){
+        if (config.getUseImageMagic){
           val imageDetails = getImageDimensions(config.imagemagickIdentifyPath, localImageName)
           val fileExtension = getFileExtensionName(imageDetails)
           Some(LocallyStoredImage(imageSrc, localImageName, linkhash, imageFile.length(), fileExtension, imageDetails.getHeight, imageDetails.getWidth))

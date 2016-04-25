@@ -297,7 +297,7 @@ class UpgradedImageIExtractor(httpClient: HttpClient, article: Article, config: 
             image.attr("tempImagePath", localSrcPath)
             try {
 
-              if (config.userImageMagic){
+              if (config.useImageMagic){
                 var imageDims: ImageDetails = ImageUtils.getImageDimensions(config.imagemagickIdentifyPath, localSrcPath)
                 width = imageDims.getWidth
                 height = imageDims.getHeight
