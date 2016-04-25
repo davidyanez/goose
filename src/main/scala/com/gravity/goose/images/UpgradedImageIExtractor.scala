@@ -1,6 +1,8 @@
 package com.gravity.goose.images
 
+import java.io.IOException
 import java.net.{MalformedURLException, URL}
+import java.util
 import java.util.ArrayList
 import java.util.regex.{Matcher, Pattern}
 
@@ -11,7 +13,7 @@ import org.jsoup.nodes.{Document, Element}
 import org.jsoup.select.Elements
 
 import scala.collection.JavaConversions._
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.{HashMap, ListBuffer}
 import scala.io.Source
 import scala.util.parsing.json.{JSON, JSONObject}
 
@@ -114,6 +116,7 @@ class UpgradedImageIExtractor(httpClient: HttpClient, article: Article, config: 
   }
 
 
+
   /**
   * although slow the best way to determine the best image is to download them and check the actual dimensions of the image when on disk
   * so we'll go through a phased approach...
@@ -209,14 +212,14 @@ class UpgradedImageIExtractor(httpClient: HttpClient, article: Article, config: 
       for {
         locallyStoredImage <- getLocallyStoredImage(buildImagePath(image.attr("src")))
         width = locallyStoredImage.width
-        if (width > MIN_WIDTH)
+//        if (width > MIN_WIDTH)
         height = locallyStoredImage.height
-        if (height > MIN_HEIGHT)
+//        if (height > MIN_HEIGHT)
         fileExtension = locallyStoredImage.fileExtension
-        if (fileExtension != ".gif" && fileExtension != "NA")
+//        if (fileExtension != ".gif" && fileExtension != "NA")
         imageSrc = locallyStoredImage.imgSrc
-        if ((depthLevel >= 1 && locallyStoredImage.width > 300) || depthLevel < 1)
-        if (!isBannerDimensions(width, height))
+//        if ((depthLevel >= 1 && locallyStoredImage.width > 300) || depthLevel < 1)
+//        if (!isBannerDimensions(width, height))
       } {
         val sequenceScore: Float = 1.0f / cnt
         val area: Float = width * height
@@ -246,6 +249,131 @@ class UpgradedImageIExtractor(httpClient: HttpClient, article: Article, config: 
   def getAllImages: ArrayList[Element] = {
     null
   }
+
+  private def findGoodSizeImage(images: ArrayList[Element]): ArrayList[Element] ={
+    for (image <- images) {
+      try {
+        val imageSource: String = this.buildImagePath(image.attr("src"))
+        val local_img = getLocallyStoredImage(buildImagePath(image.attr("src"))).getOrElse(null)
+        if (local_img != None){
+          if ((local_img.width < 300 || local_img.height < 300 || local_img.bytes < config.minBytesForImages)) {
+            image.remove()
+          }
+        }
+      }
+    }
+    images
+  }
+
+  private def StandardDownloadImagesAndGetResults(images: ArrayList[Element], depthLevel: Int): HashMap[Element, Float] = {
+
+      val imageResults: HashMap[Element, Float] = new HashMap[Element, Float]
+      var cnt: Int = 1
+      var initialArea: Float = 0
+
+      for (image <- images) {
+        var continueVar = true // major haxor during java to scala conversion -> this whole section needs a rewrite
+        if (cnt > 30) {
+          if (logger.isDebugEnabled) {
+            logger.debug("over 30 images attempted, that's enough for now")
+          }
+          return imageResults
+        }
+        try {
+          val imageSource: String = this.buildImagePath(image.attr("src"))
+          val localSrcPath: String = ImageSaver.storeTempImage(this.httpClient, this.linkhash, imageSource, config)
+          if (localSrcPath == null) {
+            if (logger.isDebugEnabled) {
+              logger.debug("unable to store this image locally: IMGSRC: " + image.attr("src") + " BUILD SRC: " + imageSource)
+            }
+            continueVar = false
+          }
+          if (logger.isDebugEnabled) {
+            logger.debug("Starting image: " + localSrcPath)
+          }
+          var width: Int = 0
+          var height: Int = 0
+          if (continueVar) {
+            image.attr("tempImagePath", localSrcPath)
+            try {
+
+              if (config.userImageMagic){
+                var imageDims: ImageDetails = ImageUtils.getImageDimensions(config.imagemagickIdentifyPath, localSrcPath)
+                width = imageDims.getWidth
+                height = imageDims.getHeight
+              }
+              else{
+                var imageDims = ImageUtils.getImageDimensionsJava(localSrcPath)
+                width = imageDims("width")
+                height = imageDims("height")
+              }
+
+
+              if (depthLevel > 1) {
+                if (width < 300) {
+                  if (logger.isDebugEnabled) {
+                    logger.debug("going depthlevel: " + depthLevel + " and img was only: " + width + " wide: " + localSrcPath)
+                  }
+                  continueVar = false
+                }
+              }
+            }
+            catch {
+              case e: IOException => {
+                throw e
+              }
+            }
+          }
+          if (continueVar) {
+            if (this.isBannerDimensions(width, height)) {
+              if (logger.isDebugEnabled) {
+                logger.debug(image.attr("src") + " seems like a fishy image dimension wise, skipping it")
+              }
+              image.remove()
+              continueVar = false
+            }
+          }
+          if (continueVar) {
+            if (width < 50) {
+              if (logger.isDebugEnabled) {
+                logger.debug(image.attr("src") + " is too small width: " + width + " removing..")
+              }
+              image.remove()
+              continueVar = false
+            }
+          }
+          if (continueVar) {
+            val sequenceScore: Float = (1).asInstanceOf[Float] / cnt
+            val area: Int = width * height
+            var totalScore: Float = 0
+            if (initialArea == 0) {
+              // give the initial image a little area boost as well
+              initialArea = area * 1.48.asInstanceOf[Float]
+              totalScore = 1
+            }
+            else {
+              val areaDifference: Float = area.asInstanceOf[Float] / initialArea
+              totalScore = sequenceScore.asInstanceOf[Float] * areaDifference
+            }
+            trace(logPrefix + imageSource + " Area is: " + area + " sequence score: " + sequenceScore + " totalScore: " + totalScore)
+            cnt += 1;
+
+            imageResults.put(image, totalScore)
+          }
+        }
+        catch {
+          case e: SecretGifException => {
+
+          }
+          case e: Exception => {
+            warn(e, e.toString)
+
+          }
+        }
+      }
+      imageResults
+    }
+
 
   /**
   * returns true if we think this is kind of a bannery dimension
@@ -325,16 +453,27 @@ class UpgradedImageIExtractor(httpClient: HttpClient, article: Article, config: 
   def getImageCandidates(node: Element): Option[ArrayList[Element]] = {
 
     for {
-      n <- getNode(node)
+//      n <- getNode(node)
       images <- getImagesFromNode(node)
       filteredImages <- filterBadNames(images)
       goodImages <- findImagesThatPassByteSizeTest(filteredImages)
+
     } {
       return Some(filteredImages)
     }
     None
 
   }
+
+
+  private def RemoveBadImageCandidates(node: Element): Unit = {
+
+    val images = getImagesFromNode(node)
+    val filteredImages = filterBadNames(images.get)
+    val goodSizeImages  = findGoodSizeImage(filteredImages.get)
+
+    }
+
 
   /**
   * loop through all the images and find the ones that have the best bytez to even make them a candidate
@@ -559,6 +698,23 @@ class UpgradedImageIExtractor(httpClient: HttpClient, article: Article, config: 
     imageSrc
   }
 
+  def RemoveBadImages(article: Article)  {
+
+      val allNodes = article.topNode.getAllElements
+
+      for (el <- allNodes) {
+        try {
+          if (el.tagName() == "img" || !el.getElementsByTag("img").isEmpty) {
+            RemoveBadImageCandidates(el)
+          }
+        }
+        catch {
+          case e: IllegalArgumentException => {
+            logger.error(e.getMessage)
+          }
+        }
+      }
+  }
 
 }
 
