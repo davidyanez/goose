@@ -126,9 +126,28 @@ trait OutputFormatter {
               "<img src=\"" + e.attr("src")  + "\">"
             else
               ""
-          } else {
+          }else if (e.tagName() == "iframe" &&
+            (e.attr("src").startsWith("https://www.youtube.com/embed/") ||
+              e.attr("src").startsWith("https://player.vimeo.com/video/")
+              )
+          ) {
+            //e.outerHtml()
+            var iframe_attributes =  e.attributes().filter((a: Attribute) => a.getKey() != "style").
+              map((a: Attribute) => a.getKey.toString + "=\"" + a.getValue.toString + "\"").mkString(" ")
+
+            iframe_attributes = iframe_attributes + "width=\"" + "100%" + "height=\"" + "auto" + "\""
+            val wrapper_div_style = "position:relative;padding-bottom: 56.25%;padding-top: 25px;height:0;"
+            val iframe_style= "position:absolute;top=0;left:0;width:80%;height:80%;"
+            "<div style=\""+wrapper_div_style+ "\">" + "<iframe " + iframe_attributes + " style=\"" + iframe_style + "\"></iframe></div>"
+
+//            "<div style=\""> <iframe ${iframe_attributes}></iframe></div>"
+          }
+          else {
             ""
           }
+
+
+
         }).toList.mkString("")
       }
     }
@@ -225,7 +244,7 @@ trait OutputFormatter {
       if (logger.isDebugEnabled) {
         logger.debug("removeParagraphsWithFewWords starting...")
       }
-      val IGNORE_TAGS = Array("img")
+      val IGNORE_TAGS = Array("img", "iframe", "picture")
 
       val allNodes = topNode.getAllElements
 
