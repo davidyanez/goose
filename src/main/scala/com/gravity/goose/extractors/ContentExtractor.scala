@@ -431,6 +431,11 @@ trait ContentExtractor {
     val vimdeoStr = "vimeo"
     try {
       node.parent.getElementsByTag("embed").foreach(candidates.add(_))
+
+      node.parent.getElementsByTag("iframe").filter(e => e.hasAttr("src") &&
+        (e.attr("src").startsWith("https://www.youtube.com/embed/") || e.attr("src").startsWith("https://player.vimeo.com/video/"))
+      ).foreach(candidates.add(_)) // iframe with  youtube source
+
       node.parent.getElementsByTag("object").foreach(candidates.add(_))
 
       trace(logPrefix + "extractVideos: Starting to extract videos. Found: " + candidates.size)
