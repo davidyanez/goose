@@ -434,7 +434,18 @@ class ExtractionsTest {
         out_html.close()
       }
 
+  @Test
+   def ie_youtube_test() {
+        implicit val config = TestUtils.NO_IMAGE_CONFIG
 
+        val url =   "http://interestingengineering.com/hacker-installed-windows-95-smartwatch/"
+        val article = TestUtils.getArticle(url = url)
+        println(article.cleanedArticleSimpleHTML)
+        val out_html = new PrintWriter(new File("ie_youtube_win95.html" ))
+        out_html.write(article.cleanedArticleSimpleHTML)
+        out_html.close()
+      }
 
+         // http://interestingengineering.com/hacker-installed-windows-95-smartwatch/
 
 }
