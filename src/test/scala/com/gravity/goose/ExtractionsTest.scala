@@ -446,6 +446,16 @@ class ExtractionsTest {
         out_html.close()
       }
 
-         // http://interestingengineering.com/hacker-installed-windows-95-smartwatch/
+  @Test
+   def wired_nexlist_test() {
+        implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+        val url =   "http://www.wired.com/2016/04/wired-nextlist-2016/"
+        val article = TestUtils.getArticle(url = url)
+        println(article.cleanedArticleSimpleHTML)
+        val out_html = new PrintWriter(new File("wired_nextlist.html" ))
+        out_html.write(article.cleanedArticleSimpleHTML)
+        out_html.close()
+      }
 
 }
