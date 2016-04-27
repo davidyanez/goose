@@ -114,18 +114,17 @@ trait OutputFormatter {
       case null => ""
 
       case node => {
-//        (node.children().map((e: Element) => {
+
         node.getAllElements.map((e: Element) => {
           if (e.tagName() == "p") {
             s"<p>${StringEscapeUtils.unescapeHtml(e.text).trim}</p>"
           }
           else if (e.tagName() == "img") {
-            if (e.hasAttr("srcset"))
-            "<img srcset=\"" + e.attr("srcset")  + "\">"
-            else if (e.hasAttr("src"))
-              "<img src=\"" + e.attr("src")  + "\">"
-            else
-              ""
+            var img_attrinutes =  e.attributes().filter((a: Attribute) => a.getKey() != "style").
+                          map((a: Attribute) => a.getKey.toString + "=\"" + a.getValue.toString + "\"").mkString(" ")
+
+            s"<img $img_attrinutes >"
+
           }else if (e.tagName() == "iframe" &&
             (e.attr("src").startsWith("https://www.youtube.com/embed/") ||
               e.attr("src").startsWith("https://player.vimeo.com/video/")
