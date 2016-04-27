@@ -130,7 +130,7 @@ trait OutputFormatter {
               e.attr("src").startsWith("https://player.vimeo.com/video/")
               )
           ) {
-            //e.outerHtml()
+
             var iframe_attributes =  e.attributes().filter((a: Attribute) => a.getKey() != "style").
               map((a: Attribute) => a.getKey.toString + "=\"" + a.getValue.toString + "\"").mkString(" ")
 
