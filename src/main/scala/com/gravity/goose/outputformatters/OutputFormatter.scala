@@ -18,12 +18,15 @@
 
 package com.gravity.goose.outputformatters
 
+import com.gravity.goose.Article
 import org.jsoup.nodes._
 import org.apache.commons.lang.StringEscapeUtils
 import org.jsoup.select.Elements
 import com.gravity.goose.text.StopWords
 import scala.collection.JavaConversions._
 import org.slf4j.Logger
+
+import scala.collection.immutable.List
 
 /**
 * Created by Jim Plush
@@ -78,7 +81,10 @@ trait OutputFormatter {
     * @param topNode the top most node to format
   * @return a formatted string with all HTML removed
   */
-  def getFormattedHTML(topNode: Element, title: String): String = {
+  def getFormattedHTML(article: Article): String = {
+
+    val topNode =  article.topNode
+    val title = article.title
 
     removeNodesWithNegativeScores(topNode)
     convertLinksToText(topNode)
@@ -87,10 +93,10 @@ trait OutputFormatter {
     val header_meta = "<meta http-equiv='Content-Type' content='text/html;charset=utf-8'/>"
     val style = "<style>" +
       "h1 {font-size: 2.5em;}" +
-      "p {font-size:1.25em;}" +
+      "p {font-size:1.25em; }" +
       "</style>"
 
-    s"<html><head>$header_meta$style</head><body><h1>$title</h1>${convertToSimpleHTML(topNode)}</ body></ html>"
+    s"<html><head>$header_meta$style</head><body><h1>$title</h1>${convertToSimpleHTML(topNode, article.domain)}</ body></ html>"
   }
 
   /**
@@ -109,43 +115,63 @@ trait OutputFormatter {
 
     }
 
-  def convertToSimpleHTML(topNode: Element): String = topNode match {
+  def convertToSimpleHTML(topNode: Element, domain: String): String = topNode match {
 
       case null => ""
 
       case node => {
 
+        val SKIP_ATTRIBUTES: List[String] = List("style", "class")
+        val HEADERS: List[String] = List("h2", "h3", "h4", "h5", "h6")
+        val keep_tags: List[String] = List("hr")
+
         node.getAllElements.map((e: Element) => {
-          if (e.tagName() == "p") {
-            s"<p>${StringEscapeUtils.unescapeHtml(e.text).trim}</p>"
-          }
-          else if (e.tagName() == "img") {
-            var img_attrinutes =  e.attributes().filter((a: Attribute) => a.getKey() != "style").
-                          map((a: Attribute) => a.getKey.toString + "=\"" + a.getValue.toString + "\"").mkString(" ")
 
-            s"<img $img_attrinutes >"
+            if (e.tagName() == "p") {
+              s"<p>${StringEscapeUtils.unescapeHtml(e.text).trim}</p>"
+//              s"<p>${e.html}</p>"
+            }
+            else if (keep_tags.contains(e.tagName())){
+              e.outerHtml()
+            }
+            else if (e.tagName() == "img") {
+              if (e.hasAttr("src") && !e.attr("src").startsWith("http") )
+                e.attr("src", "http://"+domain+e.attr("src"))
+              if (e.hasAttr("srcset")){
+                var img_sources = e.attr("src").split(",").map((url: String) => url.trim())
+                img_sources = img_sources.map(src => if (src.toString.startsWith("http")) src else "http://"+domain+src)
+                val srcset =  String.join(", ", img_sources.toList)
+                e.attr("srcset", srcset)
+              }
 
-          }else if (e.tagName() == "iframe" &&
-            (e.attr("src").startsWith("https://www.youtube.com/embed/") ||
-              e.attr("src").startsWith("https://player.vimeo.com/video/")
-              )
-          ) {
+                e.attr("src", "http://"+domain+e.attr("src"))
 
-            var iframe_attributes =  e.attributes().filter((a: Attribute) => a.getKey() != "style").
-              map((a: Attribute) => a.getKey.toString + "=\"" + a.getValue.toString + "\"").mkString(" ")
+              var img_attrinutes = e.attributes().filter((a: Attribute) => !SKIP_ATTRIBUTES.contains(a.getKey())).
+                map((a: Attribute) => a.getKey.toString + "=\"" + a.getValue.toString + "\"").mkString(" ")
 
-            iframe_attributes = iframe_attributes + "width=\"" + "100%" + "height=\"" + "auto" + "\""
-            val wrapper_div_style = "position:relative;padding-bottom: 56.25%;padding-top: 25px;height:0;"
-            val iframe_style= "position:absolute;top=0;left:0;width:80%;height:80%;"
-            "<div style=\""+wrapper_div_style+ "\">" + "<iframe " + iframe_attributes + " style=\"" + iframe_style + "\"></iframe></div>"
+              s"<img $img_attrinutes >"
 
-//            "<div style=\""> <iframe ${iframe_attributes}></iframe></div>"
-          }
-          else {
-            ""
-          }
+            } else if (e.tagName() == "iframe" &&
+              (e.attr("src").startsWith("https://www.youtube.com/embed/") ||
+                e.attr("src").startsWith("https://player.vimeo.com/video/")
+                )
+            ) {
 
+              var iframe_attributes = e.attributes().filter((a: Attribute) => a.getKey() != "style").
+                map((a: Attribute) => a.getKey.toString + "=\"" + a.getValue.toString + "\"").mkString(" ")
 
+              iframe_attributes = iframe_attributes + "width=\"" + "100%" + "height=\"" + "auto" + "\""
+              val wrapper_div_style = "position:relative;padding-bottom: 56.25%;padding-top: 25px;height:0;"
+              val iframe_style = "position:absolute;top=0;left:0;width:80%;height:80%;"
+              "<div style=\"" + wrapper_div_style + "\">" + "<iframe " + iframe_attributes + " style=\"" + iframe_style + "\"></iframe></div>"
+            }
+            else if (HEADERS.contains(e.tagName())) {
+              s"<${e.tagName}>${e.text()}</${e.tagName}>"
+//              s"<${e.tagName}>${e.html()}</${e.tagName}>"
+            }
+            else {
+              ""
+            }
 
         }).toList.mkString("")
       }
@@ -167,7 +193,6 @@ trait OutputFormatter {
         }
       }
     }
-
   }
 
   /**
@@ -243,7 +268,7 @@ trait OutputFormatter {
       if (logger.isDebugEnabled) {
         logger.debug("removeParagraphsWithFewWords starting...")
       }
-      val IGNORE_TAGS = Array("img", "iframe", "picture")
+      val IGNORE_TAGS = Array("img", "iframe", "picture", "hr", "h2", "h3", "h4")
 
       val allNodes = topNode.getAllElements
 

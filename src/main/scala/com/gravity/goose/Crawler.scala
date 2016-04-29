@@ -96,7 +96,7 @@ class Crawler(config: Configuration) {
           val imageExtractor = getImageExtractor(article)
           imageExtractor.RemoveBadImages(article)
 
-          article.cleanedArticleSimpleHTML = outputFormatter.getFormattedHTML(article.topNode, extractor.getTitle(article))
+          article.cleanedArticleSimpleHTML = outputFormatter.getFormattedHTML(article)
 
           //article.topNode = extractor.postExtractionCleanup(article.topNode)
 
