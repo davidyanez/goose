@@ -129,7 +129,7 @@ trait OutputFormatter {
 
             if (e.tagName() == "p") {
               s"<p>${StringEscapeUtils.unescapeHtml(e.text).trim}</p>"
-//              s"<p>${e.html}</p>"
+
             }
             else if (keep_tags.contains(e.tagName())){
               e.outerHtml()
@@ -147,7 +147,7 @@ trait OutputFormatter {
                 e.attr("src", "http://"+domain+e.attr("src"))
 
               var img_attrinutes = e.attributes().filter((a: Attribute) => !SKIP_ATTRIBUTES.contains(a.getKey())).
-                map((a: Attribute) => a.getKey.toString + "=\"" + a.getValue.toString + "\"").mkString(" ")
+                map((a: Attribute) => a.getKey + "=\"" + a.getValue + "\"").mkString(" ")
 
               s"<img $img_attrinutes >"
 
@@ -158,7 +158,7 @@ trait OutputFormatter {
             ) {
 
               var iframe_attributes = e.attributes().filter((a: Attribute) => a.getKey() != "style").
-                map((a: Attribute) => a.getKey.toString + "=\"" + a.getValue.toString + "\"").mkString(" ")
+                map((a: Attribute) => a.getKey + "=\"" + a.getValue + "\"").mkString(" ")
 
               iframe_attributes = iframe_attributes + "width=\"" + "100%" + "height=\"" + "auto" + "\""
               val wrapper_div_style = "position:relative;padding-bottom: 56.25%;padding-top: 25px;height:0;"
@@ -167,7 +167,6 @@ trait OutputFormatter {
             }
             else if (HEADERS.contains(e.tagName())) {
               s"<${e.tagName}>${e.text()}</${e.tagName}>"
-//              s"<${e.tagName}>${e.html()}</${e.tagName}>"
             }
             else {
               ""
