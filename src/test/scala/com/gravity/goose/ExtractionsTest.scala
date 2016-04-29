@@ -410,20 +410,20 @@ class ExtractionsTest {
   }
 
   @Test
-  def bloomberg_test() {
+  def bloomberg_tesla_test() {
     implicit val config = TestUtils.NO_IMAGE_CONFIG
 
     val url =  "http://www.bloomberg.com/news/articles/2016-04-21/tesla-changed-cars-forever-now-it-must-deliver"
     val article = TestUtils.getArticle(url = url)
     println(article.cleanedArticleSimpleHTML)
-    val out_html = new PrintWriter(new File("bloomberg.html" ))
+    val out_html = new PrintWriter(new File("bloomberg_tesla.html" ))
     out_html.write(article.cleanedArticleSimpleHTML)
     out_html.close()
 
   }
 
   @Test
-   def theverge_test() {
+   def theverge_nasa_test() {
         implicit val config = TestUtils.NO_IMAGE_CONFIG
 
         val url =   "http://www.theverge.com/2016/4/20/11466636/nasa-aerojet-rocketdyne-solar-electric-propulsion-contract"
@@ -458,4 +458,176 @@ class ExtractionsTest {
         out_html.close()
       }
 
+   @Test
+   def newscientist_spacex_mars() {
+        implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+        val url =  "https://www.newscientist.com/article/2086270-spacex-claims-it-can-get-to-mars-by-2018-what-are-its-chances/"
+        val article = TestUtils.getArticle(url = url)
+        println(article.cleanedArticleSimpleHTML)
+        val out_html = new PrintWriter(new File("newscientist_spacex_mars.html" ))
+        out_html.write(article.cleanedArticleSimpleHTML)
+        out_html.close()
+      }
+
+
+  @Test
+   def outbrain_webcontent_tools() {
+        implicit val config = TestUtils.NO_IMAGE_CONFIG
+        // Fails!  no article found ?>  when page is loaded it only shows  loading_page
+        val url =  "http://www.outbrain.com/blog/2016/04/10-tools-every-content-marketer-needs-to-stay-ahead-in-2016.html"
+        val article = TestUtils.getArticle(url = url)
+        println(article.cleanedArticleSimpleHTML)
+        val out_html = new PrintWriter(new File("outbrain_webcontent_tools.html" ))
+        out_html.write(article.cleanedArticleSimpleHTML)
+        out_html.close()
+      }
+
+  @Test
+   def rt_spacex() {
+
+        implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+        val url =  "https://www.rt.com/usa/341166-spacex-founders-micro-satellite-rockets/"
+        val article = TestUtils.getArticle(url = url)
+        println(article.cleanedArticleSimpleHTML)
+        val out_html = new PrintWriter(new File("rt_spacex.html" ))
+        out_html.write(article.cleanedArticleSimpleHTML)
+        out_html.close()
+      }
+
+   @Test
+   def wsj_5gadgets() {
+
+        implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+        val url =  "http://www.wsj.com/articles/5-gadgets-tough-enough-for-campers-1461862177?mod=ST1"
+        val article = TestUtils.getArticle(url = url)
+        println(article.cleanedArticleSimpleHTML)
+        val out_html = new PrintWriter(new File("wsj_5gadgets.html" ))
+        out_html.write(article.cleanedArticleSimpleHTML)
+        out_html.close()
+      }
+
+   @Test
+     def theage_steve_wozniak_ai() {
+
+          implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+          val url =  "http://www.theage.com.au/technology/innovation/apple-cofounder-steve-wozniak-artificial-intelligence-revolution-is-near-20160428-gogy87.html"
+          val article = TestUtils.getArticle(url = url)
+          println(article.cleanedArticleSimpleHTML)
+          val out_html = new PrintWriter(new File("theage_steve_wozniak_ai.html" ))
+          out_html.write(article.cleanedArticleSimpleHTML)
+          out_html.close()
+        }
+
+  @Test
+  def theinquirer_ai_revolution() {
+
+       implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+       val url =  "http://www.theinquirer.net/inquirer/news/2408538/artificial-intelligence-will-create-the-next-industrial-revolution-experts-claim"
+       val article = TestUtils.getArticle(url = url)
+       println(article.cleanedArticleSimpleHTML)
+       val out_html = new PrintWriter(new File("theinquirer_ai_revolution.html" ))
+       out_html.write(article.cleanedArticleSimpleHTML)
+       out_html.close()
+     }
+
+  @Test
+  def newyork_to_london_highway() {
+        // failed:
+       implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+       val url =  "http://www.thinkinghumanity.com/2016/04/russia-proposes-superhighway-linking-new-york-and-london.html"
+       val article = TestUtils.getArticle(url = url)
+       println(article.cleanedArticleSimpleHTML)
+       val out_html = new PrintWriter(new File("newyork_to_london_highway.html" ))
+       out_html.write(article.cleanedArticleSimpleHTML)
+       out_html.close()
+       }
+
+  @Test
+    def economist_neurological_night_watch() {
+
+     implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+     val url =  "http://www.economist.com/news/science-and-technology/21697213-why-familiar-bed-provides-good-nights-sleep-neurological-night-watch"
+     val article = TestUtils.getArticle(url = url)
+     println(article.cleanedArticleSimpleHTML)
+     val out_html = new PrintWriter(new File("economist_neurological_night_watch.html" ))
+     out_html.write(article.cleanedArticleSimpleHTML)
+     out_html.close()
+     }
+
+  @Test
+    def engadget_dyson_dryer() {
+
+     implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+     val url =  "http://www.engadget.com/2016/04/27/dyson-made-a-hair-dryer/"
+     val article = TestUtils.getArticle(url = url)
+     println(article.cleanedArticleSimpleHTML)
+     val out_html = new PrintWriter(new File("engadget_dyson_dryer.html" ))
+     out_html.write(article.cleanedArticleSimpleHTML)
+     out_html.close()
+     }
+
+  @Test
+  def vice_mini_europe() {
+    // failed:  exception on downloading an image, getting a not authorized message
+   implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+   val url =  "http://www.vice.com/read/a-model-continent-eu-postcards"
+   val article = TestUtils.getArticle(url = url)
+   println(article.cleanedArticleSimpleHTML)
+   val out_html = new PrintWriter(new File("vice_mini_europe.html" ))
+   out_html.write(article.cleanedArticleSimpleHTML)
+   out_html.close()
+   }
+
+  @Test
+    def vice_robots_ai() {
+      // failed:  exception on downloading an image, getting a not authorized message
+     implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+     val url =  "http://motherboard.vice.com/read/computers-might-just-see-like-humans-after-all-vision-deep-learning-neural-networks"
+     val article = TestUtils.getArticle(url = url)
+     println(article.cleanedArticleSimpleHTML)
+     val out_html = new PrintWriter(new File("vice_robots_ai.html" ))
+     out_html.write(article.cleanedArticleSimpleHTML)
+     out_html.close()
+     }
+
+  @Test
+  def vice_f35_bugs() {
+    // failed:  exception on downloading an image, getting a not authorized message
+    implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+    val url = "http://motherboard.vice.com/read/the-f-35s-software-is-so-buggy-it-might-ground-the-whole-fleet"
+    val article = TestUtils.getArticle(url = url)
+    println(article.cleanedArticleSimpleHTML)
+    val out_html = new PrintWriter(new File("vice_f35_bugs.html"))
+    out_html.write(article.cleanedArticleSimpleHTML)
+    out_html.close()
+  }
+
+  @Test
+   def hbr_social_media() {
+     // failed:  exception on downloading an image, getting a not authorized message
+     implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+     val url = "https://hbr.org/2016/04/social-media-is-too-important-to-be-left-to-the-marketing-department"
+     val article = TestUtils.getArticle(url = url)
+     println(article.cleanedArticleSimpleHTML)
+     val out_html = new PrintWriter(new File("hbr_social_media.html"))
+     out_html.write(article.cleanedArticleSimpleHTML)
+     out_html.close()
+   }
+
+
+  // http://motherboard-images.vice.com/content-images/contentimage/no-id/1461696042952895.jpeg
+  // http://www.engadget.com/2016/04/27/dyson-made-a-hair-dryer/
+  // https://hbr.org/2016/04/social-media-is-too-important-to-be-left-to-the-marketing-department
 }
