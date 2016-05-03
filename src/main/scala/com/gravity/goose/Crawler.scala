@@ -73,24 +73,24 @@ class Crawler(config: Configuration) {
       extractor.calculateBestNodeBasedOnClustering(article) match {
         case Some(node: Element) => {
           article.topNode = node
-          article.movies = extractor.extractVideos(article.topNode)
-
-          if (config.enableImageFetching) {
-            trace(logPrefix + "Image fetching enabled...")
-            val imageExtractor = getImageExtractor(article)
-            try {
-              if (article.rawDoc == null) {
-                article.topImage = new Image
-              } else {
-
-                article.topImage = imageExtractor.getBestImage(article.rawDoc, article.topNode)
-              }
-            } catch {
-              case e: Exception => {
-                warn(e, e.toString)
-              }
-            }
-          }
+//          article.movies = extractor.extractVideos(article.topNode)
+//
+//          if (config.enableImageFetching) {
+//            trace(logPrefix + "Image fetching enabled...")
+//            val imageExtractor = getImageExtractor(article)
+//            try {
+//              if (article.rawDoc == null) {
+//                article.topImage = new Image
+//              } else {
+//
+//                article.topImage = imageExtractor.getBestImage(article.rawDoc, article.topNode)
+//              }
+//            } catch {
+//              case e: Exception => {
+//                warn(e, e.toString)
+//              }
+//            }
+//          }
 
 
           val imageExtractor = getImageExtractor(article)
