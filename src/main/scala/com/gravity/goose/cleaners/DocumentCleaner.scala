@@ -55,7 +55,7 @@ trait DocumentCleaner {
     docToClean = removeNodesViaRegEx(docToClean, facebookPattern)
     docToClean = removeNodesViaRegEx(docToClean, twitterPattern)
     docToClean = cleanUpSpanTagsInParagraphs(docToClean)
-    docToClean = convertWantedTagsToParagraphs(docToClean, articleRootTags)
+//    docToClean = convertWantedTagsToParagraphs(docToClean, articleRootTags)
 //    docToClean = convertDivsToParagraphs(docToClean, "div")
 //    docToClean = convertDivsToParagraphs(docToClean, "span")
 
