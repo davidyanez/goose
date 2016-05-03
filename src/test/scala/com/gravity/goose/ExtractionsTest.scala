@@ -614,14 +614,67 @@ class ExtractionsTest {
   }
 
   @Test
-   def hbr_social_media() {
-     // failed:  exception on downloading an image, getting a not authorized message
+  def hbr_social_media() {
+      // failed:  exception on downloading an image, getting a not authorized message
+      implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+      val url = "https://hbr.org/2016/04/social-media-is-too-important-to-be-left-to-the-marketing-department"
+      val article = TestUtils.getArticle(url = url)
+      println(article.cleanedArticleSimpleHTML)
+      val out_html = new PrintWriter(new File("hbr_social_media.html"))
+      out_html.write(article.cleanedArticleSimpleHTML)
+      out_html.close()
+    }
+
+  @Test
+     def dailyedge_pizza_box() {
+       // failed:  exception on downloading an image, getting a not authorized message
+       implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+       val url = "http://www.dailyedge.ie/pizza-pizza-box-amazing-2742051-Apr2016/"
+       val article = TestUtils.getArticle(url = url)
+       println(article.cleanedArticleSimpleHTML)
+       val out_html = new PrintWriter(new File("dailyedge_pizza_box.html"))
+       out_html.write(article.cleanedArticleSimpleHTML)
+       out_html.close()
+     }
+
+  @Test
+      def fool_bombardier_oder() {
+
+        implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+        val url = "http://www.fool.ca/2016/04/28/bombardier-inc-gets-another-order/"
+        val article = TestUtils.getArticle(url = url)
+        println(article.cleanedArticleSimpleHTML)
+        val out_html = new PrintWriter(new File("fool_bombardier_oder.html"))
+        out_html.write(article.cleanedArticleSimpleHTML)
+        out_html.close()
+      }
+
+  @Test
+   def stradigi() {
+
      implicit val config = TestUtils.NO_IMAGE_CONFIG
 
-     val url = "https://hbr.org/2016/04/social-media-is-too-important-to-be-left-to-the-marketing-department"
+     val url = "http://www.stradigi.ca"
      val article = TestUtils.getArticle(url = url)
      println(article.cleanedArticleSimpleHTML)
-     val out_html = new PrintWriter(new File("hbr_social_media.html"))
+     val out_html = new PrintWriter(new File("stradigi.html"))
+     out_html.write(article.cleanedArticleSimpleHTML)
+     out_html.close()
+   }
+
+
+  @Test
+   def business_insider() {
+
+     implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+     val url = "http://www.businessinsider.com"
+     val article = TestUtils.getArticle(url = url)
+     println(article.cleanedArticleSimpleHTML)
+     val out_html = new PrintWriter(new File("businessinsider.html"))
      out_html.write(article.cleanedArticleSimpleHTML)
      out_html.close()
    }
@@ -630,4 +683,7 @@ class ExtractionsTest {
   // http://motherboard-images.vice.com/content-images/contentimage/no-id/1461696042952895.jpeg
   // http://www.engadget.com/2016/04/27/dyson-made-a-hair-dryer/
   // https://hbr.org/2016/04/social-media-is-too-important-to-be-left-to-the-marketing-department
+  // http://www.dailyedge.ie/pizza-pizza-box-amazing-2742051-Apr2016/
+  // http://www.fool.ca/2016/04/28/bombardier-inc-gets-another-order/
+
 }
