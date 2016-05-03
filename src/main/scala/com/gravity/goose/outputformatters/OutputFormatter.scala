@@ -131,10 +131,10 @@ trait OutputFormatter {
 
             if (e.tagName() == "p") {
               if (e.text() != title)
-                s"<p>${StringEscapeUtils.unescapeHtml(e.text).trim}</p>"
+//                s"<p>${StringEscapeUtils.unescapeHtml(e.text).trim}</p>"
+              s"<p>${e.html()}</p>"
               else
                 ""
-
             }
             else if (e.tagName() == "video") {
               e.outerHtml()
@@ -282,7 +282,7 @@ trait OutputFormatter {
       if (logger.isDebugEnabled) {
         logger.debug("removeParagraphsWithFewWords starting...")
       }
-      val IGNORE_TAGS = Array("img", "iframe", "picture", "video","figure", "hr", "h2", "h3", "h4")
+      val IGNORE_TAGS = Array("img", "iframe", "picture", "video","figure", "hr", "h2", "h3", "h4", "br", "b")
 
       val allNodes = topNode.getAllElements
 
