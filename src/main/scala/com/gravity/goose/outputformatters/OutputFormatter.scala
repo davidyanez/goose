@@ -121,15 +121,23 @@ trait OutputFormatter {
 
       case node => {
 
+
         val SKIP_ATTRIBUTES: List[String] = List("style", "class")
         val HEADERS: List[String] = List("h2", "h3", "h4", "h5", "h6")
         val keep_tags: List[String] = List("hr")
+        val FOLLOW_HEADER_TAGS : List[String] = List("p", "img", "iframe", "video", "picture", "figure", "hr")
 
         node.getAllElements.map((e: Element) => {
 
             if (e.tagName() == "p") {
               s"<p>${StringEscapeUtils.unescapeHtml(e.text).trim}</p>"
 
+            }
+            else if (e.tagName() == "video") {
+              e.outerHtml()
+            }
+            else if (e.tagName() == "ol") {
+              e.outerHtml()
             }
             else if (keep_tags.contains(e.tagName())){
               e.outerHtml()
@@ -138,14 +146,11 @@ trait OutputFormatter {
               if (e.hasAttr("src") && !e.attr("src").startsWith("http") )
                 e.attr("src", "http://"+domain+e.attr("src"))
               if (e.hasAttr("srcset")){
-                var img_sources = e.attr("src").split(",").map((url: String) => url.trim())
+                var img_sources = e.attr("srcset").split(",").map((url: String) => url.trim())
                 img_sources = img_sources.map(src => if (src.toString.startsWith("http")) src else "http://"+domain+src)
                 val srcset =  String.join(", ", img_sources.toList)
                 e.attr("srcset", srcset)
               }
-
-                e.attr("src", "http://"+domain+e.attr("src"))
-
               var img_attrinutes = e.attributes().filter((a: Attribute) => !SKIP_ATTRIBUTES.contains(a.getKey())).
                 map((a: Attribute) => a.getKey + "=\"" + a.getValue + "\"").mkString(" ")
 
@@ -165,8 +170,10 @@ trait OutputFormatter {
               val iframe_style = "position:absolute;top=0;left:0;width:80%;height:80%;"
               "<div style=\"" + wrapper_div_style + "\">" + "<iframe " + iframe_attributes + " style=\"" + iframe_style + "\"></iframe></div>"
             }
-            else if (HEADERS.contains(e.tagName())) {
-              s"<${e.tagName}>${e.text()}</${e.tagName}>"
+            else if (HEADERS.contains(e.tagName()) &&  e.nextElementSibling() != null &&
+              (e.nextElementSibling().select("p") != null || e.nextElementSibling().select("img") != null)
+            ) {
+              s"<${e.tagName}>${e.text()}</${e.tagName}>"   // && FOLLOW_HEADER_TAGS.contains(e.nextElementSibling().tagName())
             }
             else {
               ""
@@ -267,7 +274,7 @@ trait OutputFormatter {
       if (logger.isDebugEnabled) {
         logger.debug("removeParagraphsWithFewWords starting...")
       }
-      val IGNORE_TAGS = Array("img", "iframe", "picture", "hr", "h2", "h3", "h4")
+      val IGNORE_TAGS = Array("img", "iframe", "picture", "video","figure", "hr", "h2", "h3", "h4")
 
       val allNodes = topNode.getAllElements
 
