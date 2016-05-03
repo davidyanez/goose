@@ -53,7 +53,7 @@ trait ContentExtractor {
   val SPACE_SPLITTER: StringSplitter = new StringSplitter(" ")
   val NO_STRINGS = Set.empty[String]
   val A_REL_TAG_SELECTOR: String = "a[rel=tag], a[href*=/tag/]"
-  val TOP_NODE_TAGS = new TagsEvaluator(Set("p", "td", "pre"))
+  val TOP_NODE_TAGS = new TagsEvaluator(Set("p", "td", "pre", "div"))
 
   def getTitle(article: Article): String = {
     var title: String = string.empty
