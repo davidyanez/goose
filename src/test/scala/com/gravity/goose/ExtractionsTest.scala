@@ -640,14 +640,14 @@ class ExtractionsTest {
      }
 
   @Test
-      def fool_bombardier_oder() {
+      def fool_bombardier_order() {
 
         implicit val config = TestUtils.NO_IMAGE_CONFIG
 
         val url = "http://www.fool.ca/2016/04/28/bombardier-inc-gets-another-order/"
         val article = TestUtils.getArticle(url = url)
         println(article.cleanedArticleSimpleHTML)
-        val out_html = new PrintWriter(new File("fool_bombardier_oder.html"))
+        val out_html = new PrintWriter(new File("fool_bombardier_order.html"))
         out_html.write(article.cleanedArticleSimpleHTML)
         out_html.close()
       }
