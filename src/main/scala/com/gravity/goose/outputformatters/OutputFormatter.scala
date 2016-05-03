@@ -168,9 +168,8 @@ trait OutputFormatter {
               var iframe_attributes = e.attributes().filter((a: Attribute) => a.getKey() != "style").
                 map((a: Attribute) => a.getKey + "=\"" + a.getValue + "\"").mkString(" ")
 
-              iframe_attributes = iframe_attributes + "width=\"" + "100%" + "height=\"" + "auto" + "\""
               val wrapper_div_style = "position:relative;padding-bottom: 56.25%;padding-top: 25px;height:0;"
-              val iframe_style = "position:absolute;top=0;left:0;width:80%;height:80%;"
+              val iframe_style = "position:absolute;top=0;left:0;width:100%;height:95%;"
               "<div style=\"" + wrapper_div_style + "\">" + "<iframe " + iframe_attributes + " style=\"" + iframe_style + "\"></iframe></div>"
             }
             else if (HEADERS.contains(e.tagName()) &&  e.nextElementSibling() != null &&
@@ -282,7 +281,7 @@ trait OutputFormatter {
       if (logger.isDebugEnabled) {
         logger.debug("removeParagraphsWithFewWords starting...")
       }
-      val IGNORE_TAGS = Array("img", "iframe", "picture", "video","figure", "hr", "h2", "h3", "h4", "br", "b")
+      val IGNORE_TAGS = Array("img", "iframe", "picture", "video","figure","hr", "h2", "h3", "h4", "br", "b")
 
       val allNodes = topNode.getAllElements
 
