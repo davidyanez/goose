@@ -96,7 +96,7 @@ trait OutputFormatter {
       "p {font-size:1.25em; }" +
       "</style>"
 
-    s"<html><head>$header_meta$style</head><body><h1>$title</h1>${convertToSimpleHTML(topNode, article.domain)}</ body></ html>"
+    s"<html><head>$header_meta$style</head><body><h1>$title</h1>${convertToSimpleHTML(topNode, article.domain, article.title)}</ body></ html>"
   }
 
   /**
@@ -115,7 +115,7 @@ trait OutputFormatter {
 
     }
 
-  def convertToSimpleHTML(topNode: Element, domain: String): String = topNode match {
+  def convertToSimpleHTML(topNode: Element, domain: String, title: String = ""): String = topNode match {
 
       case null => ""
 
@@ -123,14 +123,17 @@ trait OutputFormatter {
 
 
         val SKIP_ATTRIBUTES: List[String] = List("style", "class")
-        val HEADERS: List[String] = List("h2", "h3", "h4", "h5", "h6")
+        val HEADERS: List[String] = List("h1","h2", "h3", "h4", "h5", "h6")
         val keep_tags: List[String] = List("hr")
         val FOLLOW_HEADER_TAGS : List[String] = List("p", "img", "iframe", "video", "picture", "figure", "hr")
 
         node.getAllElements.map((e: Element) => {
 
             if (e.tagName() == "p") {
-              s"<p>${StringEscapeUtils.unescapeHtml(e.text).trim}</p>"
+              if (e.text() != title)
+                s"<p>${StringEscapeUtils.unescapeHtml(e.text).trim}</p>"
+              else
+                ""
 
             }
             else if (e.tagName() == "video") {
@@ -173,7 +176,12 @@ trait OutputFormatter {
             else if (HEADERS.contains(e.tagName()) &&  e.nextElementSibling() != null &&
               (e.nextElementSibling().select("p") != null || e.nextElementSibling().select("img") != null)
             ) {
-              s"<${e.tagName}>${e.text()}</${e.tagName}>"   // && FOLLOW_HEADER_TAGS.contains(e.nextElementSibling().tagName())
+              if (e.text() != title)
+              s"<${e.tagName}>${e.text()}</${e.tagName}>"
+              else{
+                ""
+              }
+              // && FOLLOW_HEADER_TAGS.contains(e.nextElementSibling().tagName())
             }
             else {
               ""
