@@ -87,9 +87,9 @@ trait OutputFormatter {
     val title = article.title
 
     removeNodesWithNegativeScores(topNode)
-    convertLinksToText(topNode)
-    replaceTagsWithText(topNode)
-    removeParagraphsWithFewWords(topNode)
+//    convertLinksToText(topNode)
+//    replaceTagsWithText(topNode)
+//    removeParagraphsWithFewWords(topNode)
     val header_meta = "<meta http-equiv='Content-Type' content='text/html;charset=utf-8'/>"
     val style = "<style>" +
       "h1 {font-size: 2.5em;}" +
@@ -131,8 +131,18 @@ trait OutputFormatter {
 
             if (e.tagName() == "p") {
               if (e.text() != title)
-//                s"<p>${StringEscapeUtils.unescapeHtml(e.text).trim}</p>"
-              s"<p>${e.html()}</p>"
+
+                if (e.select("a").length > 0){
+                  if (e.select("a")(0).text() == e.text()){
+                       ""
+                  }  else{
+                    s"<p>${StringEscapeUtils.unescapeHtml(e.text).trim}</p>"
+                  }
+                } else{
+                  s"<p>${StringEscapeUtils.unescapeHtml(e.text).trim}</p>"
+                }
+
+
               else
                 ""
             }
@@ -168,20 +178,21 @@ trait OutputFormatter {
               var iframe_attributes = e.attributes().filter((a: Attribute) => a.getKey() != "style").
                 map((a: Attribute) => a.getKey + "=\"" + a.getValue + "\"").mkString(" ")
 
+
               val wrapper_div_style = "position:relative;padding-bottom: 56.25%;padding-top: 25px;height:0;"
               val iframe_style = "position:absolute;top=0;left:0;width:100%;height:95%;"
               "<div style=\"" + wrapper_div_style + "\">" + "<iframe " + iframe_attributes + " style=\"" + iframe_style + "\"></iframe></div>"
             }
-            else if (HEADERS.contains(e.tagName()) &&  e.nextElementSibling() != null &&
-              (e.nextElementSibling().select("p") != null || e.nextElementSibling().select("img") != null)
-            ) {
-              if (e.text() != title)
-              s"<${e.tagName}>${e.text()}</${e.tagName}>"
-              else{
-                ""
-              }
-              // && FOLLOW_HEADER_TAGS.contains(e.nextElementSibling().tagName())
-            }
+//            else if (HEADERS.contains(e.tagName()) &&  e.nextElementSibling() != null &&
+//              (e.nextElementSibling().select("p") != null || e.nextElementSibling().select("img") != null)
+//            ) {
+//              if (e.text() != title)
+//              s"<${e.tagName}>${e.text()}</${e.tagName}>"
+//              else{
+//                ""
+//              }
+//              // && FOLLOW_HEADER_TAGS.contains(e.nextElementSibling().tagName())
+//            }
             else {
               ""
             }
