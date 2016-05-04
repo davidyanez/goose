@@ -189,16 +189,15 @@ trait OutputFormatter {
               val iframe_style = "position:absolute;top=0;left:0;width:100%;height:95%;"
               "<div style=\"" + wrapper_div_style + "\">" + "<iframe " + iframe_attributes + " style=\"" + iframe_style + "\"></iframe></div>"
             }
-//            else if (HEADERS.contains(e.tagName()) &&  e.nextElementSibling() != null &&
-//              (e.nextElementSibling().select("p") != null || e.nextElementSibling().select("img") != null)
-//            ) {
-//              if (e.text() != title)
-//              s"<${e.tagName}>${e.text()}</${e.tagName}>"
-//              else{
-//                ""
-//              }
-//              // && FOLLOW_HEADER_TAGS.contains(e.nextElementSibling().tagName())
-//            }
+            else if (HEADERS.contains(e.tagName()))
+             {
+              if (e.text() != title)
+              s"<${e.tagName}>${e.text()}</${e.tagName}>"
+              else{
+                ""
+              }
+              // && FOLLOW_HEADER_TAGS.contains(e.nextElementSibling().tagName())
+            }
             else {
               ""
             }
