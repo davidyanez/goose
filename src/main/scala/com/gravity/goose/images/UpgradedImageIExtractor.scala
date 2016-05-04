@@ -260,6 +260,10 @@ class UpgradedImageIExtractor(httpClient: HttpClient, article: Article, config: 
           image.remove()
         }
 
+      } catch {
+        case _ => {
+          logger.debug("Error processing image")
+        }
       }
     }
     images
