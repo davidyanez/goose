@@ -122,7 +122,7 @@ trait OutputFormatter {
       case node => {
 
 
-        val SKIP_ATTRIBUTES: List[String] = List("style", "class")
+        val SKIP_ATTRIBUTES: List[String] = List("style", "class", "alt")
         val HEADERS: List[String] = List("h1","h2", "h3", "h4", "h5", "h6")
         val keep_tags: List[String] = List("hr")
         val FOLLOW_HEADER_TAGS : List[String] = List("p", "img", "iframe", "video", "picture", "figure", "hr")
@@ -156,11 +156,17 @@ trait OutputFormatter {
               e.outerHtml()
             }
             else if (e.tagName() == "img") {
-              if (e.hasAttr("src") && !e.attr("src").startsWith("http") )
+              if (e.hasAttr("src") && (e.attr("src").startsWith("http"))) {}
+              else if  (e.hasAttr("src") && e.attr("src").startsWith("//")){
+                e.attr("src", "http:"+e.attr("src"))
+              }
+              else {
                 e.attr("src", "http://"+domain+e.attr("src"))
+              }
               if (e.hasAttr("srcset")){
                 var img_sources = e.attr("srcset").split(",").map((url: String) => url.trim())
-                img_sources = img_sources.map(src => if (src.toString.startsWith("http")) src else "http://"+domain+src)
+                img_sources = img_sources.map(src =>  if (src.startsWith("http")) src
+                  else if (src.startsWith("//")) "http:"+ src else "http://"+domain+src)
                 val srcset =  String.join(", ", img_sources.toList)
                 e.attr("srcset", srcset)
               }
