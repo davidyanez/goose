@@ -55,6 +55,9 @@ trait DocumentCleaner {
     docToClean = removeNodesViaRegEx(docToClean, facebookPattern)
     docToClean = removeNodesViaRegEx(docToClean, twitterPattern)
     docToClean = cleanUpSpanTagsInParagraphs(docToClean)
+    docToClean =  removeBadTags(docToClean)
+
+
 //    docToClean = convertWantedTagsToParagraphs(docToClean, articleRootTags)
 //    docToClean = convertDivsToParagraphs(docToClean, "div")
 //    docToClean = convertDivsToParagraphs(docToClean, "span")
@@ -107,6 +110,18 @@ trait DocumentCleaner {
       val tn: TextNode = new TextNode(item.text, doc.baseUri)
       item.replaceWith(tn)
     }
+    doc
+  }
+
+
+  private def removeBadTags(doc: Document): Document = {
+     for (tag <- tagsToRemove){
+       val items: Elements = doc.select(tag)
+       for (item <- items) {
+         item.remove()
+       }
+
+     }
     doc
   }
 
@@ -377,8 +392,8 @@ object DocumentCleaner extends Logging {
   var sb: StringBuilder = new StringBuilder
 
   // create negative elements
-  sb.append("^side$|combx|retweet|mediaarticlerelated|menucontainer|navbar|comment|PopularQuestions|contact|foot|footer|Footer|footnote|cnn_strycaptiontxt|links|meta$|scroll|shoutbox|sponsor")
-  sb.append("|tags|socialnetworking|socialNetworking|cnnStryHghLght|cnn_stryspcvbx|^inset$|pagetools|post-attributes|welcome_form|contentTools2|the_answers|remember-tool-tip")
+  sb.append("^side$|combx|retweet|mediaarticlerelated|menucontainer|navbar|comment|PopularQuestions|contact|foot|footer|Footer|footnote|cnn_strycaptiontxt|links|meta$|shoutbox|sponsor")
+  sb.append("|tags|socialnetworking|socialNetworking|cnnStryHghLght|cnn_stryspcvbx|^inset$|pagetools|post-attributes|welcome_form|contentTools2|the_answers|remember-tool-tip|article-media-overlay")
   sb.append("|communitypromo|runaroundLeft|subscribe|vcard|articleheadings|date|^print$|popup|author-dropdown|tools|socialtools|byline|konafilter|KonaFilter|breadcrumbs|^fn$|wp-caption-text")
 
   /**
@@ -390,12 +405,14 @@ object DocumentCleaner extends Logging {
   val queryNaughtyClasses = "[class~=(" + regExRemoveNodes + ")]"
   val queryNaughtyNames = "[name~=(" + regExRemoveNodes + ")]"
   val tabsAndNewLinesReplacements = ReplaceSequence.create("\n", "\n\n").append("\t").append("^\\s+$")
+  val tagsToRemove: List[String] = List("noscript")
+
   /**
   * regex to detect if there are block level elements inside of a div element
   */
-  val divToPElementsPattern: Pattern = Pattern.compile("<(a|blockquote|dl|div|picture|img|ol|p|pre|table|ul|video)")
+  val divToPElementsPattern: Pattern = Pattern.compile("<(a|blockquote|dl|div|picture|img|ol|p|pre|table|ul|video|section)")
 
-  val blockElemementTags = TagsEvaluator("a", "blockquote", "dl", "div", "img", "picture", "ol", "p", "pre", "table", "ul", "video")
+  val blockElemementTags = TagsEvaluator("a", "blockquote", "dl", "div", "img", "picture", "ol", "p", "pre", "table", "ul", "video", "section")
   val articleRootTags = TagsEvaluator("div", "span", "article")
 
   val captionPattern: Pattern = Pattern.compile("^caption$")
