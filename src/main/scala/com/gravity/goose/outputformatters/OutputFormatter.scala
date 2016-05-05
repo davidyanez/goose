@@ -21,7 +21,7 @@ package com.gravity.goose.outputformatters
 import com.gravity.goose.Article
 import org.jsoup.nodes._
 import org.apache.commons.lang.StringEscapeUtils
-import org.jsoup.select.Elements
+import org.jsoup.select.{TagsEvaluator, Collector, Elements}
 import com.gravity.goose.text.StopWords
 import scala.collection.JavaConversions._
 import org.slf4j.Logger
@@ -87,6 +87,8 @@ trait OutputFormatter {
     val title = article.title
 
     removeNodesWithNegativeScores(topNode)
+    cleanLinks(topNode)
+    cleanHeaders(topNode)
 //    convertLinksToText(topNode)
 //    replaceTagsWithText(topNode)
 //    removeParagraphsWithFewWords(topNode)
@@ -115,12 +117,28 @@ trait OutputFormatter {
 
     }
 
+  def trim_element_text(e: Element): String ={
+    if (e.select("a").length > 0){
+      val link_text =   e.select("a")(0).text()
+      val text_world_count = StopWords.getStopWordCount(e.text()).getWordCount
+      val link_world_count = StopWords.getStopWordCount(e.select("a")(0).text()).getWordCount
+      val max_link_words_percent = 0.7
+
+      if (link_world_count.toFloat > max_link_words_percent*text_world_count){
+           ""
+      }  else{
+        s"<p>${StringEscapeUtils.unescapeHtml(e.text).trim}</p>"
+      }
+    } else{
+      s"<p>${StringEscapeUtils.unescapeHtml(e.text).trim}</p>"
+    }
+  }
+
   def convertToSimpleHTML(topNode: Element, domain: String, title: String = ""): String = topNode match {
 
       case null => ""
 
       case node => {
-
 
         val SKIP_ATTRIBUTES: List[String] = List("style", "class", "alt")
         val HEADERS: List[String] = List("h1","h2", "h3", "h4", "h5", "h6")
@@ -131,25 +149,14 @@ trait OutputFormatter {
 
             if (e.tagName() == "p") {
               if (e.text() != title)
-
-                if (e.select("a").length > 0){
-                  if (e.select("a")(0).text() == e.text()){
-                       ""
-                  }  else{
-                    s"<p>${StringEscapeUtils.unescapeHtml(e.text).trim}</p>"
-                  }
-                } else{
-                  s"<p>${StringEscapeUtils.unescapeHtml(e.text).trim}</p>"
-                }
-
-
+                trim_element_text(e)
               else
                 ""
             }
             else if (e.tagName() == "video") {
               e.outerHtml()
             }
-            else if (e.tagName() == "ol") {
+            else if (e.tagName().contains(List("ol","ul"))) {
               e.outerHtml()
             }
             else if (keep_tags.contains(e.tagName())){
@@ -192,7 +199,7 @@ trait OutputFormatter {
             else if (HEADERS.contains(e.tagName()))
              {
               if (e.text() != title)
-              s"<${e.tagName}>${e.text()}</${e.tagName}>"
+              s"<${e.tagName}>${trim_element_text(e)}</${e.tagName}>"
               else{
                 ""
               }
@@ -223,6 +230,46 @@ trait OutputFormatter {
       }
     }
   }
+
+  /**
+    * cleans up links, the links outside p are removed
+    *
+    */
+  private def cleanLinks(topNode: Element) {
+    if (topNode != null) {
+      logger.trace(logPrefix + "Turning links to text")
+      val baseUri = topNode.baseUri()
+
+      val links = topNode.getElementsByTag("a")
+      for (item <- links) {
+        if (item.getElementsByTag("img").isEmpty) {
+          if (item.parents().map(e => e.tagName()).filter(tag => tag == "p").length == 0){
+            item.remove()
+          }
+        }
+      }
+    }
+  }
+
+  /**
+    * cleans up headers, keep only the header followed by an element that contains only accepted tags
+    *
+    */
+  private def cleanHeaders(topNode: Element): Unit ={
+
+    val ACCEPTED_TAGS = TagsEvaluator("p","img","video","figure","picture")
+    val HEADER_TAGS = TagsEvaluator("h1","h2","h3","h4","h5","h6")
+
+    val headers = Collector.collect(HEADER_TAGS, topNode)
+    for (header <- headers) {
+      //      check if next sibling contains ACCEPTED_TAGS
+      val sibling_good_elements = Collector.collect(ACCEPTED_TAGS, header.nextElementSibling())
+      if (sibling_good_elements.length == 0) {
+        header.remove()
+      }
+    }
+  }
+
 
   /**
   * if there are elements inside our top node that have a negative gravity score, let's
