@@ -89,6 +89,7 @@ trait OutputFormatter {
     removeNodesWithNegativeScores(topNode)
     cleanLinks(topNode)
     cleanHeaders(topNode)
+    cleanParagraphs(topNode)
 //    convertLinksToText(topNode)
 //    replaceTagsWithText(topNode)
 //    removeParagraphsWithFewWords(topNode)
@@ -117,22 +118,22 @@ trait OutputFormatter {
 
     }
 
-  def trim_element_text(e: Element): String ={
-    if (e.select("a").length > 0){
-      val link_text =   e.select("a")(0).text()
-      val text_world_count = StopWords.getStopWordCount(e.text()).getWordCount
-      val link_world_count = StopWords.getStopWordCount(e.select("a")(0).text()).getWordCount
-      val max_link_words_percent = 0.7
-
-      if (link_world_count.toFloat > max_link_words_percent*text_world_count){
-           ""
-      }  else{
-        s"<p>${StringEscapeUtils.unescapeHtml(e.text).trim}</p>"
-      }
-    } else{
-      s"<p>${StringEscapeUtils.unescapeHtml(e.text).trim}</p>"
-    }
-  }
+//  def trim_element_text(e: Element): String ={
+//    if (e.select("a").length > 0){
+//      val link_text =   e.select("a")(0).text()
+//      val text_world_count = StopWords.getStopWordCount(e.text()).getWordCount
+//      val link_world_count = StopWords.getStopWordCount(e.select("a")(0).text()).getWordCount
+//      val max_link_words_percent = 0.7
+//
+//      if (link_world_count.toFloat > max_link_words_percent*text_world_count){
+//           ""
+//      }  else{
+//        s"<p>${StringEscapeUtils.unescapeHtml(e.text).trim}</p>"
+//      }
+//    } else{
+//      s"<p>${StringEscapeUtils.unescapeHtml(e.text).trim}</p>"
+//    }
+//  }
 
   def convertToSimpleHTML(topNode: Element, domain: String, title: String = ""): String = topNode match {
 
@@ -149,7 +150,7 @@ trait OutputFormatter {
 
             if (e.tagName() == "p") {
               if (e.text() != title)
-                trim_element_text(e)
+                s"<p>${getcleanParagraphHTML(e)}</p>"
               else
                 ""
             }
@@ -199,7 +200,9 @@ trait OutputFormatter {
             else if (HEADERS.contains(e.tagName()))
              {
               if (e.text() != title)
-              s"<${e.tagName}>${trim_element_text(e)}</${e.tagName}>"
+
+               s"<${e.tagName}>${e.html}</${e.tagName}>"
+//              s"<${e.tagName}>${trim_element_text(e)}</${e.tagName}>"
               else{
                 ""
               }
@@ -270,6 +273,43 @@ trait OutputFormatter {
     }
   }
 
+  /**
+      * cleans up Paragraphs
+      *
+      */
+    private def cleanParagraphs(topNode: Element): Unit = {
+
+      val max_link_words_percent = 0.7
+
+      for (p <- topNode.select("p")){
+        for (tag <- p.children()){
+
+          if (tag.tagName() == "a") {
+            val text_world_count = StopWords.getStopWordCount(tag.text()).getWordCount
+            val link_world_count = StopWords.getStopWordCount(p.text()).getWordCount
+            if (link_world_count.toFloat > max_link_words_percent*text_world_count){
+              // this is a link paragraph and should be removed
+              p.remove()
+            }
+          }
+        }
+      }
+    }
+
+    private def getcleanParagraphHTML(paragraph: Element): String = {
+
+      val ACCEPTED_TAGS  = List("b", "strong", "em", "a", "hr", "br")
+      val p = paragraph.clone()
+
+      for (tag <- p.children()){
+        if (!ACCEPTED_TAGS.contains(tag.tagName()) ){
+          tag.remove()
+        }else{
+
+        }
+      }
+      p.html
+    }
 
   /**
   * if there are elements inside our top node that have a negative gravity score, let's
