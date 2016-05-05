@@ -155,7 +155,7 @@ trait OutputFormatter {
                 ""
             }
             else if (e.tagName() == "video") {
-              e.outerHtml()
+              s"<p><video>${e.html}</video></p>" // e.outerHtml()
             }
             else if (e.tagName().contains(List("ol","ul"))) {
               e.outerHtml()
@@ -178,10 +178,10 @@ trait OutputFormatter {
                 val srcset =  String.join(", ", img_sources.toList)
                 e.attr("srcset", srcset)
               }
-              var img_attrinutes = e.attributes().filter((a: Attribute) => !SKIP_ATTRIBUTES.contains(a.getKey())).
+              var img_attributes = e.attributes().filter((a: Attribute) => !SKIP_ATTRIBUTES.contains(a.getKey())).
                 map((a: Attribute) => a.getKey + "=\"" + a.getValue + "\"").mkString(" ")
 
-              s"<img $img_attrinutes >"
+              s"<p><img $img_attributes ></p>"
 
             } else if (e.tagName() == "iframe" &&
               (e.attr("src").startsWith("https://www.youtube.com/embed/") ||
