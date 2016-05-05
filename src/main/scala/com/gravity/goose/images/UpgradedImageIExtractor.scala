@@ -473,8 +473,10 @@ class UpgradedImageIExtractor(httpClient: HttpClient, article: Article, config: 
   private def RemoveBadImageCandidates(node: Element): Unit = {
 
     val images = getImagesFromNode(node)
-    val filteredImages = filterBadNames(images.get)
-    val goodSizeImages  = findGoodSizeImage(filteredImages.get)
+    if (images.isDefined) {
+      val filteredImages = filterBadNames(images.get)
+      if (filteredImages.isDefined){ val goodSizeImages  = findGoodSizeImage(filteredImages.get) }
+    }
 
     }
 
