@@ -18,6 +18,9 @@
 
 package com.gravity.goose.outputformatters
 
+import scala.util.control._
+import scala.collection.mutable.ListBuffer
+
 import com.gravity.goose.Article
 import org.jsoup.nodes._
 import org.apache.commons.lang.StringEscapeUtils
@@ -90,6 +93,7 @@ trait OutputFormatter {
     cleanLinks(topNode)
     cleanHeaders(topNode)
     cleanParagraphs(topNode)
+
 //    convertLinksToText(topNode)
 //    replaceTagsWithText(topNode)
 //    removeParagraphsWithFewWords(topNode)
@@ -99,7 +103,7 @@ trait OutputFormatter {
       "p {font-size:1.25em; }" +
       "</style>"
 
-    s"<html><head>$header_meta$style</head><body><h1>$title</h1>${convertToSimpleHTML(topNode, article.domain, article.title)}</ body></ html>"
+    s"<html><head>$header_meta$style</head><body><h1>$title</h1>${convertToSimpleHTML(topNode, article)}</ body></ html>"
   }
 
   /**
@@ -118,28 +122,14 @@ trait OutputFormatter {
 
     }
 
-//  def trim_element_text(e: Element): String ={
-//    if (e.select("a").length > 0){
-//      val link_text =   e.select("a")(0).text()
-//      val text_world_count = StopWords.getStopWordCount(e.text()).getWordCount
-//      val link_world_count = StopWords.getStopWordCount(e.select("a")(0).text()).getWordCount
-//      val max_link_words_percent = 0.7
-//
-//      if (link_world_count.toFloat > max_link_words_percent*text_world_count){
-//           ""
-//      }  else{
-//        s"<p>${StringEscapeUtils.unescapeHtml(e.text).trim}</p>"
-//      }
-//    } else{
-//      s"<p>${StringEscapeUtils.unescapeHtml(e.text).trim}</p>"
-//    }
-//  }
-
-  def convertToSimpleHTML(topNode: Element, domain: String, title: String = ""): String = topNode match {
+  def convertToSimpleHTML(topNode: Element, article: Article): String = topNode match {
 
       case null => ""
 
       case node => {
+
+        val domain = article.domain
+        val title = article.title
 
         val SKIP_ATTRIBUTES: List[String] = List("style", "class", "alt")
         val HEADERS: List[String] = List("h1","h2", "h3", "h4", "h5", "h6")
@@ -148,70 +138,68 @@ trait OutputFormatter {
 
         node.getAllElements.map((e: Element) => {
 
-            if (e.tagName() == "p") {
-              if (e.text() != title)
-                s"<p>${getcleanParagraphHTML(e)}</p>"
-              else
-                ""
+          if (e.tagName() == "p") {
+            if (e.text() != title)
+              s"<p>${getcleanParagraphHTML(e)}</p>"
+            else
+              ""
+          }
+          else if (e.tagName() == "video") {
+            s"<p>${e.outerHtml()}</p>"
+          }
+          else if (e.tagName().contains(List("ol", "ul"))) {
+            e.outerHtml()
+          }
+          else if (keep_tags.contains(e.tagName())) {
+            e.outerHtml()
+          }
+          else if (e.tagName() == "img") {
+            if (e.hasAttr("src") && (e.attr("src").startsWith("http"))) {}
+            else if (e.hasAttr("src") && e.attr("src").startsWith("//")) {
+              e.attr("src", "http:" + e.attr("src"))
             }
-            else if (e.tagName() == "video") {
-              s"<p><video>${e.html}</video></p>" // e.outerHtml()
+            else {
+              e.attr("src", "http://" + domain + e.attr("src"))
             }
-            else if (e.tagName().contains(List("ol","ul"))) {
-              e.outerHtml()
+            if (e.hasAttr("srcset")) {
+              var img_sources = e.attr("srcset").split(",").map((url: String) => url.trim())
+              img_sources = img_sources.map(src => if (src.startsWith("http")) src
+              else if (src.startsWith("//")) "http:" + src else "http://" + domain + src)
+              val srcset = String.join(", ", img_sources.toList)
+              e.attr("srcset", srcset)
             }
-            else if (keep_tags.contains(e.tagName())){
-              e.outerHtml()
-            }
-            else if (e.tagName() == "img") {
-              if (e.hasAttr("src") && (e.attr("src").startsWith("http"))) {}
-              else if  (e.hasAttr("src") && e.attr("src").startsWith("//")){
-                e.attr("src", "http:"+e.attr("src"))
-              }
-              else {
-                e.attr("src", "http://"+domain+e.attr("src"))
-              }
-              if (e.hasAttr("srcset")){
-                var img_sources = e.attr("srcset").split(",").map((url: String) => url.trim())
-                img_sources = img_sources.map(src =>  if (src.startsWith("http")) src
-                  else if (src.startsWith("//")) "http:"+ src else "http://"+domain+src)
-                val srcset =  String.join(", ", img_sources.toList)
-                e.attr("srcset", srcset)
-              }
-              var img_attributes = e.attributes().filter((a: Attribute) => !SKIP_ATTRIBUTES.contains(a.getKey())).
-                map((a: Attribute) => a.getKey + "=\"" + a.getValue + "\"").mkString(" ")
+            var img_attributes = e.attributes().filter((a: Attribute) => !SKIP_ATTRIBUTES.contains(a.getKey())).
+              map((a: Attribute) => a.getKey + "=\"" + a.getValue + "\"").mkString(" ")
 
-              s"<p><img $img_attributes ></p>"
+            s"<p><img $img_attributes ></p>"
 
-            } else if (e.tagName() == "iframe" &&
-              (e.attr("src").startsWith("https://www.youtube.com/embed/") ||
-                e.attr("src").startsWith("https://player.vimeo.com/video/")
-                )
-            ) {
+          } else if (e.tagName() == "iframe"
+//            && (e.attr("src").startsWith("https://www.youtube.com/embed/") ||
+//              e.attr("src").startsWith("https://player.vimeo.com/video/"))
 
-              var iframe_attributes = e.attributes().filter((a: Attribute) => a.getKey() != "style").
-                map((a: Attribute) => a.getKey + "=\"" + a.getValue + "\"").mkString(" ")
+          ) {
+
+            var iframe_attributes = e.attributes().filter((a: Attribute) => a.getKey() != "style").
+              map((a: Attribute) => a.getKey + "=\"" + a.getValue + "\"").mkString(" ")
 
 
-              val wrapper_div_style = "position:relative;padding-bottom: 56.25%;padding-top: 25px;height:0;"
-              val iframe_style = "position:absolute;top=0;left:0;width:100%;height:95%;"
-              "<div style=\"" + wrapper_div_style + "\">" + "<iframe " + iframe_attributes + " style=\"" + iframe_style + "\"></iframe></div>"
-            }
-            else if (HEADERS.contains(e.tagName()))
-             {
-              if (e.text() != title)
+            val wrapper_div_style = "position:relative;padding-bottom: 56.25%;padding-top: 25px;height:0;"
+            val iframe_style = "position:absolute;top=0;left:0;width:100%;height:95%;"
+            "<div style=\"" + wrapper_div_style + "\">" + "<iframe " + iframe_attributes + " style=\"" + iframe_style + "\"></iframe></div>"
+          }
+          else if (HEADERS.contains(e.tagName())) {
+            if (e.text() != title)
 
-               s"<${e.tagName}>${e.html}</${e.tagName}>"
-//              s"<${e.tagName}>${trim_element_text(e)}</${e.tagName}>"
-              else{
-                ""
-              }
-              // && FOLLOW_HEADER_TAGS.contains(e.nextElementSibling().tagName())
-            }
+              s"<${e.tagName}>${e.html}</${e.tagName}>"
+            //              s"<${e.tagName}>${trim_element_text(e)}</${e.tagName}>"
             else {
               ""
             }
-
+            // && FOLLOW_HEADER_TAGS.contains(e.nextElementSibling().tagName())
+          }
+          else {
+            ""
+          }
         }).toList.mkString("")
       }
     }
@@ -274,22 +262,31 @@ trait OutputFormatter {
   }
 
   /**
-      * cleans up Paragraphs
-      *
-      */
+    * cleans up Paragraphs
+    *
+    */
     private def cleanParagraphs(topNode: Element): Unit = {
 
       val max_link_words_percent = 0.7
+      val loop = new Breaks;
 
       for (p <- topNode.select("p")){
-        for (tag <- p.children()){
+        loop.breakable {
+          for (tag <- p.children()) {
 
-          if (tag.tagName() == "a") {
-            val text_world_count = StopWords.getStopWordCount(tag.text()).getWordCount
-            val link_world_count = StopWords.getStopWordCount(p.text()).getWordCount
-            if (link_world_count.toFloat > max_link_words_percent*text_world_count){
-              // this is a link paragraph and should be removed
-              p.remove()
+            if (tag.tagName() == "a") {
+              val text_world_count = StopWords.getStopWordCount(p.text()).getWordCount
+              val link_world_count = StopWords.getStopWordCount(tag.text()).getWordCount
+              if (link_world_count.toFloat > max_link_words_percent * text_world_count) {
+                // this is a link paragraph and should be removed
+                try {
+                  p.remove()
+                  loop.break()
+                } catch {
+                  case _ => {}
+                }
+
+              }
             }
           }
         }
