@@ -73,25 +73,59 @@ class Crawler(config: Configuration) {
       extractor.calculateBestNodeBasedOnClustering(article) match {
         case Some(node: Element) => {
           article.topNode = node
-//          article.movies = extractor.extractVideos(article.topNode)
-//
-//          if (config.enableImageFetching) {
-//            trace(logPrefix + "Image fetching enabled...")
-//            val imageExtractor = getImageExtractor(article)
-//            try {
-//              if (article.rawDoc == null) {
-//                article.topImage = new Image
-//              } else {
-//
-//                article.topImage = imageExtractor.getBestImage(article.rawDoc, article.topNode)
-//              }
-//            } catch {
-//              case e: Exception => {
-//                warn(e, e.toString)
-//              }
-//            }
-//          }
 
+          val imageExtractor = getImageExtractor(article)
+          imageExtractor.RemoveBadImages(article)
+
+          article.cleanedArticleSimpleHTML = outputFormatter.getFormattedHTML(article)
+
+          //article.topNode = extractor.postExtractionCleanup(article.topNode)
+
+          article.cleanedArticleText = outputFormatter.getFormattedText(article.topNode)
+
+        }
+        case _ => trace("NO ARTICLE FOUND")
+      }
+      releaseResources(article)
+      article
+    }
+
+    article
+  }
+
+  def extractArticle(crawlCandidate: CrawlCandidate): Article = {
+    val article = new Article()
+    for {
+      parseCandidate <- URLHelper.getCleanedUrl(crawlCandidate.url)
+      rawHtml <- getHTML(crawlCandidate, parseCandidate)
+      doc <- getDocument(parseCandidate.url.toString, rawHtml)
+    } {
+      trace("Crawling url: " + parseCandidate.url)
+
+      val extractor = getExtractor
+      val docCleaner = getDocCleaner
+      val outputFormatter = getOutputFormatter
+
+      article.finalUrl = parseCandidate.url.toString
+      article.domain = parseCandidate.url.getHost
+      article.linkhash = parseCandidate.linkhash
+      article.rawHtml = rawHtml
+      article.doc = doc
+      article.rawDoc = doc.clone()
+
+      article.title = extractor.getTitle(article)
+      article.publishDate = config.publishDateExtractor.extract(doc)
+      article.additionalData = config.getAdditionalDataExtractor.extract(doc)
+      article.metaDescription = extractor.getMetaDescription(article)
+      article.metaKeywords = extractor.getMetaKeywords(article)
+      article.canonicalLink = extractor.getCanonicalLink(article)
+      article.tags = extractor.extractTags(article)
+      // before we do any calcs on the body itself let's clean up the document
+      article.doc =  docCleaner.clean(article)
+
+      extractor.calculateBestNodeBasedOnClustering(article) match {
+        case Some(node: Element) => {
+          article.topNode = node
 
           val imageExtractor = getImageExtractor(article)
           imageExtractor.RemoveBadImages(article)
