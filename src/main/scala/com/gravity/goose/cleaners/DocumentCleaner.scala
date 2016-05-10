@@ -20,11 +20,13 @@ package com.gravity.goose.cleaners
 import com.gravity.goose.utils.Logging
 import java.util.regex.{Matcher, Pattern}
 import org.jsoup.nodes.{TextNode, Node, Element, Document}
-import com.gravity.goose.text.ReplaceSequence
+import com.gravity.goose.text.{StopWords, ReplaceSequence}
 import scala.collection.JavaConversions._
 import com.gravity.goose.Article
 import collection.mutable.ListBuffer
 import org.jsoup.select.{TagsEvaluator, Collector, Elements}
+
+import scala.util.control.Breaks
 
 trait DocumentCleaner {
 
@@ -54,14 +56,16 @@ trait DocumentCleaner {
     docToClean = removeNodesViaRegEx(docToClean, entriesPattern)
     docToClean = removeNodesViaRegEx(docToClean, facebookPattern)
     docToClean = removeNodesViaRegEx(docToClean, twitterPattern)
-    docToClean = cleanUpSpanTagsInParagraphs(docToClean)
+//    docToClean = cleanUpSpanTagsInParagraphs(docToClean)
     docToClean =  removeBadTags(docToClean)
 
+    docToClean = cleanLinks(docToClean)
+    docToClean = cleanHeaders(docToClean)
+    docToClean = cleanParagraphs(docToClean)
 
-//    docToClean = convertWantedTagsToParagraphs(docToClean, articleRootTags)
+    docToClean = convertWantedTagsToParagraphs(docToClean, articleRootTags)
 //    docToClean = convertDivsToParagraphs(docToClean, "div")
 //    docToClean = convertDivsToParagraphs(docToClean, "span")
-
     //    docToClean = convertDivsToParagraphs(docToClean, "span")
     docToClean
   }
@@ -214,7 +218,8 @@ trait DocumentCleaner {
 
   /**
   * Apparently jsoup expects the node's parent to not be null and throws if it is. Let's be safe.
-  * @param node the node to remove from the doc
+    *
+    * @param node the node to remove from the doc
   */
   private def removeNode(node: Element) {
     if (node == null || node.parent == null) return
@@ -385,6 +390,81 @@ trait DocumentCleaner {
 
   }
 
+
+  /**
+    * cleans up links, the links outside p are removed
+    *
+    */
+  private def cleanLinks(doc: Document): Document = {
+    if (doc != null) {
+      logger.trace(logPrefix + "Turning links to text")
+      val baseUri = doc.baseUri()
+
+      val links = doc.getElementsByTag("a")
+      for (item <- links) {
+        if (item.getElementsByTag("img").isEmpty) {
+
+          if (item.parents().map(e => e.tagName()).filter(tag => tag == "p").length == 0){
+            item.remove()
+          }
+        }
+      }
+    }
+    doc
+  }
+
+  /**
+    * cleans up headers, keep only the header followed by an element that contains only accepted tags
+    *
+    */
+  private def cleanHeaders(doc: Document): Document ={
+
+    val ACCEPTED_TAGS = TagsEvaluator("p","img","video","figure","picture")
+    val HEADER_TAGS = TagsEvaluator("h1","h2","h3","h4","h5","h6")
+
+    val headers = Collector.collect(HEADER_TAGS, doc)
+    for (header <- headers) {
+      //      check if next sibling contains ACCEPTED_TAGS
+      val sibling_good_elements = Collector.collect(ACCEPTED_TAGS, header.nextElementSibling())
+      if (sibling_good_elements.length == 0) {
+        header.remove()
+      }
+    }
+    doc
+  }
+
+  /**
+    * cleans up Paragraphs
+    *
+    */
+    private def cleanParagraphs(doc: Document): Document = {
+
+      val max_link_words_percent = 0.7
+      val loop = new Breaks;
+
+      for (p <- doc.select("p")){
+        loop.breakable {
+          for (tag <- p.children()) {
+
+            if (tag.tagName() == "a") {
+              val text_world_count = StopWords.getStopWordCount(p.text()).getWordCount
+              val link_world_count = StopWords.getStopWordCount(tag.text()).getWordCount
+              if (link_world_count.toFloat > max_link_words_percent * text_world_count) {
+                // this is a link paragraph and should be removed
+                try {
+                  p.remove()
+                  loop.break()
+                } catch {
+                  case _ => {}
+                }
+
+              }
+            }
+          }
+        }
+      }
+    doc
+    }
 }
 
 
@@ -412,7 +492,7 @@ object DocumentCleaner extends Logging {
   */
   val divToPElementsPattern: Pattern = Pattern.compile("<(a|blockquote|dl|div|picture|img|ol|p|pre|table|ul|video|section)")
 
-  val blockElemementTags = TagsEvaluator("a", "blockquote", "dl", "div", "img", "picture", "ol", "p", "pre", "table", "ul", "video", "section")
+  val blockElemementTags = TagsEvaluator("a", "blockquote", "dl", "div", "img", "picture", "ol", "p", "pre", "table", "section", "figure")
   val articleRootTags = TagsEvaluator("div", "span", "article")
 
   val captionPattern: Pattern = Pattern.compile("^caption$")
