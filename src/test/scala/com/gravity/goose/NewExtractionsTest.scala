@@ -307,17 +307,33 @@ class NewExtractionsTest {
    }
 
   @Test
-     def newscientist_google_ai_nhs() {
+   def newscientist_google_ai_nhs() {
 
-       implicit val config = TestUtils.NO_IMAGE_CONFIG
+     implicit val config = TestUtils.NO_IMAGE_CONFIG
 
-       val url = "https://www.newscientist.com/article/2086454-revealed-google-ai-has-access-to-huge-haul-of-nhs-patient-data/"
-       val article = TestUtils.getArticle(url = url)
-       println(article.cleanedArticleSimpleHTML)
-       val out_html = new PrintWriter(new File("newscientist_google_ai_nhs.html"))
-       out_html.write(article.cleanedArticleSimpleHTML)
-       out_html.close()
-     }
+     val url = "https://www.newscientist.com/article/2086454-revealed-google-ai-has-access-to-huge-haul-of-nhs-patient-data/"
+     val article = TestUtils.getArticle(url = url)
+     println(article.cleanedArticleSimpleHTML)
+     val out_html = new PrintWriter(new File("newscientist_google_ai_nhs.html"))
+     out_html.write(article.cleanedArticleSimpleHTML)
+     out_html.close()
+   }
+
+  @Test
+   def motortrend_tesla3() {
+
+     implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+     val url = "http://www.motortrend.com/news/tesla-model-3-photos-analysis/"
+     val article = TestUtils.getArticle(url = url)
+     println(article.cleanedArticleSimpleHTML)
+     val out_html = new PrintWriter(new File("motortrend_tesla3.html"))
+     out_html.write(article.cleanedArticleSimpleHTML)
+     out_html.close()
+   }
+
+
+  // http://www.motortrend.com/news/tesla-model-3-photos-analysis/
 
 
   // https://www.newscientist.com/article/2086454-revealed-google-ai-has-access-to-huge-haul-of-nhs-patient-data/
