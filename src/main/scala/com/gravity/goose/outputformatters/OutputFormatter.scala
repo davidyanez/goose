@@ -86,24 +86,21 @@ trait OutputFormatter {
   */
   def getFormattedHTML(article: Article): String = {
 
-    val topNode =  article.topNode
     val title = article.title
 
-    removeNodesWithNegativeScores(topNode)
-    cleanLinks(topNode)
-    cleanHeaders(topNode)
-    cleanParagraphs(topNode)
+    removeNodesWithNegativeScores(article.topNode)
 
 //    convertLinksToText(topNode)
 //    replaceTagsWithText(topNode)
 //    removeParagraphsWithFewWords(topNode)
+
     val header_meta = "<meta http-equiv='Content-Type' content='text/html;charset=utf-8'/>"
     val style = "<style>" +
       "h1 {font-size: 2.5em;}" +
       "p {font-size:1.25em; }" +
       "</style>"
 
-    s"<html><head>$header_meta$style</head><body><h1>$title</h1>${convertToSimpleHTML(topNode, article)}</ body></ html>"
+    s"<html><head>$header_meta$style</head><body><h1>$title</h1>${convertToSimpleHTML(article.topNode, article)}</ body></ html>"
   }
 
   /**
@@ -134,7 +131,6 @@ trait OutputFormatter {
         val SKIP_ATTRIBUTES: List[String] = List("style", "class", "alt")
         val HEADERS: List[String] = List("h1","h2", "h3", "h4", "h5", "h6")
         val keep_tags: List[String] = List("hr")
-        val FOLLOW_HEADER_TAGS : List[String] = List("p", "img", "iframe", "video", "picture", "figure", "hr")
 
         node.getAllElements.map((e: Element) => {
 
@@ -168,20 +164,17 @@ trait OutputFormatter {
               val srcset = String.join(", ", img_sources.toList)
               e.attr("srcset", srcset)
             }
-            var img_attributes = e.attributes().filter((a: Attribute) => !SKIP_ATTRIBUTES.contains(a.getKey())).
+            val img_attributes = e.attributes().filter((a: Attribute) => !SKIP_ATTRIBUTES.contains(a.getKey())).
               map((a: Attribute) => a.getKey + "=\"" + a.getValue + "\"").mkString(" ")
 
             s"<p><img $img_attributes ></p>"
 
-          } else if (e.tagName() == "iframe"
-//            && (e.attr("src").startsWith("https://www.youtube.com/embed/") ||
-//              e.attr("src").startsWith("https://player.vimeo.com/video/"))
+          } else if (e.tagName() == "iframe" && (e.hasAttr("allowfullscreen")) || e.attr("src").contains("://youtube")
+            || e.attr("src").contains("://vimeo"))
+           {
 
-          ) {
-
-            var iframe_attributes = e.attributes().filter((a: Attribute) => a.getKey() != "style").
+            val iframe_attributes = e.attributes().filter((a: Attribute) => a.getKey() != "style").
               map((a: Attribute) => a.getKey + "=\"" + a.getValue + "\"").mkString(" ")
-
 
             val wrapper_div_style = "position:relative;padding-bottom: 56.25%;padding-top: 25px;height:0;"
             val iframe_style = "position:absolute;top=0;left:0;width:100%;height:95%;"
@@ -191,7 +184,6 @@ trait OutputFormatter {
             if (e.text() != title)
 
               s"<${e.tagName}>${e.html}</${e.tagName}>"
-            //              s"<${e.tagName}>${trim_element_text(e)}</${e.tagName}>"
             else {
               ""
             }
@@ -221,77 +213,6 @@ trait OutputFormatter {
       }
     }
   }
-
-  /**
-    * cleans up links, the links outside p are removed
-    *
-    */
-  private def cleanLinks(topNode: Element) {
-    if (topNode != null) {
-      logger.trace(logPrefix + "Turning links to text")
-      val baseUri = topNode.baseUri()
-
-      val links = topNode.getElementsByTag("a")
-      for (item <- links) {
-        if (item.getElementsByTag("img").isEmpty) {
-          if (item.parents().map(e => e.tagName()).filter(tag => tag == "p").length == 0){
-            item.remove()
-          }
-        }
-      }
-    }
-  }
-
-  /**
-    * cleans up headers, keep only the header followed by an element that contains only accepted tags
-    *
-    */
-  private def cleanHeaders(topNode: Element): Unit ={
-
-    val ACCEPTED_TAGS = TagsEvaluator("p","img","video","figure","picture")
-    val HEADER_TAGS = TagsEvaluator("h1","h2","h3","h4","h5","h6")
-
-    val headers = Collector.collect(HEADER_TAGS, topNode)
-    for (header <- headers) {
-      //      check if next sibling contains ACCEPTED_TAGS
-      val sibling_good_elements = Collector.collect(ACCEPTED_TAGS, header.nextElementSibling())
-      if (sibling_good_elements.length == 0) {
-        header.remove()
-      }
-    }
-  }
-
-  /**
-    * cleans up Paragraphs
-    *
-    */
-    private def cleanParagraphs(topNode: Element): Unit = {
-
-      val max_link_words_percent = 0.7
-      val loop = new Breaks;
-
-      for (p <- topNode.select("p")){
-        loop.breakable {
-          for (tag <- p.children()) {
-
-            if (tag.tagName() == "a") {
-              val text_world_count = StopWords.getStopWordCount(p.text()).getWordCount
-              val link_world_count = StopWords.getStopWordCount(tag.text()).getWordCount
-              if (link_world_count.toFloat > max_link_words_percent * text_world_count) {
-                // this is a link paragraph and should be removed
-                try {
-                  p.remove()
-                  loop.break()
-                } catch {
-                  case _ => {}
-                }
-
-              }
-            }
-          }
-        }
-      }
-    }
 
     private def getcleanParagraphHTML(paragraph: Element): String = {
 
