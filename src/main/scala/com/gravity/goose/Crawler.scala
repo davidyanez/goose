@@ -99,7 +99,6 @@ class Crawler(config: Configuration) {
     val article = new Article()
     var article_found = true
 
-
     for {
       parseCandidate <- URLHelper.getCleanedUrl(crawlCandidate.url)
       rawHtml <- getHTML(crawlCandidate, parseCandidate)

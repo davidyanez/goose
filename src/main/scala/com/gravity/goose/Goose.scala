@@ -44,6 +44,12 @@ class Goose(config: Configuration = new Configuration) {
     sendToActor(cc)
   }
 
+  def extractArticle(url: String): Option[Article] = {
+      val cc = new CrawlCandidate(config, url, null)
+      crawlArticle(cc)
+  }
+
+
   def shutdownNetwork() {
     HtmlFetcher.getHttpClient.getConnectionManager.shutdown()
   }
@@ -51,6 +57,12 @@ class Goose(config: Configuration = new Configuration) {
   def sendToActor(crawlCandidate: CrawlCandidate) = {
     val crawler = new Crawler(config)
     val article = crawler.crawl(crawlCandidate)
+    article
+  }
+
+  def crawlArticle(crawlCandidate: CrawlCandidate): Option[Article] = {
+    val crawler = new Crawler(config)
+    val article = crawler.extractArticle(crawlCandidate)
     article
   }
 
