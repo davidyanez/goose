@@ -25,8 +25,10 @@ import org.apache.http.client.HttpClient
 import org.jsoup.nodes.{Document, Element}
 import org.jsoup.Jsoup
 import java.io.File
+import org.jsoup.select.Elements
 import utils.{ParsingCandidate, URLHelper, Logging}
 import com.gravity.goose.outputformatters.{StandardOutputFormatter, OutputFormatter}
+import scala.collection.JavaConverters._
 
 /**
  * Created by Jim Plush
@@ -93,8 +95,11 @@ class Crawler(config: Configuration) {
     article
   }
 
-  def extractArticle(crawlCandidate: CrawlCandidate): Article = {
+  def extractArticle(crawlCandidate: CrawlCandidate): Option[Article] = {
     val article = new Article()
+    var article_found = true
+
+
     for {
       parseCandidate <- URLHelper.getCleanedUrl(crawlCandidate.url)
       rawHtml <- getHTML(crawlCandidate, parseCandidate)
@@ -132,19 +137,29 @@ class Crawler(config: Configuration) {
 
           article.cleanedArticleSimpleHTML = outputFormatter.getFormattedHTML(article)
 
-          //article.topNode = extractor.postExtractionCleanup(article.topNode)
-
-          article.cleanedArticleText = outputFormatter.getFormattedText(article.topNode)
-
         }
-        case _ => trace("NO ARTICLE FOUND")
+        case _ => {trace("NO ARTICLE FOUND");article_found=false }
       }
       releaseResources(article)
-      article
     }
-
-    article
+    if (article_found && isValidArticle(article)){
+      Some(article)
+    }  else {
+      None
+    }
   }
+
+  def isValidArticle(article: Article): Boolean ={
+
+    val mim_paragraph_words = 5
+    val min_paragraphs = 2
+    val n_nodes = article.topNode.select("p").asScala.filter(p => p.text().length() > mim_paragraph_words).length
+
+     if  (n_nodes >= min_paragraphs) {
+       true
+     }  else {false}
+
+   }
 
   def getHTML(crawlCandidate: CrawlCandidate, parsingCandidate: ParsingCandidate): Option[String] = {
     if (crawlCandidate.rawHTML != null) {
