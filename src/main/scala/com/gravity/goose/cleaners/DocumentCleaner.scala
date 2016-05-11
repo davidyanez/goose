@@ -54,7 +54,7 @@ trait DocumentCleaner {
     docToClean = removeNodesViaRegEx(docToClean, entriesPattern)
     docToClean = removeNodesViaRegEx(docToClean, facebookPattern)
     docToClean = removeNodesViaRegEx(docToClean, twitterPattern)
-    docToClean = cleanUpSpanTagsInParagraphs(docToClean)
+//    docToClean = cleanUpSpanTagsInParagraphs(docToClean)
     docToClean =  removeBadTags(docToClean)
 
 
@@ -384,6 +384,8 @@ trait DocumentCleaner {
     nodesToReturn
 
   }
+
+
 
 }
 
