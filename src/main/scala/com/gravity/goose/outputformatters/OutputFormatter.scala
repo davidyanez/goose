@@ -97,7 +97,9 @@ trait OutputFormatter {
 //    convertLinksToText(topNode)
 //    replaceTagsWithText(topNode)
 //    removeParagraphsWithFewWords(topNode)
-    val header_meta = "<meta http-equiv='Content-Type' content='text/html;charset=utf-8'/>"
+    val header_meta = s"<meta http-equiv='Content-Type' content='text/html;charset=utf-8'/>" +
+      s"<meta name='keywords' content='${article.metaKeywords}'>"  + s"<meta name='description' content='${article.metaDescription}'>"
+
     val style = "<style>" +
       "h1 {font-size: 2.5em;}" +
       "p {font-size:1.25em; }" +
