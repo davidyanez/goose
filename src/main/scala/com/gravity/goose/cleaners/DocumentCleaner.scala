@@ -59,10 +59,6 @@ trait DocumentCleaner {
 //    docToClean = cleanUpSpanTagsInParagraphs(docToClean)
     docToClean =  removeBadTags(docToClean)
 
-    docToClean = cleanLinks(docToClean)
-    docToClean = cleanHeaders(docToClean)
-    docToClean = cleanParagraphs(docToClean)
-
     docToClean = convertWantedTagsToParagraphs(docToClean, articleRootTags)
 //    docToClean = convertDivsToParagraphs(docToClean, "div")
 //    docToClean = convertDivsToParagraphs(docToClean, "span")
@@ -390,81 +386,6 @@ trait DocumentCleaner {
 
   }
 
-
-  /**
-    * cleans up links, the links outside p are removed
-    *
-    */
-  private def cleanLinks(doc: Document): Document = {
-    if (doc != null) {
-      logger.trace(logPrefix + "Turning links to text")
-      val baseUri = doc.baseUri()
-
-      val links = doc.getElementsByTag("a")
-      for (item <- links) {
-        if (item.getElementsByTag("img").isEmpty) {
-
-          if (item.parents().map(e => e.tagName()).filter(tag => tag == "p").length == 0){
-            item.remove()
-          }
-        }
-      }
-    }
-    doc
-  }
-
-  /**
-    * cleans up headers, keep only the header followed by an element that contains only accepted tags
-    *
-    */
-  private def cleanHeaders(doc: Document): Document ={
-
-    val ACCEPTED_TAGS = TagsEvaluator("p","img","video","figure","picture")
-    val HEADER_TAGS = TagsEvaluator("h1","h2","h3","h4","h5","h6")
-
-    val headers = Collector.collect(HEADER_TAGS, doc)
-    for (header <- headers) {
-      //      check if next sibling contains ACCEPTED_TAGS
-      val sibling_good_elements = Collector.collect(ACCEPTED_TAGS, header.nextElementSibling())
-      if (sibling_good_elements.length == 0) {
-        header.remove()
-      }
-    }
-    doc
-  }
-
-  /**
-    * cleans up Paragraphs
-    *
-    */
-    private def cleanParagraphs(doc: Document): Document = {
-
-      val max_link_words_percent = 0.7
-      val loop = new Breaks;
-
-      for (p <- doc.select("p")){
-        loop.breakable {
-          for (tag <- p.children()) {
-
-            if (tag.tagName() == "a") {
-              val text_world_count = StopWords.getStopWordCount(p.text()).getWordCount
-              val link_world_count = StopWords.getStopWordCount(tag.text()).getWordCount
-              if (link_world_count.toFloat > max_link_words_percent * text_world_count) {
-                // this is a link paragraph and should be removed
-                try {
-                  p.remove()
-                  loop.break()
-                } catch {
-                  case _ => {}
-                }
-
-              }
-            }
-          }
-        }
-      }
-    doc
-    }
 }
 
 

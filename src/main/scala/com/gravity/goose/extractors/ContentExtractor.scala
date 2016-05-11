@@ -27,6 +27,8 @@ import scala.collection.JavaConversions._
 import org.jsoup.nodes.{Attributes, Element, Document}
 import org.jsoup.select._
 
+import scala.util.control.Breaks
+
 /**
 * Created by Jim Plush
 * User: jim
@@ -185,7 +187,8 @@ trait ContentExtractor {
   * also store on how high up the paragraphs are, comments are usually at the bottom and should get a lower score
   *
   * // todo refactor this long method
-  * @return
+    *
+    * @return
   */
 
   def calculateBestNodeBasedOnClustering(article: Article): Option[Element] = {
@@ -285,8 +288,7 @@ trait ContentExtractor {
   * boost a parent node that it should be connected to other paragraphs, at least for the first n paragraphs
   * so we'll want to make sure that the next sibling is a paragraph and has at least some substatial weight to it
   *
-  *
-  * @param node
+    * @param node
   * @return
   */
   private def isOkToBoost(node: Element): Boolean = {
@@ -472,11 +474,11 @@ trait ContentExtractor {
   def isTableTagAndNoParagraphsExist(e: Element): Boolean = {
 
     val subParagraphs: Elements = e.getElementsByTag("p")
-    for (p <- subParagraphs) {
-      if (p.text.length < 25) {
-        p.remove()
-      }
-    }
+//    for (p <- subParagraphs) {
+//      if (p.text.length < 25) {
+//        p.remove()
+//      }
+//    }
     val subParagraphs2: Elements = e.getElementsByTag("p")
     if (subParagraphs2.size == 0 && !(e.tagName == "td")) {
       trace("Removing node because it doesn't have any paragraphs")
@@ -510,6 +512,11 @@ trait ContentExtractor {
         }
       }
     }
+
+    cleanLinks(node)
+    cleanHeaders(node)
+    cleanParagraphs(node)
+
     node
   }
 
@@ -519,7 +526,7 @@ trait ContentExtractor {
     val node = addSiblings(targetNode)
     for {
       e <- node.children
-      if (e.tagName != "p" && e.tagName != "img")
+      if (e.tagName != "p" && e.tagName != "img" && e.tagName != "video")
     } {
       trace(logPrefix + "CLEANUP  NODE: " + e.id + " class: " + e.attr("class"))
       if (isHighLinkDensity(e) || isTableTagAndNoParagraphsExist(e) || !isNodeScoreThreshholdMet(node, e)) {
@@ -530,8 +537,98 @@ trait ContentExtractor {
         }
       }
     }
+//    cleanLinks(node)
+//    cleanHeaders(node)
+//    cleanParagraphs(node)
     node
   }
+
+  def postExtractionCleanup3(targetNode: Element): Element = {
+
+    val node = addSiblings(targetNode)
+
+    cleanLinks(node)
+    cleanHeaders(node)
+    cleanParagraphs(node)
+    node
+  }
+
+  /**
+      * cleans up links, the links outside p are removed
+      *
+      */
+    private def cleanLinks(topNode: Element) {
+      if (topNode != null) {
+        logger.trace(logPrefix + "Turning links to text")
+        val baseUri = topNode.baseUri()
+
+        val links = topNode.getElementsByTag("a")
+        for (item <- links) {
+          if (item.getElementsByTag("img").isEmpty) {
+            if (item.parents().map(e => e.tagName()).filter(tag => tag == "p").length == 0){
+              item.remove()
+            }
+          }
+        }
+      }
+    }
+
+    /**
+      * cleans up headers, keep only the header followed by an element that contains only accepted tags
+      *
+      */
+    private def cleanHeaders(topNode: Element): Unit ={
+
+      val ACCEPTED_TAGS = TagsEvaluator("p","img","video","figure","picture")
+      val HEADER_TAGS = TagsEvaluator("h1","h2","h3","h4","h5","h6")
+
+      val headers = Collector.collect(HEADER_TAGS, topNode)
+      for (header <- headers) {
+        //      check if next sibling contains ACCEPTED_TAGS
+        val sibling_good_elements = Collector.collect(ACCEPTED_TAGS, header.nextElementSibling())
+        if (sibling_good_elements.length == 0) {
+          header.remove()
+        }
+      }
+    }
+
+    /**
+      * cleans up Paragraphs
+      *
+      */
+      private def cleanParagraphs(topNode: Element): Unit = {
+
+        val max_link_words_percent = 0.7
+        val loop = new Breaks;
+        val subParagraphs: Elements = topNode.getElementsByTag("p")
+        for (p <- subParagraphs) {
+          if (p.text.length < 25 && p.select("img|video").length == 0) {
+            p.remove()
+          }
+        }
+
+        for (p <- topNode.select("p")){
+          loop.breakable {
+            for (tag <- p.children()) {
+
+              if (tag.tagName() == "a") {
+                val text_world_count = StopWords.getStopWordCount(p.text()).getWordCount
+                val link_world_count = StopWords.getStopWordCount(tag.text()).getWordCount
+                if (link_world_count.toFloat > max_link_words_percent * text_world_count) {
+                  // this is a link paragraph and should be removed
+                  try {
+                    p.remove()
+                    loop.break()
+                  } catch {
+                    case _ => {}
+                  }
+
+                }
+              }
+            }
+          }
+        }
+      }
 
 
   def isNodeScoreThreshholdMet(node: Element, e: Element): Boolean = {
