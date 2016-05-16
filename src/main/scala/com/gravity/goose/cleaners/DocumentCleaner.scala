@@ -49,7 +49,7 @@ trait DocumentCleaner {
     docToClean = removeDropCaps(docToClean)
     docToClean = removeScriptsAndStyles(docToClean)
     docToClean = cleanBadTags(docToClean)
-    docToClean = removeNodesViaRegEx(docToClean, captionPattern)
+//    docToClean = removeNodesViaRegEx(docToClean, captionPattern)
     docToClean = removeNodesViaRegEx(docToClean, googlePattern)
     docToClean = removeNodesViaRegEx(docToClean, entriesPattern)
     docToClean = removeNodesViaRegEx(docToClean, facebookPattern)
@@ -412,9 +412,9 @@ object DocumentCleaner extends Logging {
   /**
   * regex to detect if there are block level elements inside of a div element
   */
-  val divToPElementsPattern: Pattern = Pattern.compile("<(a|blockquote|dl|div|picture|img|ol|p|pre|table|ul|video|section)")
+  val divToPElementsPattern: Pattern = Pattern.compile("<(a|blockquote|dl|div|picture|img|ol|p|pre|table|ul|video|section|figcaption)")
 
-  val blockElemementTags = TagsEvaluator("a", "blockquote", "dl", "div", "img", "picture", "ol", "p", "pre", "table", "ul", "video", "section")
+  val blockElemementTags = TagsEvaluator("a", "blockquote", "dl", "div", "img", "picture", "ol", "p", "pre", "table", "ul", "video", "section", "figcaption")
   val articleRootTags = TagsEvaluator("div", "span", "article")
 
   val captionPattern: Pattern = Pattern.compile("^caption$")
