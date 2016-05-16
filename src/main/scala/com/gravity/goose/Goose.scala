@@ -44,6 +44,12 @@ class Goose(config: Configuration = new Configuration) {
     sendToActor(cc)
   }
 
+  def extractSimpleHTML(url: String): Option[Article] = {
+    val cc = new CrawlCandidate(config, url, null)
+    val crawler = new Crawler(config)
+    crawler.extractArticle(cc)
+    }
+
   def shutdownNetwork() {
     HtmlFetcher.getHttpClient.getConnectionManager.shutdown()
   }
