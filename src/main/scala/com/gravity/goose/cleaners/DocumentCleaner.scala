@@ -49,7 +49,7 @@ trait DocumentCleaner {
     docToClean = removeDropCaps(docToClean)
     docToClean = removeScriptsAndStyles(docToClean)
     docToClean = cleanBadTags(docToClean)
-//    docToClean = removeNodesViaRegEx(docToClean, captionPattern)
+    docToClean = removeNodesViaRegEx(docToClean, captionPattern)
     docToClean = removeNodesViaRegEx(docToClean, googlePattern)
     docToClean = removeNodesViaRegEx(docToClean, entriesPattern)
     docToClean = removeNodesViaRegEx(docToClean, facebookPattern)
@@ -396,7 +396,7 @@ object DocumentCleaner extends Logging {
   // create negative elements
   sb.append("^side$|combx|retweet|mediaarticlerelated|menucontainer|navbar|comment|PopularQuestions|contact|foot|footer|Footer|footnote|cnn_strycaptiontxt|links|meta$|shoutbox|sponsor")
   sb.append("|tags|socialnetworking|socialNetworking|cnnStryHghLght|cnn_stryspcvbx|^inset$|pagetools|post-attributes|welcome_form|contentTools2|the_answers|remember-tool-tip|article-media-overlay")
-  sb.append("|communitypromo|runaroundLeft|subscribe|vcard|articleheadings|date|^print$|popup|author-dropdown|tools|socialtools|byline|konafilter|KonaFilter|breadcrumbs|^fn$|wp-caption-text")
+  sb.append("|communitypromo|runaroundLeft|subscribe|vcard|articleheadings|date|^print$|popup|author-dropdown|tools|socialtools|byline|konafilter|KonaFilter|breadcrumbs|^fn$|wp-caption-text|related")
 
   /**
   * this regex is used to remove undesirable nodes from our doc
