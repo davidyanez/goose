@@ -137,71 +137,73 @@ trait OutputFormatter {
         val HEADERS: List[String] = List("h1","h2", "h3", "h4", "h5", "h6")
         val keep_tags: List[String] = List("hr")
         val FOLLOW_HEADER_TAGS : List[String] = List("p", "img", "iframe", "video", "picture", "figure", "hr")
+        var processed_element = new ListBuffer[Int]
 
         node.getAllElements.map((e: Element) => {
 
-          if (e.tagName() == "p") {
-            if (e.text() != title)
-              s"<p>${getcleanParagraphHTML(e)}</p>"
-            else
-              ""
-          }
-          else if (e.tagName() == "video") {
-            s"<p>${e.outerHtml()}</p>"
-          }
-          else if (e.tagName().contains(List("ol", "ul"))) {
-            e.outerHtml()
-          }
-          else if (keep_tags.contains(e.tagName())) {
-            e.outerHtml()
-          }
-          else if (e.tagName() == "img") {
-            if (e.hasAttr("src") && (e.attr("src").startsWith("http"))) {}
-            else if (e.hasAttr("src") && e.attr("src").startsWith("//")) {
-              e.attr("src", "http:" + e.attr("src"))
+          if (!processed_element.contains(e.hashCode())) {
+            processed_element += e.hashCode()
+
+            if (e.tagName() == "p") {
+              if (e.text() != title)
+                s"<p>${getcleanParagraphHTML(e)}</p>"
+              else
+                ""
             }
-            else {
-              e.attr("src", "http://" + domain + e.attr("src"))
+            else if (e.tagName() == "video") {
+              s"<p>${e.outerHtml()}</p>"
             }
-            if (e.hasAttr("srcset")) {
-              var img_sources = e.attr("srcset").split(",").map((url: String) => url.trim())
-              img_sources = img_sources.map(src => if (src.startsWith("http")) src
-              else if (src.startsWith("//")) "http:" + src else "http://" + domain + src)
-              val srcset = String.join(", ", img_sources.toList)
-              e.attr("srcset", srcset)
+            else if (e.tagName().contains(List("ol", "ul"))) {
+              e.outerHtml()
             }
-            var img_attributes = e.attributes().filter((a: Attribute) => !SKIP_ATTRIBUTES.contains(a.getKey())).
-              map((a: Attribute) => a.getKey + "=\"" + a.getValue + "\"").mkString(" ")
-
-            s"<p><img $img_attributes ></p>"
-
-          } else if (e.tagName() == "iframe"
-//            && (e.attr("src").startsWith("https://www.youtube.com/embed/") ||
-//              e.attr("src").startsWith("https://player.vimeo.com/video/"))
-
-          ) {
-
-            var iframe_attributes = e.attributes().filter((a: Attribute) => a.getKey() != "style").
-              map((a: Attribute) => a.getKey + "=\"" + a.getValue + "\"").mkString(" ")
-
-
-            val wrapper_div_style = "position:relative;padding-bottom: 56.25%;padding-top: 25px;height:0;"
-            val iframe_style = "position:absolute;top=0;left:0;width:100%;height:95%;"
-            "<div style=\"" + wrapper_div_style + "\">" + "<iframe " + iframe_attributes + " style=\"" + iframe_style + "\"></iframe></div>"
-          }
-          else if (HEADERS.contains(e.tagName())) {
-            if (e.text() != title)
-
-              s"<${e.tagName}>${e.html}</${e.tagName}>"
-            //              s"<${e.tagName}>${trim_element_text(e)}</${e.tagName}>"
-            else {
-              ""
+            else if (keep_tags.contains(e.tagName())) {
+              e.outerHtml()
             }
-            // && FOLLOW_HEADER_TAGS.contains(e.nextElementSibling().tagName())
-          }
-          else {
-            ""
-          }
+            else if (e.tagName() == "img") {
+
+              if (e.hasAttr("src") && (e.attr("src").startsWith("http"))) {}
+              else if (e.hasAttr("src") && e.attr("src").startsWith("//")) {
+                e.attr("src", "http:" + e.attr("src"))
+              }
+              else {
+                e.attr("src", "http://" + domain + e.attr("src"))
+              }
+              if (e.hasAttr("srcset")) {
+                var img_sources = e.attr("srcset").split(",").map((url: String) => url.trim())
+                img_sources = img_sources.map(src => if (src.startsWith("http")) src
+                else if (src.startsWith("//")) "http:" + src else "http://" + domain + src)
+                val srcset = String.join(", ", img_sources.toList)
+                e.attr("srcset", srcset)
+              }
+              var img_attributes = e.attributes().filter((a: Attribute) => !SKIP_ATTRIBUTES.contains(a.getKey())).
+                map((a: Attribute) => a.getKey + "=\"" + a.getValue + "\"").mkString(" ")
+
+              s"<p><img $img_attributes ></p>"
+
+            } else if (e.tagName() == "iframe"
+              && (e.attr("src").startsWith("https://www.youtube.com/embed/")
+              || e.attr("src").startsWith("https://player.vimeo.com/video/"))
+              ||  e.hasAttr("allowfullscreen ")
+            ) {
+
+              var iframe_attributes = e.attributes().filter((a: Attribute) => a.getKey() != "style").
+                map((a: Attribute) => a.getKey + "=\"" + a.getValue + "\"").mkString(" ")
+
+
+              val wrapper_div_style = "position:relative;padding-bottom: 56.25%;padding-top: 25px;height:0;"
+              val iframe_style = "position:absolute;top=0;left:0;width:100%;height:95%;"
+              "<div style=\"" + wrapper_div_style + "\">" + "<iframe " + iframe_attributes + " style=\"" + iframe_style + "\"></iframe></div>"
+            }
+            else if (HEADERS.contains(e.tagName())) {
+              if (e.text() != title)
+
+                s"<${e.tagName}>${e.html}</${e.tagName}>"
+              //              s"<${e.tagName}>${trim_element_text(e)}</${e.tagName}>"
+              else {""}
+              // && FOLLOW_HEADER_TAGS.contains(e.nextElementSibling().tagName())
+            }
+            else {""}
+        }   else {""}
         }).toList.mkString("")
       }
     }
