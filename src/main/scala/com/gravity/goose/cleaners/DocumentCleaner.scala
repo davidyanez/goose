@@ -59,7 +59,7 @@ trait DocumentCleaner {
 
 
 //    docToClean = convertWantedTagsToParagraphs(docToClean, articleRootTags)
-//    docToClean = convertDivsToParagraphs(docToClean, "div")
+    docToClean = convertDivsToParagraphs(docToClean, "div")
 //    docToClean = convertDivsToParagraphs(docToClean, "span")
 
     //    docToClean = convertDivsToParagraphs(docToClean, "span")
@@ -269,18 +269,18 @@ trait DocumentCleaner {
           badDivs += 1;
         }
         else {
-          val replaceNodes = getReplacementNodes(doc, div)
-
-          div.children().foreach(_.remove())
-          replaceNodes.foreach(node => {
-
-            try {
-              div.appendChild(node)
-            } catch {
-              case e: Exception => info(e, e.toString)
-            }
-
-          })
+//          val replaceNodes = getReplacementNodes(doc, div)
+//
+//          div.children().foreach(_.remove())
+//          replaceNodes.foreach(node => {
+//
+//            try {
+//              div.appendChild(node)
+//            } catch {
+//              case e: Exception => info(e, e.toString)
+//            }
+//
+//          })
         }
       }
       catch {
@@ -394,7 +394,7 @@ object DocumentCleaner extends Logging {
   var sb: StringBuilder = new StringBuilder
 
   // create negative elements
-  sb.append("^side$|combx|retweet|mediaarticlerelated|menucontainer|navbar|comment|PopularQuestions|contact|foot|footer|Footer|footnote|cnn_strycaptiontxt|links|meta$|shoutbox|sponsor")
+  sb.append("^side$|combx|retweet|mediaarticlerelated|menucontainer|navbar|comment|PopularQuestions|contact|foot|footer|Footer|footnote|cnn_strycaptiontxt|links|meta$|shoutbox|sponsor|error|^pb|sidebar")
   sb.append("|tags|socialnetworking|socialNetworking|cnnStryHghLght|cnn_stryspcvbx|^inset$|pagetools|post-attributes|welcome_form|contentTools2|the_answers|remember-tool-tip|article-media-overlay")
   sb.append("|communitypromo|runaroundLeft|subscribe|vcard|articleheadings|date|^print$|popup|author-dropdown|tools|socialtools|byline|konafilter|KonaFilter|breadcrumbs|^fn$|wp-caption-text|related")
 
@@ -407,14 +407,14 @@ object DocumentCleaner extends Logging {
   val queryNaughtyClasses = "[class~=(" + regExRemoveNodes + ")]"
   val queryNaughtyNames = "[name~=(" + regExRemoveNodes + ")]"
   val tabsAndNewLinesReplacements = ReplaceSequence.create("\n", "\n\n").append("\t").append("^\\s+$")
-  val tagsToRemove: List[String] = List("noscript")
+  val tagsToRemove: List[String] = List("noscript", "aside")
 
   /**
   * regex to detect if there are block level elements inside of a div element
   */
   val divToPElementsPattern: Pattern = Pattern.compile("<(a|blockquote|dl|div|picture|img|ol|p|pre|table|ul|video|section|figcaption)")
 
-  val blockElemementTags = TagsEvaluator("a", "blockquote", "dl", "div", "img", "picture", "ol", "p", "pre", "table", "ul", "video", "section", "figcaption")
+  val blockElemementTags = TagsEvaluator("a", "blockquote", "dl", "div", "ol", "p", "pre", "table", "ul", "section", "img", "video")
   val articleRootTags = TagsEvaluator("div", "span", "article")
 
   val captionPattern: Pattern = Pattern.compile("^caption$")
