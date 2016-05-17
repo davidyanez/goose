@@ -374,8 +374,23 @@ class NewExtractionsTest {
    out_html.close()
   }
 
+  @Test
+  def qivo_1554() {
 
-  //
+   implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+   val url = "http://screenrant.com/iron-man-batman-costs-infographics/all/1/"
+   val article = TestUtils.getArticle(url = url)
+   println(article.cleanedArticleSimpleHTML)
+   val out_html = new PrintWriter(new File("./"+output_folder+"/"+"q1564_batman.html"))
+   out_html.write(article.cleanedArticleSimpleHTML)
+   out_html.close()
+  }
+
+
+  // http://screenrant.com/iron-man-batman-costs-infographics/all/1/
+
+
   // https://www.buzzfeed.com/stephaniemlee/uncommon-core?utm_term=.xcwYP87n5#.gdQmJYGgq
 
 
