@@ -360,6 +360,22 @@ class NewExtractionsTest {
      out_html.close()
    }
 
+
+  @Test
+  def qivo_1450() {
+
+   implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+   val url = "http://www.food.com/recipe/bourbon-chicken-45809"
+   val article = TestUtils.getArticle(url = url)
+   println(article.cleanedArticleSimpleHTML)
+   val out_html = new PrintWriter(new File("./"+output_folder+"/"+"bourbon-chicken_q1450.html"))
+   out_html.write(article.cleanedArticleSimpleHTML)
+   out_html.close()
+  }
+
+
+  //
   // https://www.buzzfeed.com/stephaniemlee/uncommon-core?utm_term=.xcwYP87n5#.gdQmJYGgq
 
 
