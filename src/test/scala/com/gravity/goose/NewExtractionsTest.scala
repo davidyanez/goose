@@ -335,7 +335,7 @@ class NewExtractionsTest {
    }
 
   @Test
-   def art_sheep_1() {
+   def art_sheep_qivo1545() {
 
      implicit val config = TestUtils.NO_IMAGE_CONFIG
 
@@ -347,9 +347,18 @@ class NewExtractionsTest {
      out_html.close()
    }
 
+  @Test
+   def qivo_1502() {
 
-  //
+     implicit val config = TestUtils.NO_IMAGE_CONFIG
 
+     val url = "http://www.modernsalon.com/qa-kl-christoffersen-stylist-behind-fluid-hair-painting"
+     val article = TestUtils.getArticle(url = url)
+     println(article.cleanedArticleSimpleHTML)
+     val out_html = new PrintWriter(new File("./"+output_folder+"/"+"modern_salon_qivo1502.html"))
+     out_html.write(article.cleanedArticleSimpleHTML)
+     out_html.close()
+   }
 
   // https://www.buzzfeed.com/stephaniemlee/uncommon-core?utm_term=.xcwYP87n5#.gdQmJYGgq
 
