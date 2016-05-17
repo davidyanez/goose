@@ -439,7 +439,7 @@ object DocumentCleaner extends Logging {
   val queryNaughtyClasses = "[class~=(" + regExRemoveNodes + ")]"
   val queryNaughtyNames = "[name~=(" + regExRemoveNodes + ")]"
   val tabsAndNewLinesReplacements = ReplaceSequence.create("\n", "\n\n").append("\t").append("^\\s+$")
-  val tagsToRemove: List[String] = List("noscript", "aside")
+  val tagsToRemove: List[String] = List("aside")
 
   /**
   * regex to detect if there are block level elements inside of a div element
