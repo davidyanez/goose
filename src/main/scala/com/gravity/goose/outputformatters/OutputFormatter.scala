@@ -166,7 +166,7 @@ trait OutputFormatter {
             else {
               e.attr("src", "http://" + domain + e.attr("src"))
             }
-            if (e.hasAttr("srcset")) {
+            if (e.hasAttr("srcset") && e.attr("srcset").length > 0) {
               var img_sources = e.attr("srcset").split(",").map((url: String) => url.trim())
               img_sources = img_sources.map(src => if (src.startsWith("http")) src
               else if (src.startsWith("//")) "http:" + src else "http://" + domain + src)
@@ -179,14 +179,14 @@ trait OutputFormatter {
             s"<p><img $img_attributes ></p>"
 
           } else if (e.tagName() == "iframe"
-            && (e.attr("src").startsWith("https://www.youtube.com/embed/")
-            || e.attr("src").startsWith("https://player.vimeo.com/video/"))
+            && (e.attr("src").contains("//www.youtube.com/embed/")
+            || e.attr("src").contains("//player.vimeo.com/video/"))
             ||  e.hasAttr("allowfullscreen ")
           ) {
 
             var iframe_attributes = e.attributes().filter((a: Attribute) => a.getKey() != "style").
-              map((a: Attribute) => a.getKey + "=\"" + a.getValue + "\"").mkString(" ")
-
+              map((a: Attribute) => if (a.getKey == "src" && a.getValue.startsWith("//")) a.getKey + "=\"http:" + a.getValue + "\""
+              else a.getKey + "=\"" + a.getValue + "\"").mkString(" ")
 
             val wrapper_div_style = "position:relative;padding-bottom: 56.25%;padding-top: 25px;height:0;"
             val iframe_style = "position:absolute;top=0;left:0;width:100%;height:95%;"
