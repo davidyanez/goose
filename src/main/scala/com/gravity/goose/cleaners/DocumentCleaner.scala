@@ -59,6 +59,7 @@ trait DocumentCleaner {
 
 
 //    docToClean = convertWantedTagsToParagraphs(docToClean, articleRootTags)
+    docToClean = convertDivsToParagraphs(docToClean, "li")
     docToClean = convertDivsToParagraphs(docToClean, "div")
 //    docToClean = convertDivsToParagraphs(docToClean, "span")
 
@@ -269,18 +270,18 @@ trait DocumentCleaner {
           badDivs += 1;
         }
         else {
-//          val replaceNodes = getReplacementNodes(doc, div)
-//
-//          div.children().foreach(_.remove())
-//          replaceNodes.foreach(node => {
-//
-//            try {
-//              div.appendChild(node)
-//            } catch {
-//              case e: Exception => info(e, e.toString)
-//            }
-//
-//          })
+          val replaceNodes = getReplacementNodes(doc, div)
+
+          div.children().foreach(_.remove())
+          replaceNodes.foreach(node => {
+
+            try {
+              div.appendChild(node)
+            } catch {
+              case e: Exception => info(e, e.toString)
+            }
+
+          })
         }
       }
       catch {
@@ -394,7 +395,7 @@ object DocumentCleaner extends Logging {
   var sb: StringBuilder = new StringBuilder
 
   // create negative elements
-  sb.append("^side$|combx|retweet|mediaarticlerelated|menucontainer|navbar|comment|PopularQuestions|contact|foot|footer|Footer|footnote|cnn_strycaptiontxt|links|meta$|shoutbox|sponsor|^pb|error")
+  sb.append("^side$|combx|retweet|mediaarticlerelated|menucontainer|navbar|comment|PopularQuestions|contact|foot|footer|Footer|footnote|cnn_strycaptiontxt|links|meta$|shoutbox|sponsor|^pb|error|review")
   sb.append("|tags|socialnetworking|socialNetworking|cnnStryHghLght|cnn_stryspcvbx|^inset$|pagetools|post-attributes|welcome_form|contentTools2|the_answers|remember-tool-tip|article-media-overlay")
   sb.append("|communitypromo|runaroundLeft|subscribe|vcard|articleheadings|date|^print$|popup|author-dropdown|tools|socialtools|byline|konafilter|KonaFilter|breadcrumbs|^fn$|wp-caption-text|related")
 
