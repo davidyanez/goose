@@ -54,14 +54,16 @@ trait DocumentCleaner {
     docToClean = removeNodesViaRegEx(docToClean, entriesPattern)
     docToClean = removeNodesViaRegEx(docToClean, facebookPattern)
     docToClean = removeNodesViaRegEx(docToClean, twitterPattern)
-//    docToClean = cleanUpSpanTagsInParagraphs(docToClean)
+
     docToClean =  removeBadTags(docToClean)
 
 
 //    docToClean = convertWantedTagsToParagraphs(docToClean, articleRootTags)
-    docToClean = convertDivsToParagraphs(docToClean, "li")
+
     docToClean = convertDivsToParagraphs(docToClean, "div")
 //    docToClean = convertDivsToParagraphs(docToClean, "span")
+    docToClean = cleanUpSpanTagsInParagraphs(docToClean)
+    docToClean = convertElementsToParagraphs(docToClean, "li")
 
     //    docToClean = convertDivsToParagraphs(docToClean, "span")
     docToClean
@@ -90,9 +92,10 @@ trait DocumentCleaner {
   * e.g. businessweek2.txt
   */
   private def cleanUpSpanTagsInParagraphs(doc: Document) = {
+    val PARAGRAPH_TAGS = List("li", "p")
     val spans: Elements = doc.getElementsByTag("span")
     for (item <- spans) {
-      if (item.parent().nodeName() == "p") {
+      if ( PARAGRAPH_TAGS.contains(item.parent().nodeName())) {
         val tn: TextNode = new TextNode(item.text, doc.baseUri)
         item.replaceWith(tn)
         trace("Replacing nested span with TextNode: " + item.text())
@@ -299,6 +302,34 @@ trait DocumentCleaner {
     doc
   }
 
+  private def convertElementsToParagraphs(doc: Document, domType: String): Document = {
+     trace("Starting to replace bad divs...")
+     var badDivs: Int = 0
+     var convertedTextNodes: Int = 0
+     val divs: Elements = doc.getElementsByTag(domType)
+     var divIndex = 0
+
+
+     for (div <- divs) {
+       try {
+         replaceElementsWithPara(doc, div)
+       }
+       catch {
+         case e: NullPointerException => {
+           logger.error(e.toString)
+         }
+       }
+       divIndex += 1
+     }
+
+     trace("Found %d total %s with %d bad ones replaced and %d textnodes converted inside %s"
+         .format(divs.size, domType, badDivs, convertedTextNodes, domType))
+
+
+     doc
+   }
+
+
   /**
   * go through all the div's nodes and clean up dangling text nodes and get rid of obvious jank
   */
@@ -413,10 +444,10 @@ object DocumentCleaner extends Logging {
   /**
   * regex to detect if there are block level elements inside of a div element
   */
-  val divToPElementsPattern: Pattern = Pattern.compile("<(a|blockquote|dl|div|picture|img|ol|p|pre|table|ul|video|section|figcaption)")
+  val divToPElementsPattern: Pattern = Pattern.compile("<(a|blockquote|dl|div|picture|img|ol|p|pre|table|ul|li|video|section|figcaption)")
 
   val blockElemementTags = TagsEvaluator("a", "blockquote", "dl", "div", "ol", "p", "pre", "table", "ul", "section", "img", "video")
-  val articleRootTags = TagsEvaluator("div", "span", "article")
+  val articleRootTags = TagsEvaluator("div", "article")
 
   val captionPattern: Pattern = Pattern.compile("^caption$")
   val googlePattern: Pattern = Pattern.compile(" google ")
