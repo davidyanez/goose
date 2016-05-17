@@ -250,7 +250,7 @@ trait OutputFormatter {
     */
   private def cleanHeaders(topNode: Element): Unit ={
 
-    val ACCEPTED_TAGS = TagsEvaluator("p","img","video","figure","picture")
+    val ACCEPTED_TAGS = TagsEvaluator("p","img","video","figure","picture", "ol", "iframe", "div")
     val HEADER_TAGS = TagsEvaluator("h1","h2","h3","h4","h5","h6")
 
     val headers = Collector.collect(HEADER_TAGS, topNode)
@@ -297,7 +297,7 @@ trait OutputFormatter {
 
     private def getcleanParagraphHTML(paragraph: Element): String = {
 
-      val ACCEPTED_TAGS  = List("b", "strong", "em", "a", "hr", "br")
+      val ACCEPTED_TAGS  = List("b", "strong", "em", "a", "hr", "br", "span")
       val p = paragraph.clone()
 
       for (tag <- p.children()){
