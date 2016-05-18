@@ -123,11 +123,11 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
       entity = response.getEntity
       if (entity != null) {
         instream = entity.getContent
-        var encodingType: String = "UTF-8"
+        var encodingType: String = "ISO-8859-15" //"ISO-8859-15"
         try {
           encodingType = EntityUtils.getContentCharSet(entity)
           if (encodingType == null) {
-            encodingType = "UTF-8"
+            encodingType = "ISO-8859-15"//"UTF-8" ISO-8859-15
           }
         }
         catch {
@@ -206,7 +206,7 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
     var is: InputStream = null
     var mimeType: String = null
     try {
-      is = new ByteArrayInputStream(htmlResult.getBytes("UTF-8"))
+      is = new ByteArrayInputStream(htmlResult.getBytes("ISO-8859-15"))
       mimeType = URLConnection.guessContentTypeFromStream(is)
       if (mimeType != null) {
         if ((mimeType == "text/html") == true || (mimeType == "application/xml") == true) {
@@ -263,7 +263,7 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
     httpParams.setParameter("http.protocol.cookie-policy", CookiePolicy.BROWSER_COMPATIBILITY)
     httpParams.setParameter("http.User-Agent", "Mozilla/5.0 (X11; U; Linux x86_64; de; rv:1.9.2.8) Gecko/20100723 Ubuntu/10.04 (lucid) Firefox/3.6.8")
     httpParams.setParameter("http.language.Accept-Language", "en-us")
-    httpParams.setParameter("http.protocol.content-charset", "UTF-8")
+    httpParams.setParameter("http.protocol.content-charset", "ISO-8859-15")
     httpParams.setParameter("Accept", "application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5")
     httpParams.setParameter("Cache-Control", "max-age=0")
     httpParams.setParameter("http.connection.stalecheck", false)
