@@ -24,7 +24,7 @@ import images.{Image, UpgradedImageIExtractor, ImageExtractor}
 import org.apache.http.client.HttpClient
 import org.jsoup.nodes.{Document, Element}
 import org.jsoup.Jsoup
-import java.io.File
+import java.io._
 import org.jsoup.select.Elements
 import utils.{ParsingCandidate, URLHelper, Logging}
 import com.gravity.goose.outputformatters.{StandardOutputFormatter, OutputFormatter}
@@ -196,7 +196,9 @@ class Crawler(config: Configuration) {
   def getDocument(url: String, rawlHtml: String): Option[Document] = {
 
     try {
-      Some(Jsoup.parse(rawlHtml))
+      val is = new ByteArrayInputStream(rawlHtml.getBytes())
+      Some(Jsoup.parse(is, "ISO-8859-1", url))
+//      Some(Jsoup.parse(rawlHtml))
     } catch {
       case e: Exception => {
         trace("Unable to parse " + url + " properly into JSoup Doc")
