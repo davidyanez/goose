@@ -65,7 +65,7 @@ trait ContentExtractor {
     try {
       val titleElem: Elements = doc.getElementsByTag("title")
       if (titleElem == null || titleElem.isEmpty) return string.empty
-      var titleText: String = titleElem.first.text
+      var titleText: String = titleElem.first.html()
       if (string.isNullOrEmpty(titleText)) return string.empty
       var usedDelimeter: Boolean = false
       if (titleText.contains("|")) {
