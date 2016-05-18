@@ -197,8 +197,8 @@ class Crawler(config: Configuration) {
 
     try {
       val is = new ByteArrayInputStream(rawlHtml.getBytes())
-      Some(Jsoup.parse(is, "ISO-8859-1", url))
-//      Some(Jsoup.parse(rawlHtml))
+//      Some(Jsoup.parse(is, "UTF-8", url))
+      Some(Jsoup.parse(rawlHtml))
     } catch {
       case e: Exception => {
         trace("Unable to parse " + url + " properly into JSoup Doc")
