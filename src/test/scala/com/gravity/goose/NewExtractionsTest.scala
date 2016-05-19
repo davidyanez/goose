@@ -412,10 +412,8 @@ class NewExtractionsTest {
 //   val out_html = new PrintWriter(new File("./"+output_folder+"/"+"qivo_1587.html"))
 //   out_html.write(article.cleanedArticleSimpleHTML)
 
-    val out_html = new BufferedWriter(new OutputStreamWriter(
-      new FileOutputStream("./"+output_folder+"/"+"qivo_1587.html"), "ISO-8859-15"));
-//   val out_html = new PrintWriter(new File("./"+output_folder+"/"+"qivo_1587.html"))
-//   out_html.write(article.cleanedArticleSimpleHTML)
+   val out_html = new PrintWriter(new File("./"+output_folder+"/"+"qivo_1587.html"))
+   out_html.write(article.cleanedArticleSimpleHTML)
 
     out_html.write(article.cleanedArticleSimpleHTML)
 
