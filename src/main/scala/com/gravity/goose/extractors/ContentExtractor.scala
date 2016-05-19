@@ -65,7 +65,7 @@ trait ContentExtractor {
     try {
       val titleElem: Elements = doc.getElementsByTag("title")
       if (titleElem == null || titleElem.isEmpty) return string.empty
-      var titleText: String = titleElem.first.html()
+      var titleText: String = titleElem.first.html
       if (string.isNullOrEmpty(titleText)) return string.empty
       var usedDelimeter: Boolean = false
       if (titleText.contains("|")) {
@@ -149,6 +149,24 @@ trait ContentExtractor {
     getMetaContent(article.doc, "meta[name=keywords]")
   }
 
+  def getMetaContentType(article: Article): String = {
+    var meta_content_type = "<meta charset='ISO-8859-15'>"
+
+    if (article.doc.select("meta[charset]").length > 0){
+      meta_content_type = article.doc.select("meta[charset]").first.toString
+    }else if(article.doc.select("meta[http-equiv=Content-Type]").length > 0){
+      meta_content_type =  article.doc.select("meta[http-equiv=Content-Type]").first.toString
+//      val content = article.doc.select("meta[http-equiv=Content-Type]").first().toString  // (0).attr("content").toString
+//      val index =   content.indexOfSlice("charset=")
+//      if (index > 0){
+//        meta_content_type = content.substring(index+8)
+//      }
+    }
+    meta_content_type
+    }
+
+
+
 
   /**
    * if the article has meta canonical link set in the url
@@ -205,7 +223,7 @@ trait ContentExtractor {
       val nodeText: String = node.text
       val wordStats: WordStats = StopWords.getStopWordCount(nodeText)
       val highLinkDensity: Boolean = isHighLinkDensity(node)
-      if (wordStats.getStopWordCount > 2 && !highLinkDensity) {
+      if (wordStats.getStopWordCount > 5 && !highLinkDensity) {
         nodesWithText.add(node)
       }
     }
