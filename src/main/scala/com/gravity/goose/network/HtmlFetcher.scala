@@ -94,6 +94,7 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
     var htmlResult: String = null
     var entity: HttpEntity = null
     var instream: InputStream = null
+    var encodingType: String = "ISO-8859-15"
 
     // Identified the the apache http client does not drop URL fragments before opening the request to the host
     // more info: http://stackoverflow.com/questions/4251841/400-error-with-httpclient-for-a-link-with-an-anchor
@@ -123,7 +124,7 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
       entity = response.getEntity
       if (entity != null) {
         instream = entity.getContent
-        var encodingType: String = "ISO-8859-15" //"ISO-8859-15"
+
         try {
           encodingType = EntityUtils.getContentCharSet(entity)
           if (encodingType == null) {
@@ -206,7 +207,7 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
     var is: InputStream = null
     var mimeType: String = null
     try {
-      is = new ByteArrayInputStream(htmlResult.getBytes("ISO-8859-15"))
+      is = new ByteArrayInputStream(htmlResult.getBytes(encodingType))
       mimeType = URLConnection.guessContentTypeFromStream(is)
       if (mimeType != null) {
         if ((mimeType == "text/html") == true || (mimeType == "application/xml") == true) {
