@@ -20,11 +20,13 @@ package com.gravity.goose.cleaners
 import com.gravity.goose.utils.Logging
 import java.util.regex.{Matcher, Pattern}
 import org.jsoup.nodes.{TextNode, Node, Element, Document}
-import com.gravity.goose.text.ReplaceSequence
+import com.gravity.goose.text.{StopWords, ReplaceSequence}
 import scala.collection.JavaConversions._
 import com.gravity.goose.Article
 import collection.mutable.ListBuffer
 import org.jsoup.select.{TagsEvaluator, Collector, Elements}
+
+import scala.util.control.Breaks
 
 trait DocumentCleaner {
 
@@ -65,8 +67,38 @@ trait DocumentCleaner {
     docToClean = cleanUpSpanTagsInParagraphs(docToClean)
     docToClean = convertElementsToParagraphs(docToClean, "li")
 
+    docToClean = cleanParagraphs(docToClean)
+
     //    docToClean = convertDivsToParagraphs(docToClean, "span")
     docToClean
+  }
+
+
+  private def cleanParagraphs(doc: Document): Document = {
+
+    val max_link_words_percent = 0.7
+    val loop = new Breaks;
+
+    for (p <- doc.select("p")){
+      val text_world_count = StopWords.getStopWordCount(p.text()).getWordCount
+      loop.breakable {
+        for (tag <- p.select("a")) {
+
+          val link_world_count = StopWords.getStopWordCount(tag.text()).getWordCount
+          if (link_world_count.toFloat > max_link_words_percent * text_world_count) {
+            // this is a link paragraph and should be removed
+            try {
+              p.remove()
+              loop.break()
+            } catch {
+              case _ => {}
+            }
+
+          }
+        }
+      }
+    }
+    doc
   }
 
   /**
@@ -218,7 +250,8 @@ trait DocumentCleaner {
 
   /**
   * Apparently jsoup expects the node's parent to not be null and throws if it is. Let's be safe.
-  * @param node the node to remove from the doc
+    *
+    * @param node the node to remove from the doc
   */
   private def removeNode(node: Element) {
     if (node == null || node.parent == null) return
@@ -308,11 +341,20 @@ trait DocumentCleaner {
      var convertedTextNodes: Int = 0
      val divs: Elements = doc.getElementsByTag(domType)
      var divIndex = 0
+     val max_link_words_percent = 0.7
 
 
      for (div <- divs) {
        try {
-         replaceElementsWithPara(doc, div)
+
+         val text_world_count = StopWords.getStopWordCount(div.text()).getWordCount
+         // convert it only if the element text moslty a link
+
+         if (div.select("a").map(a => StopWords.getStopWordCount(a.text()).wordCount).sum > max_link_words_percent * text_world_count){
+           replaceElementsWithPara(doc, div)
+         }
+
+
        }
        catch {
          case e: NullPointerException => {
