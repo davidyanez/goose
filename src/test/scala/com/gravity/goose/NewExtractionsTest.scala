@@ -409,14 +409,9 @@ class NewExtractionsTest {
    val url = "http://ici.radio-canada.ca/emissions/medium_large/2015-2016/chronique.asp?idChronique=389093"
    val article = TestUtils.getArticle(url = url)
    println(article.cleanedArticleSimpleHTML)
-//   val out_html = new PrintWriter(new File("./"+output_folder+"/"+"qivo_1587.html"))
-//   out_html.write(article.cleanedArticleSimpleHTML)
 
    val out_html = new PrintWriter(new File("./"+output_folder+"/"+"qivo_1587.html"))
    out_html.write(article.cleanedArticleSimpleHTML)
-
-    out_html.write(article.cleanedArticleSimpleHTML)
-
 
    out_html.close()
     }
