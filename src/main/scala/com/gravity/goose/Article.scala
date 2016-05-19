@@ -48,6 +48,8 @@ class Article {
     */
   var cleanedArticleSimpleHTML:  String = ""
 
+  var MetaContentType: String = ""
+
   /**
   * meta description field in HTML source
   */
