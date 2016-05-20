@@ -127,9 +127,8 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
       entity = response.getEntity
       if (entity != null) {
         instream = entity.getContent
-
+        var encodingType = EntityUtils.getContentCharSet(entity)
         try {
-          var encodingType = EntityUtils.getContentCharSet(entity)
 
           if  (encodingType == null) {
             val contentType = entity.getContentType().toString
