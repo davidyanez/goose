@@ -72,6 +72,7 @@ class Crawler(config: Configuration) {
       // before we do any calcs on the body itself let's clean up the document
       article.doc =  docCleaner.clean(article)
       article.metaContentType =  extractor.getMetaContentType(article)
+      article.charSet = config.getHtmlFetcher.getCharSet(article.doc)
 
       extractor.calculateBestNodeBasedOnClustering(article) match {
         case Some(node: Element) => {

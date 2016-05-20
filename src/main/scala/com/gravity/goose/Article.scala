@@ -50,6 +50,8 @@ class Article {
 
   var metaContentType: String = ""
 
+  var charSet: String = ""
+
   /**
   * meta description field in HTML source
   */
