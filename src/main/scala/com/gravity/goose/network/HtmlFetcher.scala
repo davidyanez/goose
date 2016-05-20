@@ -49,6 +49,8 @@ import java.util.List
 import com.gravity.goose.utils.Logging
 import com.gravity.goose.Configuration
 import org.apache.http.impl.client.{DefaultHttpRequestRetryHandler, AbstractHttpClient, DefaultHttpClient}
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 
 
 /**
@@ -79,7 +81,8 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
 
   /**
    * Makes an http fetch to go retrieve the HTML from a url, store it to disk and pass it off
-   * @param config Goose Configuration
+    *
+    * @param config Goose Configuration
    * @param url The web address to fetch
    * @return If all goes well, a `Some[String]` otherwise `None`
    * @throws NotFoundException(String)
@@ -94,7 +97,7 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
     var htmlResult: String = null
     var entity: HttpEntity = null
     var instream: InputStream = null
-    var encodingType: String = "ISO-8859-15"
+    var encodingType: String = "UTF-8"
 
     // Identified the the apache http client does not drop URL fragments before opening the request to the host
     // more info: http://stackoverflow.com/questions/4251841/400-error-with-httpclient-for-a-link-with-an-anchor
@@ -126,9 +129,26 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
         instream = entity.getContent
 
         try {
-          encodingType = EntityUtils.getContentCharSet(entity)
+          var encodingType = EntityUtils.getContentCharSet(entity)
+
+          if  (encodingType == null) {
+            val contentType = entity.getContentType().toString
+            val start_ix =  contentType.indexOf("charset=")
+            if (start_ix > 0){
+              encodingType = contentType.substring(start_ix+9)
+            } else {
+              val entity2 = httpClient.execute(httpget, localContext).getEntity
+              if (entity2 != null) {
+                val rawlHtml = EntityUtils.toString(entity2)
+                val is = new ByteArrayInputStream(rawlHtml.getBytes())
+                val doc = Jsoup.parse(rawlHtml)
+                encodingType = getCharSet(doc)
+              }
+            }
+          }
+//          encodingType =  getContentCharSet(entity2) // EntityUtils.getContentCharSet(entity)
           if (encodingType == null) {
-            encodingType = "ISO-8859-15"//"UTF-8" ISO-8859-15
+            encodingType = "UTF-8"//"UTF-8" ISO-8859-15
           }
         }
         catch {
@@ -234,6 +254,70 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
       }
     }
     None
+  }
+
+  private def getContentCharSet(entity: HttpEntity): String ={
+
+    val default_charset = "UTF-8"
+    var encodingCharSet = EntityUtils.getContentCharSet(entity)
+
+    if  (encodingCharSet == null) {
+      val contentType = entity.getContentType().toString
+      val start_ix =  contentType.indexOf("charset=")
+      if (start_ix > 0){
+        encodingCharSet = contentType.substring(start_ix+9)
+      } else{
+        //still can't find it?  look through html
+
+        try {
+          val instream = entity.getContent
+          val rawlHtml = EntityUtils.toString(entity)
+          val is = new ByteArrayInputStream(rawlHtml.getBytes())
+          val doc = Jsoup.parse(rawlHtml)
+          encodingCharSet = getCharSet(doc)
+        }
+        finally {
+
+          EntityUtils.consume(entity)
+        }
+      }
+    }
+
+//    if (encodingCharSet != null && encodingCharSet.toLowerCase() == "iso-8859-1") {
+//      encodingCharSet = "ISO-8859-15"
+//    }
+    encodingCharSet
+  }
+
+  def getCharSet(doc: Document): String ={
+
+    var meta_content_type: String = ""
+    var encodingCharSet: String = null
+
+      if (doc != None) {
+
+        var slice_index =  0
+        if (doc.select("meta[charset]").size() > 0){
+          meta_content_type = doc.select("meta[charset]").first.toString
+          slice_index =   meta_content_type.indexOfSlice("charset=") + 9
+        }else if(doc.select("meta[http-equiv=Content-Type]").size() > 0){
+          meta_content_type =  doc.select("meta[http-equiv=Content-Type]").first.toString
+          slice_index =   meta_content_type.indexOfSlice("charset=") + 8
+        }
+
+        if (slice_index >= 8){
+          val meta_content_type_slice =  meta_content_type.substring(slice_index)
+          val possible_endix_array = Array(meta_content_type_slice.indexOf("'"), meta_content_type_slice.indexOf("\""), meta_content_type_slice.indexOf(" ")).filter(i => i > 0)
+          if (possible_endix_array.length > 0 ){
+            val end_ix =   possible_endix_array.reduceLeft(_ min _)
+            encodingCharSet = meta_content_type_slice.substring(0, end_ix)
+          }
+        }
+      }
+//    if (encodingCharSet != null && encodingCharSet.toLowerCase() == "iso-8859-1") {
+//      encodingCharSet = "ISO-8859-15"
+//    }
+    encodingCharSet
   }
 
   private def initClient() {
