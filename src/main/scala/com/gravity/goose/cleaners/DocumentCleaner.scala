@@ -47,7 +47,7 @@ trait DocumentCleaner {
     trace("Starting cleaning phase with DefaultDocumentCleaner")
 
     var docToClean: Document = article.doc
-    docToClean = cleanEmTags(docToClean)
+//    docToClean = cleanEmTags(docToClean)
     docToClean = removeDropCaps(docToClean)
     docToClean = removeScriptsAndStyles(docToClean)
     docToClean = cleanBadTags(docToClean)
@@ -350,11 +350,9 @@ trait DocumentCleaner {
          val text_world_count = StopWords.getStopWordCount(div.text()).getWordCount
          // convert it only if the element text moslty a link
 
-         if (div.select("a").map(a => StopWords.getStopWordCount(a.text()).wordCount).sum > max_link_words_percent * text_world_count){
+         if (div.select("a").map(a => StopWords.getStopWordCount(a.text()).wordCount).sum < max_link_words_percent * text_world_count){
            replaceElementsWithPara(doc, div)
          }
-
-
        }
        catch {
          case e: NullPointerException => {
@@ -470,7 +468,7 @@ object DocumentCleaner extends Logging {
   // create negative elements
   sb.append("^side$|combx|retweet|mediaarticlerelated|menucontainer|navbar|comment|PopularQuestions|contact|foot|footer|Footer|footnote|cnn_strycaptiontxt|links|meta$|shoutbox|sponsor|^pb|error|review")
   sb.append("|tags|socialnetworking|socialNetworking|cnnStryHghLght|cnn_stryspcvbx|^inset$|pagetools|post-attributes|welcome_form|contentTools2|the_answers|remember-tool-tip|article-media-overlay")
-  sb.append("|communitypromo|runaroundLeft|subscribe|vcard|articleheadings|date|^print$|popup|author-dropdown|tools|socialtools|byline|konafilter|KonaFilter|breadcrumbs|^fn$|wp-caption-text|related")
+  sb.append("|communitypromo|runaroundLeft|subscribe|vcard|articleheadings|date|^print$|popup|author-dropdown|tools|socialtools|byline|konafilter|KonaFilter|breadcrumbs|^fn$|wp-caption-text|related|hidden")
 
   /**
   * this regex is used to remove undesirable nodes from our doc
@@ -481,7 +479,7 @@ object DocumentCleaner extends Logging {
   val queryNaughtyClasses = "[class~=(" + regExRemoveNodes + ")]"
   val queryNaughtyNames = "[name~=(" + regExRemoveNodes + ")]"
   val tabsAndNewLinesReplacements = ReplaceSequence.create("\n", "\n\n").append("\t").append("^\\s+$")
-  val tagsToRemove: List[String] = List("aside")
+  val tagsToRemove: List[String] = List("aside", "article", "em")
 
   /**
   * regex to detect if there are block level elements inside of a div element
@@ -489,7 +487,7 @@ object DocumentCleaner extends Logging {
   val divToPElementsPattern: Pattern = Pattern.compile("<(a|blockquote|dl|div|picture|img|ol|p|pre|table|ul|li|video|section|figcaption)")
 
   val blockElemementTags = TagsEvaluator("a", "blockquote", "dl", "div", "ol", "p", "pre", "table", "ul", "section", "img", "video")
-  val articleRootTags = TagsEvaluator("div", "span", "article")
+  val articleRootTags = TagsEvaluator("div", "span")
 
   val captionPattern: Pattern = Pattern.compile("^caption$")
   val googlePattern: Pattern = Pattern.compile(" google ")
