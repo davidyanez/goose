@@ -193,9 +193,11 @@ trait OutputFormatter {
             "<div style=\"" + wrapper_div_style + "\">" + "<iframe " + iframe_attributes + " style=\"" + iframe_style + "\"></iframe></div>"
           }
           else if (HEADERS.contains(e.tagName())) {
+            // to avoid having two h1 headers in the top , title and first h1 tag.
+            val tag_name =  if (e.tagName() == "h1") "h2" else e.tagName()
             if (e.text() != title)
 
-              s"<${e.tagName}>${e.html}</${e.tagName}>"
+              s"<${tag_name}>${e.html}</${tag_name}>"
             //              s"<${e.tagName}>${trim_element_text(e)}</${e.tagName}>"
             else {""}
             // && FOLLOW_HEADER_TAGS.contains(e.nextElementSibling().tagName())
