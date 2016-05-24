@@ -137,7 +137,6 @@ trait OutputFormatter {
         val HEADERS: List[String] = List("h1","h2", "h3", "h4", "h5", "h6")
         val keep_tags: List[String] = List("hr", "figcaption")
         val FOLLOW_HEADER_TAGS : List[String] = List("p", "img", "iframe", "video", "picture", "figure", "hr")
-//        var processed_element = new ListBuffer[Int]
 
         node.getAllElements.map((e: Element) => {
 
@@ -392,7 +391,7 @@ trait OutputFormatter {
       for (el <- allNodes) {
         try {
           val stopWords = StopWords.getStopWordCount(el.text)
-          if ( (!IGNORE_TAGS.contains(el.tagName()) && IGNORE_TAGS.forall(tag => el.getElementsByTag(tag).isEmpty)) && stopWords.getStopWordCount < 3 && el.getElementsByTag("object").size == 0 && el.getElementsByTag("embed").size == 0) {
+          if ( (!IGNORE_TAGS.contains(el.tagName()) && IGNORE_TAGS.forall(tag => el.getElementsByTag(tag).isEmpty)) && stopWords.getWordCount <= 1 && el.getElementsByTag("object").size == 0 && el.getElementsByTag("embed").size == 0) {
             logger.debug("removeParagraphsWithFewWords - swcnt: %d removing text: %s".format(stopWords.getStopWordCount, el.text()))
             el.remove()
           }
