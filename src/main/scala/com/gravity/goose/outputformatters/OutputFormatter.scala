@@ -19,7 +19,6 @@
 package com.gravity.goose.outputformatters
 
 import scala.util.control._
-import scala.collection.mutable.ListBuffer
 
 import com.gravity.goose.Article
 import org.jsoup.nodes._
@@ -84,7 +83,7 @@ trait OutputFormatter {
     * @param topNode the top most node to format
   * @return a formatted string with all HTML removed
   */
-  def getFormattedHTML(article: Article): String = {
+  def getFormattedHTML(article: Article): Option[Document] = {
 
     val topNode =  article.topNode
     val title = article.title
@@ -97,15 +96,8 @@ trait OutputFormatter {
 //    convertLinksToText(topNode)
 //    replaceTagsWithText(topNode)
     removeParagraphsWithFewWords(topNode)
-    val header_meta = if (article.charSet != null || article.charSet.length > 0) s"<meta charset='${article.charSet}'>" else s"<meta charset='UTF-8'>" +
-      s"<meta name='keywords' content='${article.metaKeywords}'>"  + s"<meta name='description' content='${article.metaDescription}'>"
+    getSimpleHTMLDoc(topNode, article)
 
-    val style = "<style>" +
-      "h1 {font-size: 2.5em;}" +
-      "p {font-size:1.25em; }" +
-      "</style>"
-
-    s"<html><head>$header_meta$style</head><body><h1>$title</h1>${convertToSimpleHTML(topNode, article)}</ body></ html>"
   }
 
   /**
@@ -124,11 +116,34 @@ trait OutputFormatter {
 
     }
 
-  def convertToSimpleHTML(topNode: Element, article: Article): String = topNode match {
 
-      case null => ""
+
+  def getSimpleHTMLDoc(topNode: Element, article: Article): Option[Document] = topNode match {
+
+      case null => None
 
       case node => {
+
+//        val doc = new HTMLDocument()
+//        val body = doc.setInnerHTML(doc.getDefaultRootElement, "<body>")
+//        val head = doc.setInnerHTML(doc.getDefaultRootElement, "<head>")
+        val doc = new Document("/")
+        val root = doc.appendElement("html")
+        val head = root.appendElement("head")
+        val body = root.appendElement("body")
+
+
+        val head_meta_charset = if (article.charSet != null || article.charSet.length > 0) s"<meta charset='${article.charSet}'>" else s"<meta charset='UTF-8'>"
+        val head_meta_description = s"<meta name='keywords' content='${article.metaKeywords}'>"  + s"<meta name='description' content='${article.metaDescription}'>"
+        val head_meta_style =
+          """<style>
+              h1 {font-size: 2.5em;}
+              p {font-size:1.25em; }
+            </style>""".stripMargin
+
+        head.append(head_meta_charset)
+        head.append(head_meta_description)
+        head.append(head_meta_style)
 
         val domain = article.domain
         val title = article.title
@@ -139,8 +154,7 @@ trait OutputFormatter {
         val FOLLOW_HEADER_TAGS : List[String] = List("p", "img", "iframe", "video", "picture", "figure", "hr")
 //        var processed_element = new ListBuffer[Int]
 
-        node.getAllElements.map((e: Element) => {
-
+        val body_html = node.getAllElements.map((e: Element) => {
 
           if (e.tagName() == "p") {
             if (e.text() != title)
@@ -152,10 +166,10 @@ trait OutputFormatter {
             s"<p>${e.outerHtml()}</p>"
           }
           else if (e.tagName().contains(List("ol", "ul"))) {
-            e.outerHtml()
+            s"<p>${e.outerHtml()}</p>"
           }
           else if (keep_tags.contains(e.tagName())) {
-            e.outerHtml()
+            s"<p>${e.outerHtml()}</p>"
           }
           else if (e.tagName() == "img") {
 
@@ -190,14 +204,14 @@ trait OutputFormatter {
 
             val wrapper_div_style = "position:relative;padding-bottom: 56.25%;padding-top: 25px;height:0;"
             val iframe_style = "position:absolute;top=0;left:0;width:100%;height:95%;"
-            "<div style=\"" + wrapper_div_style + "\">" + "<iframe " + iframe_attributes + " style=\"" + iframe_style + "\"></iframe></div>"
+            "<p><div style=\"" + wrapper_div_style + "\">" + "<iframe " + iframe_attributes + " style=\"" + iframe_style + "\"></iframe></div></p>"
           }
           else if (HEADERS.contains(e.tagName())) {
             // to avoid having two h1 headers in the top , title and first h1 tag.
             val tag_name =  if (e.tagName() == "h1") "h2" else e.tagName()
             if (e.text() != title)
 
-              s"<${tag_name}>${e.html}</${tag_name}>"
+              s"<p><${tag_name}>${e.html}</${tag_name}></p>"
             //              s"<${e.tagName}>${trim_element_text(e)}</${e.tagName}>"
             else {""}
             // && FOLLOW_HEADER_TAGS.contains(e.nextElementSibling().tagName())
@@ -205,6 +219,10 @@ trait OutputFormatter {
           else {""}
 
         }).toList.mkString("")
+
+        body.append(body_html)
+        Some(doc)
+
       }
     }
 
