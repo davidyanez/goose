@@ -48,6 +48,8 @@ class Article {
     */
   var cleanedArticleSimpleHTML:  String = ""
 
+  var cleanedArticleSimpleHTMLDoc:  Option[Document] = None
+
   var metaContentType: String = ""
 
   var charSet: String = ""
