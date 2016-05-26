@@ -148,13 +148,22 @@ class Crawler(config: Configuration) {
         }
         releaseResources(article)
       }
-      if (article_found && isValidArticle(article)){
+      val validArticle = isValidArticle(article)
+
+      if (article_found && validArticle){
         Some(article)
       }  else {
+         if (!validArticle) {trace(s"Article not found: ${crawlCandidate.url}")}
+        else {
+           trace(s"Article is not Valid: ${crawlCandidate.url}")
+         }
         None
       }
     } catch{
-      case _ => None
+      case _ => {
+        trace(s"Error Processing The Article: ${crawlCandidate.url}")
+        None
+      }
     }
   }
 
