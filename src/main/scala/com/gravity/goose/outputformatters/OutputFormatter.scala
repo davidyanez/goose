@@ -97,7 +97,7 @@ trait OutputFormatter {
 //    convertLinksToText(topNode)
 //    replaceTagsWithText(topNode)
     removeParagraphsWithFewWords(topNode)
-    val header_meta = if (article.charSet != null || article.charSet.length > 0) s"<meta charset='${article.charSet}'>" else "" +
+    val header_meta = if (article.charSet != null || article.charSet.length > 0) s"<meta charset='${article.charSet}'>" else s"<meta charset='UTF-8'>" +
       s"<meta name='keywords' content='${article.metaKeywords}'>"  + s"<meta name='description' content='${article.metaDescription}'>"
 
     val style = "<style>" +

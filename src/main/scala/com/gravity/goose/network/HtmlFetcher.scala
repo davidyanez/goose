@@ -282,9 +282,6 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
       }
     }
 
-//    if (encodingCharSet != null && encodingCharSet.toLowerCase() == "iso-8859-1") {
-//      encodingCharSet = "ISO-8859-15"
-//    }
     encodingCharSet
   }
 
@@ -313,9 +310,7 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
           }
         }
       }
-//    if (encodingCharSet != null && encodingCharSet.toLowerCase() == "iso-8859-1") {
-//      encodingCharSet = "ISO-8859-15"
-//    }
+
     encodingCharSet
   }
 
