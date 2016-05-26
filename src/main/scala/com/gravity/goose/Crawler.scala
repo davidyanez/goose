@@ -47,7 +47,7 @@ class Crawler(config: Configuration) {
     for {
       parseCandidate <- URLHelper.getCleanedUrl(crawlCandidate.url)
       rawHtml <- getHTML(crawlCandidate, parseCandidate)
-      doc <- getDocument(parseCandidate.url.toString, rawHtml)
+      doc <- getDocument(rawHtml)
     } {
       trace("Crawling url: " + parseCandidate.url)
 
@@ -81,21 +81,19 @@ class Crawler(config: Configuration) {
           val imageExtractor = getImageExtractor(article)
           imageExtractor.RemoveBadImages(article)
 
-//          extractor.postExtractionCleanup3(article.topNode)
+          article.cleanedArticleSimpleHTMLDoc =  outputFormatter.getFormattedHTML(article)
+          article.cleanedArticleSimpleHTML = article.cleanedArticleSimpleHTMLDoc.get.html
 
-          article.cleanedArticleSimpleHTML = outputFormatter.getFormattedHTML(article)
-
-          //article.topNode = extractor.postExtractionCleanup(article.topNode)
-
-          article.cleanedArticleText = outputFormatter.getFormattedText(article.topNode)
+//          article.cleanedArticleText = outputFormatter.getFormattedText(article.topNode)
 
         }
         case _ => trace("NO ARTICLE FOUND")
       }
       releaseResources(article)
+      val validArticle = isValidArticle(article)
       article
     }
-
+    val validArticle = isValidArticle(article)
     article
   }
 
@@ -108,7 +106,7 @@ class Crawler(config: Configuration) {
       for {
         parseCandidate <- URLHelper.getCleanedUrl(crawlCandidate.url)
         rawHtml <- getHTML(crawlCandidate, parseCandidate)
-        doc <- getDocument(parseCandidate.url.toString, rawHtml)
+        doc <- getDocument(rawHtml)
       }
       {
         trace("Crawling url: " + parseCandidate.url)
@@ -141,14 +139,16 @@ class Crawler(config: Configuration) {
             article.topNode = node
             val imageExtractor = getImageExtractor(article)
             imageExtractor.RemoveBadImages(article)
-            article.cleanedArticleSimpleHTML = outputFormatter.getFormattedHTML(article)
+
+            article.cleanedArticleSimpleHTMLDoc =  outputFormatter.getFormattedHTML(article)
+            article.cleanedArticleSimpleHTML = article.cleanedArticleSimpleHTMLDoc.get.html
 
           }
           case _ => {trace("NO ARTICLE FOUND");article_found=false }
         }
         releaseResources(article)
       }
-      val validArticle = true //isValidArticle(article)
+      val validArticle = isValidArticle(article)
 
       if (article_found && validArticle){
         Some(article)
@@ -169,13 +169,25 @@ class Crawler(config: Configuration) {
 
   def isValidArticle(article: Article): Boolean ={
 
-    val mim_paragraph_words = 2
-    val min_paragraphs = 1
-    val n_nodes = article.cleanedArticleSimpleHTML.select("p").asScala.filter(p => p.text().length() > mim_paragraph_words).length
+    if (article.cleanedArticleSimpleHTMLDoc.isDefined) {
 
-     if  (n_nodes >= min_paragraphs) {
-       true
-     }  else {false}
+      val paragraph_inner_valid_tags =  Array("img", "iframe", "video", "ul", "table")
+      val mim_paragraph_words = 4
+      val min_paragraphs = 1
+
+      // paragraphs must contains text or any paragraph_inner_valid_tags
+      val n_paragraphs = article.cleanedArticleSimpleHTMLDoc.get.select("p").asScala.filter(
+        p => p.text().length() > mim_paragraph_words || paragraph_inner_valid_tags.map(tag => p.select(tag).size() > 0).reduce((a,b) => a || b)
+      ).length
+
+       if  (n_paragraphs >= min_paragraphs) {
+         true
+       }  else {false}
+    }
+    else{
+      false
+    }
+
 
    }
 
@@ -206,15 +218,14 @@ class Crawler(config: Configuration) {
     new StandardDocumentCleaner
   }
 
-  def getDocument(url: String, rawlHtml: String): Option[Document] = {
+  def getDocument(rawlHtml: String): Option[Document] = {
 
     try {
-      val is = new ByteArrayInputStream(rawlHtml.getBytes())
-//      Some(Jsoup.parse(is, "UTF-8", url))
+
       Some(Jsoup.parse(rawlHtml))
     } catch {
       case e: Exception => {
-        trace("Unable to parse " + url + " properly into JSoup Doc")
+        trace("Unable to parse this html properly into JSoup Doc")
         None
       }
     }
