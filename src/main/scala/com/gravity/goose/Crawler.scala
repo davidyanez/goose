@@ -148,20 +148,20 @@ class Crawler(config: Configuration) {
         }
         releaseResources(article)
       }
-      val validArticle = isValidArticle(article)
+      val validArticle = true //isValidArticle(article)
 
       if (article_found && validArticle){
         Some(article)
       }  else {
-         if (!validArticle) {trace(s"Article not found: ${crawlCandidate.url}")}
+         if (!validArticle) {println(s"Article is not Valid: ${crawlCandidate.url}")}
         else {
-           trace(s"Article is not Valid: ${crawlCandidate.url}")
+           println(s"Article not Found: ${crawlCandidate.url}")
          }
         None
       }
     } catch{
       case _ => {
-        trace(s"Error Processing The Article: ${crawlCandidate.url}")
+        println(s"Error Processing The Article: ${crawlCandidate.url}")
         None
       }
     }
@@ -169,8 +169,8 @@ class Crawler(config: Configuration) {
 
   def isValidArticle(article: Article): Boolean ={
 
-    val mim_paragraph_words = 5
-    val min_paragraphs = 2
+    val mim_paragraph_words = 2
+    val min_paragraphs = 1
     val n_nodes = article.topNode.select("p").asScala.filter(p => p.text().length() > mim_paragraph_words).length
 
      if  (n_nodes >= min_paragraphs) {
