@@ -171,7 +171,7 @@ class Crawler(config: Configuration) {
 
     val mim_paragraph_words = 2
     val min_paragraphs = 1
-    val n_nodes = article.topNode.select("p").asScala.filter(p => p.text().length() > mim_paragraph_words).length
+    val n_nodes = article.cleanedArticleSimpleHTML.select("p").asScala.filter(p => p.text().length() > mim_paragraph_words).length
 
      if  (n_nodes >= min_paragraphs) {
        true
