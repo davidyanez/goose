@@ -401,7 +401,7 @@ trait OutputFormatter {
       if (logger.isDebugEnabled) {
         logger.debug("removeParagraphsWithFewWords starting...")
       }
-      val IGNORE_TAGS = Array("img", "iframe", "picture", "video","figure","hr", "h2", "h3", "h4", "br", "b")
+      val IGNORE_TAGS = Array("img", "iframe", "picture", "video","figure","hr", "h2", "h3", "h4", "br", "b", "strong")
 
       val allNodes = topNode.getAllElements
 
