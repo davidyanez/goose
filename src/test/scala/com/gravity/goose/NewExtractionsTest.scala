@@ -417,6 +417,25 @@ class NewExtractionsTest {
     }
 
 
+  @Test
+  def qivo_1561() {
+
+   implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+   val url = "http://nickoskitchen.com/blogs/10-perfectly-delicious-peanut-butter-cupcakes"
+   val article = TestUtils.getArticle(url = url)
+   println(article.cleanedArticleSimpleHTML)
+
+   val out_html = new PrintWriter(new File("./"+output_folder+"/"+"qivo_1561.html"))
+   out_html.write(article.cleanedArticleSimpleHTML)
+
+   out_html.close()
+    }
+
+
+  // http://nickoskitchen.com/blogs/10-perfectly-delicious-peanut-butter-cupcakes
+
+
   // http://ici.radio-canada.ca/emissions/medium_large/2015-2016/chronique.asp?idChronique=389093
 
   // http://www.techradar.com/us/news/world-of-tech/future-tech/graphene-breakthrough-is-a-step-closer-to-a-phone-battery-that-lasts-for-a-week-1309253
