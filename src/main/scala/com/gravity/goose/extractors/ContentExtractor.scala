@@ -55,7 +55,7 @@ trait ContentExtractor {
   val SPACE_SPLITTER: StringSplitter = new StringSplitter(" ")
   val NO_STRINGS = Set.empty[String]
   val A_REL_TAG_SELECTOR: String = "a[rel=tag], a[href*=/tag/]"
-  val TOP_NODE_TAGS = new TagsEvaluator(Set("p", "td", "pre", "div"))
+  val TOP_NODE_TAGS = new TagsEvaluator(Set("p", "td", "pre", "div", "article"))
 
   def getTitle(article: Article): String = {
     var title: String = string.empty
@@ -256,7 +256,8 @@ trait ContentExtractor {
 
       val nodeText: String = node.text
       val wordStats: WordStats = StopWords.getStopWordCount(nodeText)
-      val tag_score = if (node.tagName() == "p") 10 else 0
+      val tag_score = if (node.tagName() == "p") 10 else if (Array("img", "iframe", "video").contains(node.tagName())) 20 else 0
+
       val upscore: Int = (wordStats.getStopWordCount + boostScore + tag_score).asInstanceOf[Int]
       updateScore(node.parent, upscore)
       updateScore(node.parent.parent, upscore / 2)
