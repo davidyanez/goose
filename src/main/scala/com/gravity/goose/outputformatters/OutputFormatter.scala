@@ -124,14 +124,10 @@ trait OutputFormatter {
 
       case node => {
 
-//        val doc = new HTMLDocument()
-//        val body = doc.setInnerHTML(doc.getDefaultRootElement, "<body>")
-//        val head = doc.setInnerHTML(doc.getDefaultRootElement, "<head>")
         val doc = new Document("/")
         val root = doc.appendElement("html")
         val head = root.appendElement("head")
         val body = root.appendElement("body")
-
 
         val head_meta_charset = if (article.charSet != null || article.charSet.length > 0) s"<meta charset='${article.charSet}'>" else s"<meta charset='UTF-8'>"
         val head_meta_description = s"<meta name='keywords' content='${article.metaKeywords}'>"  + s"<meta name='description' content='${article.metaDescription}'>"
@@ -144,6 +140,8 @@ trait OutputFormatter {
         head.append(head_meta_charset)
         head.append(head_meta_description)
         head.append(head_meta_style)
+
+        body.append(s"<h1>${article.title}</h1>")
 
         val domain = article.domain
         val title = article.title
