@@ -401,14 +401,14 @@ trait OutputFormatter {
       if (logger.isDebugEnabled) {
         logger.debug("removeParagraphsWithFewWords starting...")
       }
-      val IGNORE_TAGS = Array("img", "iframe", "picture", "video","figure","hr", "h2", "h3", "h4", "br", "b", "strong")
+      val IGNORE_TAGS = Array("img", "iframe", "picture", "video","figure","hr", "h2", "h3", "h4", "br", "b", "strong", "a")
 
-      val allNodes = topNode.getAllElements
+      val allNodes = topNode.select("p")
 
       for (el <- allNodes) {
         try {
           val stopWords = StopWords.getStopWordCount(el.text)
-          if ( (!IGNORE_TAGS.contains(el.tagName()) && IGNORE_TAGS.forall(tag => el.getElementsByTag(tag).isEmpty)) && stopWords.getStopWordCount < 3 && el.getElementsByTag("object").size == 0 && el.getElementsByTag("embed").size == 0) {
+          if ( stopWords.getStopWordCount < 3 && el.getElementsByTag("object").size == 0 && el.getElementsByTag("embed").size == 0) {
             logger.debug("removeParagraphsWithFewWords - swcnt: %d removing text: %s".format(stopWords.getStopWordCount, el.text()))
             el.remove()
           }
