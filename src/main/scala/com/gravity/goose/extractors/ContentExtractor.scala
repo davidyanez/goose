@@ -256,7 +256,8 @@ trait ContentExtractor {
 
       val nodeText: String = node.text
       val wordStats: WordStats = StopWords.getStopWordCount(nodeText)
-      val upscore: Int = (wordStats.getStopWordCount + boostScore).asInstanceOf[Int]
+      val tag_score = if (node.tagName() == "p") 10 else 0
+      val upscore: Int = (wordStats.getStopWordCount + boostScore + tag_score).asInstanceOf[Int]
       updateScore(node.parent, upscore)
       updateScore(node.parent.parent, upscore / 2)
       updateNodeCount(node.parent, 1)
