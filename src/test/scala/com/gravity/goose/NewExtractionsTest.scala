@@ -432,24 +432,22 @@ class NewExtractionsTest {
    out_html.close()
     }
 
+  @Test
+  def qivo_1553() {
 
-  // http://nickoskitchen.com/blogs/10-perfectly-delicious-peanut-butter-cupcakes
+   implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+   val url = "https://www.buzzfeed.com/stephaniemlee/wearing-this-bracelet-could-lower-your-stress-levels?utm_term=.umqVgeN1v#.ce7jr2zRO"
+   val article = TestUtils.getArticle(url = url)
+   println(article.cleanedArticleSimpleHTML)
+
+   val out_html = new PrintWriter(new File("./"+output_folder+"/"+"qivo_1553.html"))
+   out_html.write(article.cleanedArticleSimpleHTML)
+
+   out_html.close()
+  }
 
 
-  // http://ici.radio-canada.ca/emissions/medium_large/2015-2016/chronique.asp?idChronique=389093
-
-  // http://www.techradar.com/us/news/world-of-tech/future-tech/graphene-breakthrough-is-a-step-closer-to-a-phone-battery-that-lasts-for-a-week-1309253
-
-  // https://www.buzzfeed.com/stephaniemlee/uncommon-core?utm_term=.xcwYP87n5#.gdQmJYGgq
-
-
-  // https://www.newscientist.com/article/2086454-revealed-google-ai-has-access-to-huge-haul-of-nhs-patient-data/
-
-
-  // http://motherboard-images.vice.com/content-images/contentimage/no-id/1461696042952895.jpeg
-  // http://www.engadget.com/2016/04/27/dyson-made-a-hair-dryer/
-  // https://hbr.org/2016/04/social-media-is-too-important-to-be-left-to-the-marketing-department
-  // http://www.dailyedge.ie/pizza-pizza-box-amazing-2742051-Apr2016/
-  // http://www.fool.ca/2016/04/28/bombardier-inc-gets-another-order/
+  // http://www.buzzfeed.com/stephaniemlee/wearing-this-bracelet-could-lower-your-stress-levels#.akO3aAVzX
 
 }
