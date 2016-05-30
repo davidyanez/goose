@@ -256,7 +256,7 @@ class UpgradedImageIExtractor(httpClient: HttpClient, article: Article, config: 
         val imageSource: String = this.buildImagePath(image.attr("src"))
         val local_img = getLocallyStoredImage(buildImagePath(image.attr("src"))).getOrElse(null)
 
-        if ((local_img.width < 150 || local_img.height < 150 || local_img.bytes < config.minBytesForImages)) {
+        if ((local_img.width < 50 && local_img.height < 50 || local_img.bytes < config.minBytesForImages)) {
           image.remove()
         }
 
