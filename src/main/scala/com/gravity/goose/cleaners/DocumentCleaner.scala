@@ -47,6 +47,8 @@ trait DocumentCleaner {
     trace("Starting cleaning phase with DefaultDocumentCleaner")
 
     var docToClean: Document = article.doc
+
+    docToClean = convertImgDataSrc(docToClean)
     docToClean = cleanEmTags(docToClean)
     docToClean = removeDropCaps(docToClean)
     docToClean = removeScriptsAndStyles(docToClean)
@@ -63,6 +65,8 @@ trait DocumentCleaner {
 //    docToClean = convertWantedTagsToParagraphs(docToClean, articleRootTags)
 
     docToClean = convertDivsToParagraphs(docToClean, "div")
+
+
 //    docToClean = convertDivsToParagraphs(docToClean, "span")
     docToClean = cleanUpSpanTagsInParagraphs(docToClean)
     docToClean = convertElementsToParagraphs(docToClean, "li")
@@ -266,6 +270,7 @@ trait DocumentCleaner {
     div.replaceWith(newNode)
   }
 
+
   private def convertWantedTagsToParagraphs(doc: Document, wantedTags: TagsEvaluator): Document = {
 
     val selected = Collector.collect(wantedTags, doc)
@@ -289,6 +294,20 @@ trait DocumentCleaner {
     doc
   }
 
+  private def convertImgDataSrc(doc: Document): Document = {
+
+    val IMG_EXTENSIONS = Array(".jpg", ".png", ".jpeg", ".bmp", ".gif", ".tif")
+    val elements = doc.getElementsByAttribute("data-src")
+    for (elem <- elements) {
+      val data_src = elem.attr("data-src")
+      if ( IMG_EXTENSIONS.map(ext => data_src.contains(ext)).reduce((a,b) => a || b)  ){
+        var ImgNode: Node =  doc.createElement("img")
+        ImgNode.attr("src", data_src)
+        elem.appendChild(ImgNode)
+      }
+    }
+    doc
+  }
 
   private def convertDivsToParagraphs(doc: Document, domType: String): Document = {
     trace("Starting to replace bad divs...")
@@ -486,7 +505,7 @@ object DocumentCleaner extends Logging {
   /**
   * regex to detect if there are block level elements inside of a div element
   */
-  val divToPElementsPattern: Pattern = Pattern.compile("<(a|blockquote|dl|div|picture|img|ol|p|pre|table|ul|li|video|section|figcaption)")
+  val divToPElementsPattern: Pattern = Pattern.compile("<(a|blockquote|dl|div|picture|ol|p|pre|table|ul|li|video|section|figcaption)")
 
   val blockElemementTags = TagsEvaluator("a", "blockquote", "dl", "div", "ol", "p", "pre", "table", "ul", "section", "img", "video")
   val articleRootTags = TagsEvaluator("div", "span", "article")
