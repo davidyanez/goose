@@ -477,7 +477,23 @@ class NewExtractionsTest {
    out_html.close()
   }
 
+  @Test
+    def qivo_1722() {
 
+     implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+     val url = "http://www.bbc.com/news/science-environment-34809804?ocid=socialflow_facebook&ns_mchannel=social&ns_campaign=bbcnews&ns_source=facebook"
+     val article = TestUtils.getArticle(url = url)
+     println(article.cleanedArticleSimpleHTML)
+
+     val out_html = new PrintWriter(new File("./"+output_folder+"/"+"qivo_1722.html"))
+     out_html.write(article.cleanedArticleSimpleHTML)
+
+     out_html.close()
+    }
+
+
+  //
   // http://www.bbc.com/news/in-pictures-34880592
   // http://business.financialpost.com/news/mining/canadian-miner-lucara-uncovers-1111-carat-diamond-believed-to-be-second-largest-ever-found
   // http://www.buzzfeed.com/stephaniemlee/wearing-this-bracelet-could-lower-your-stress-levels#.akO3aAVzX
