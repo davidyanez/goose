@@ -401,7 +401,7 @@ trait OutputFormatter {
         logger.debug("removeParagraphsWithFewWords starting...")
       }
       val IGNORE_TAGS = Array("img", "iframe", "picture", "video","figure","hr", "h1", "h2", "h3", "h4", "br", "b", "strong", "a", "li")
-      val INNER_SAFE_TAGS = Array("img", "iframe", "picture", "video", "figure")  // do not delete paragraphs containing this tags
+      val INNER_SAFE_TAGS = Array("img", "iframe", "picture", "video", "figure", "strong")  // do not delete paragraphs containing this tags
 
       val allNodes = topNode.getAllElements
 
@@ -409,7 +409,7 @@ trait OutputFormatter {
         try {
 
           val stopWords = StopWords.getStopWordCount(el.text)
-          if (!IGNORE_TAGS.contains(el.tagName())  && INNER_SAFE_TAGS.forall(tag => el.getElementsByTag(tag).isEmpty) && stopWords.getStopWordCount <= 3 && el.getElementsByTag("object").size == 0 && el.getElementsByTag("embed").size == 0) {
+          if (!IGNORE_TAGS.contains(el.tagName())  && INNER_SAFE_TAGS.forall(tag => el.getElementsByTag(tag).isEmpty) && stopWords.getStopWordCount <= 1 && el.getElementsByTag("object").size == 0 && el.getElementsByTag("embed").size == 0) {
             logger.debug("removeParagraphsWithFewWords - swcnt: %d removing text: %s".format(stopWords.getStopWordCount, el.text()))
             el.remove()
           }
