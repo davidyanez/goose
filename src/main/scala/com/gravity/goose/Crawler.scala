@@ -84,8 +84,6 @@ class Crawler(config: Configuration) {
           article.cleanedArticleSimpleHTMLDoc =  outputFormatter.getFormattedHTML(article)
           article.cleanedArticleSimpleHTML = article.cleanedArticleSimpleHTMLDoc.get.html
 
-//          article.cleanedArticleText = outputFormatter.getFormattedText(article.topNode)
-
         }
         case _ => trace("NO ARTICLE FOUND")
       }
