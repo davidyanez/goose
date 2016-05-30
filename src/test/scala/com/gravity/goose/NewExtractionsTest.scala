@@ -447,7 +447,39 @@ class NewExtractionsTest {
    out_html.close()
   }
 
+  @Test
+  def qivo_1640() {
 
+   implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+   val url = "http://business.financialpost.com/news/mining/canadian-miner-lucara-uncovers-1111-carat-diamond-believed-to-be-second-largest-ever-found"
+   val article = TestUtils.getArticle(url = url)
+   println(article.cleanedArticleSimpleHTML)
+
+   val out_html = new PrintWriter(new File("./"+output_folder+"/"+"qivo_1640.html"))
+   out_html.write(article.cleanedArticleSimpleHTML)
+
+   out_html.close()
+  }
+
+  @Test
+  def qivo_1727() {
+
+   implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+   val url = "http://www.bbc.com/news/in-pictures-34880592"
+   val article = TestUtils.getArticle(url = url)
+   println(article.cleanedArticleSimpleHTML)
+
+   val out_html = new PrintWriter(new File("./"+output_folder+"/"+"qivo_1727.html"))
+   out_html.write(article.cleanedArticleSimpleHTML)
+
+   out_html.close()
+  }
+
+
+  // http://www.bbc.com/news/in-pictures-34880592
+  // http://business.financialpost.com/news/mining/canadian-miner-lucara-uncovers-1111-carat-diamond-believed-to-be-second-largest-ever-found
   // http://www.buzzfeed.com/stephaniemlee/wearing-this-bracelet-could-lower-your-stress-levels#.akO3aAVzX
 
 }
