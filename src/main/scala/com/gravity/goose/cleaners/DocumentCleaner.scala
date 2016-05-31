@@ -61,19 +61,13 @@ trait DocumentCleaner {
 
     docToClean =  removeBadTags(docToClean)
 
-
-//    docToClean = convertWantedTagsToParagraphs(docToClean, articleRootTags)
-
     docToClean = convertDivsToParagraphs(docToClean, "div")
 
-
-//    docToClean = convertDivsToParagraphs(docToClean, "span")
     docToClean = cleanUpSpanTagsInParagraphs(docToClean)
     docToClean = convertElementsToParagraphs(docToClean, "li")
 
     docToClean = cleanParagraphs(docToClean)
 
-    //    docToClean = convertDivsToParagraphs(docToClean, "span")
     docToClean
   }
 

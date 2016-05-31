@@ -210,6 +210,7 @@ trait ContentExtractor {
   */
 
   def calculateBestNodeBasedOnClustering(article: Article): Option[Element] = {
+
     trace(logPrefix + "Starting to calculate TopNode")
     val doc = article.doc
     var topNode: Element = null
