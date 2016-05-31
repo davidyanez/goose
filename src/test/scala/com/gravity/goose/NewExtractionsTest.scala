@@ -507,9 +507,24 @@ class NewExtractionsTest {
    out_html.close()
   }
 
+  @Test
+    def qivo_4324() {
+
+     implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+     val url = "http://www.whowhatwear.com/chanel-fall-winter-2016-runway-collection-karl-lagerfeld"
+     val article = TestUtils.getArticle(url = url)
+     println(article.cleanedArticleSimpleHTML)
+
+     val out_html = new PrintWriter(new File("./"+output_folder+"/"+"qivo_4324.html"))
+     out_html.write(article.cleanedArticleSimpleHTML)
+
+     out_html.close()
+    }
 
 
 
+  //
   // http://www.oddee.com/item_91848.aspx
   // http://www.bbc.com/news/in-pictures-34880592
   // http://business.financialpost.com/news/mining/canadian-miner-lucara-uncovers-1111-carat-diamond-believed-to-be-second-largest-ever-found
