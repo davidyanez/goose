@@ -492,8 +492,25 @@ class NewExtractionsTest {
      out_html.close()
     }
 
+  @Test
+  def qivo_1748() {
 
-  //
+   implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+   val url = "http://www.oddee.com/item_91848.aspx"
+   val article = TestUtils.getArticle(url = url)
+   println(article.cleanedArticleSimpleHTML)
+
+   val out_html = new PrintWriter(new File("./"+output_folder+"/"+"qivo_1748.html"))
+   out_html.write(article.cleanedArticleSimpleHTML)
+
+   out_html.close()
+  }
+
+
+
+
+  // http://www.oddee.com/item_91848.aspx
   // http://www.bbc.com/news/in-pictures-34880592
   // http://business.financialpost.com/news/mining/canadian-miner-lucara-uncovers-1111-carat-diamond-believed-to-be-second-largest-ever-found
   // http://www.buzzfeed.com/stephaniemlee/wearing-this-bracelet-could-lower-your-stress-levels#.akO3aAVzX
