@@ -132,26 +132,41 @@ trait OutputFormatter {
         val head_meta_description = s"<meta name='keywords' content='${article.metaKeywords}'>"  + s"<meta name='description' content='${article.metaDescription}'>"
         val head_meta_style =
           """<style>
-              h1 {font-size: 2.5em;}
-              p {font-size:1.25em; }
+              #web-article {}
+              #web-article h1 {font-size: 2.5em; font-color: red;}
+              #web-article h2 {}
+              #web-article h3 {}
+              #web-article h4 {}
+              #web-article h5 {}
+              #web-article h6 {}
+              #web-article p {font-size:1.25em; }
+
+              #web-article .video-wrap {}
+              #web-article .image-wrap { width: 90%;}
+              #web-article .image { max-width: 100%; height: auto; }
+              #web-article .video-iframe-wrap { position:relative;padding-bottom: 56.25%;padding-top: 25px;height:0; }
+              #web-article .video-iframe { position:absolute;top=0;left:0;width:100%;height:95%; }
+              #web-article .list {}
             </style>""".stripMargin
 
         head.append(head_meta_charset)
         head.append(head_meta_description)
         head.append(head_meta_style)
+        val article_div = body.appendElement("div")
+        article_div.attr("id", "web-article")
 
-        body.append(s"<h1>${article.title}</h1>")
+        article_div.append(s"<h1>${article.title}</h1>")
 
         val domain = article.domain
         val title = article.title
 
-        val SKIP_ATTRIBUTES: List[String] = List("style", "class", "alt")
+        val SKIP_ATTRIBUTES: List[String] = List("style", "class", "alt", "width", "height", "max-width")
         val HEADERS: List[String] = List("h1","h2", "h3", "h4", "h5", "h6")
-        val keep_tags: List[String] = List("hr", "figcaption")
+        val keep_tags: List[String] = List("hr", "figcaption", "br")
         val FOLLOW_HEADER_TAGS : List[String] = List("p", "img", "iframe", "video", "picture", "figure", "hr")
 //        var processed_element = new ListBuffer[Int]
 
-        val body_html = node.getAllElements.map((e: Element) => {
+        val article_div_html = node.getAllElements.map((e: Element) => {
 
           if (e.tagName() == "p") {
             if (e.text() != title)
@@ -160,13 +175,13 @@ trait OutputFormatter {
               ""
           }
           else if (e.tagName() == "video") {
-            s"<p>${e.outerHtml()}</p>"
+            s"<div class='video-wrap'>${e.outerHtml()}</div>"
           }
           else if (e.tagName().contains(List("ol", "ul"))) {
-            s"<p>${e.outerHtml()}</p>"
+            s"<div class='list'>${e.outerHtml()}</div>"
           }
           else if (keep_tags.contains(e.tagName())) {
-            s"<p>${e.outerHtml()}</p>"
+            s"${e.outerHtml()}"
           }
           else if (e.tagName() == "img") {
 
@@ -187,7 +202,7 @@ trait OutputFormatter {
             var img_attributes = e.attributes().filter((a: Attribute) => !SKIP_ATTRIBUTES.contains(a.getKey())).
               map((a: Attribute) => a.getKey + "=\"" + a.getValue + "\"").mkString(" ")
 
-            s"<p><img $img_attributes ></p>"
+            s"<div class='image-wrap'><img class='image' $img_attributes></div>"
 
           } else if (e.tagName() == "iframe"
             && (e.attr("src").contains("//www.youtube.com/embed/")
@@ -201,23 +216,20 @@ trait OutputFormatter {
 
             val wrapper_div_style = "position:relative;padding-bottom: 56.25%;padding-top: 25px;height:0;"
             val iframe_style = "position:absolute;top=0;left:0;width:100%;height:95%;"
-            "<p><div style=\"" + wrapper_div_style + "\">" + "<iframe " + iframe_attributes + " style=\"" + iframe_style + "\"></iframe></div></p>"
+            "<div class='video-iframe-wrap'>" + "<iframe class='video-iframe'" + iframe_attributes + "></iframe></div>"
           }
           else if (HEADERS.contains(e.tagName())) {
             // to avoid having two h1 headers in the top , title and first h1 tag.
             val tag_name =  if (e.tagName() == "h1") "h2" else e.tagName()
             if (e.text() != title)
-
-              s"<p><${tag_name}>${e.html}</${tag_name}></p>"
-            //              s"<${e.tagName}>${trim_element_text(e)}</${e.tagName}>"
+              s"<${tag_name}>${e.html}</${tag_name}>"
             else {""}
-            // && FOLLOW_HEADER_TAGS.contains(e.nextElementSibling().tagName())
           }
           else {""}
 
         }).toList.mkString("")
 
-        body.append(body_html)
+        article_div.append(article_div_html)
         Some(doc)
 
       }
