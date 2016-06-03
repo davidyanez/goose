@@ -160,6 +160,8 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
         }
         try {
           htmlResult = HtmlFetcher.convertStreamToString(instream, 15728640, encodingType).trim
+          new String(htmlResult.getBytes("UTF-8"), "UTF8")
+
         }
         finally {
           EntityUtils.consume(entity)
