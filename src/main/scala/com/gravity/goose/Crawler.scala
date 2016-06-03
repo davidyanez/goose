@@ -72,7 +72,6 @@ class Crawler(config: Configuration) {
       // before we do any calcs on the body itself let's clean up the document
       article.doc =  docCleaner.clean(article)
       article.metaContentType =  extractor.getMetaContentType(article)
-      article.charSet = config.getHtmlFetcher.getCharSet(article.doc)
 
       extractor.calculateBestNodeBasedOnClustering(article) match {
         case Some(node: Element) => {
@@ -95,7 +94,11 @@ class Crawler(config: Configuration) {
     article
   }
 
-  def extractArticle(crawlCandidate: CrawlCandidate): Option[Article] = {
+  def extractArticle(crawlCandidate: CrawlCandidate, outputFormat: String = "ARTICLE"): Option[Article] = {
+
+    val OUTPUT_FORMATS = Array("HTML", "HTML_STYLE", "ARTICLE")
+
+    val OutputFormat = if (OUTPUT_FORMATS.contains(outputFormat)) outputFormat else "HTML"
 
     val article = new Article()
     var article_found = true
@@ -119,6 +122,7 @@ class Crawler(config: Configuration) {
         article.rawHtml = rawHtml
         article.doc = doc
         article.rawDoc = doc.clone()
+        article.outputFormat = OutputFormat
 
         article.title = extractor.getTitle(article)
         article.publishDate = config.publishDateExtractor.extract(doc)
@@ -130,7 +134,6 @@ class Crawler(config: Configuration) {
         // before we do any calcs on the body itself let's clean up the document
         article.doc =  docCleaner.clean(article)
         article.metaContentType =  extractor.getMetaContentType(article)
-        article.charSet = config.getHtmlFetcher.getCharSet(article.doc)
 
         extractor.calculateBestNodeBasedOnClustering(article) match {
           case Some(node: Element) => {
