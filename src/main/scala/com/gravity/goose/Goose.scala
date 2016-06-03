@@ -44,10 +44,10 @@ class Goose(config: Configuration = new Configuration) {
     sendToActor(cc)
   }
 
-  def extractSimpleHTML(url: String): Option[Article] = {
+  def extractSimpleHTML(url: String, outputFormat: String = "ARTICLE"): Option[Article] = {
     val cc = new CrawlCandidate(config, url, null)
     val crawler = new Crawler(config)
-    crawler.extractArticle(cc)
+    crawler.extractArticle(cc, outputFormat)
     }
 
   def shutdownNetwork() {

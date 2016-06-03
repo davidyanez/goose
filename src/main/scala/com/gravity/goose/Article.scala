@@ -54,6 +54,8 @@ class Article {
 
   var charSet: String = ""
 
+  var outputFormat: String = "HTML_STYLE"
+
   /**
   * meta description field in HTML source
   */
