@@ -28,6 +28,7 @@ import org.jsoup.parser.Tag
 import com.gravity.goose.text.StopWords
 import scala.collection.JavaConversions._
 import org.slf4j.Logger
+import java.util.Date;
 
 import scala.collection.immutable.List
 
@@ -60,7 +61,7 @@ trait OutputFormatter {
     removeNodesWithNegativeScores(topNode)
     convertLinksToText(topNode)
     replaceTagsWithText(topNode)
-    removeParagraphsWithFewWords(topNode)
+    removeElementsWithFewWords(topNode)
     topNode
   }
 
@@ -74,7 +75,7 @@ trait OutputFormatter {
     removeNodesWithNegativeScores(topNode)
     convertLinksToText(topNode)
     replaceTagsWithText(topNode)
-    removeParagraphsWithFewWords(topNode)
+    removeElementsWithFewWords(topNode)
     convertToText(topNode)
   }
 
@@ -93,10 +94,10 @@ trait OutputFormatter {
     cleanLinks(topNode)
     cleanHeaders(topNode)
     cleanParagraphs(topNode)
-    removeParagraphsWithFewWords(topNode)
+    removeElementsWithFewWords(topNode)
     val doc = getSimpleHTMLDoc(topNode, article)
     if (doc.isDefined)
-      removeParagraphsWithFewWords(doc.get.body())
+      removeElementsWithFewWords(doc.get.body(), Array("div"))
     doc
   }
 
@@ -134,7 +135,7 @@ trait OutputFormatter {
                    ""
                }else if (Array("br", "hr").contains(e.tagName())) {
                  if (e.tagName() != e.previousElementSibling().tagName()){
-                   // avoid to have rthis tag repeated consecutivelly
+                   // avoid to have this tag repeated consecutively
                    s"${e.outerHtml()}"
                  } else{
                    ""
@@ -194,7 +195,20 @@ trait OutputFormatter {
                else {""}
 
              }).toList.mkString("")
-     article_div_html
+
+     import java.util.Calendar;
+     import java.text.SimpleDateFormat;
+
+     val today = Calendar.getInstance().getTime()
+     val formatter = new SimpleDateFormat("MMMMMMMMMM dd, yyyy")
+     val today_str =  formatter.format(today)
+
+
+     val article_footer =
+       s"<hr><a class='link' href='${article.finalUrl}' target='_blank'>Read on ${article.domain}</a>" +
+       s"<div class='scraped_date'>Pulled on $today_str </div>"
+
+     article_div_html + article_footer
    }
 
   def getSimpleHTMLDoc(topNode: Element, article: Article): Option[Document] = topNode match {
@@ -435,12 +449,12 @@ trait OutputFormatter {
   /**
   * remove paragraphs that have less than x number of words, would indicate that it's some sort of link
   */
-  private def removeParagraphsWithFewWords(topNode: Element) {
+  private def removeElementsWithFewWords(topNode: Element, ignore_tags: Array[String]= Array.empty) {
     if (topNode != null) {
       if (logger.isDebugEnabled) {
         logger.debug("removeParagraphsWithFewWords starting...")
       }
-      val IGNORE_TAGS = Array("img", "iframe", "picture", "video","figure","hr", "h1", "h2", "h3", "h4", "br", "b", "strong", "a", "li")
+      val IGNORE_TAGS = Array("img", "iframe", "picture", "video","figure","hr", "h1", "h2", "h3", "h4", "br", "b", "strong", "a", "li") ++ ignore_tags
       val INNER_SAFE_TAGS = Array("img", "iframe", "picture", "video", "figure", "strong")  // do not delete paragraphs containing this tags
 
       val allNodes = topNode.getAllElements
