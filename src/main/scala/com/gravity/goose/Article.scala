@@ -50,10 +50,6 @@ class Article {
 
   var cleanedArticleSimpleHTMLDoc:  Option[Document] = None
 
-  var metaContentType: String = ""
-
-  var charSet: String = ""
-
   var outputFormat: String = "HTML_STYLE"
 
   /**
