@@ -19,13 +19,14 @@
 package com.gravity.goose
 
 import cleaners.{StandardDocumentCleaner, DocumentCleaner}
+
 import extractors.ContentExtractor
 import images.{Image, UpgradedImageIExtractor, ImageExtractor}
 import org.apache.http.client.HttpClient
 import org.jsoup.nodes.{Document, Element}
 import org.jsoup.Jsoup
 import java.io._
-import org.jsoup.select.Elements
+
 import utils.{ParsingCandidate, URLHelper, Logging}
 import com.gravity.goose.outputformatters.{StandardOutputFormatter, OutputFormatter}
 import scala.collection.JavaConverters._
@@ -37,6 +38,13 @@ import scala.collection.JavaConverters._
  */
 
 case class CrawlCandidate(config: Configuration, url: String, rawHTML: String = null)
+
+case class HtmlExtractResponse(html: String, status: HTMLExtractStatus.Status, msg: String = "")
+
+object HTMLExtractStatus extends Enumeration {
+  type Status = Value
+  val OK, FAILED = Value
+}
 
 class Crawler(config: Configuration) {
 
@@ -71,7 +79,6 @@ class Crawler(config: Configuration) {
       article.tags = extractor.extractTags(article)
       // before we do any calcs on the body itself let's clean up the document
       article.doc =  docCleaner.clean(article)
-      article.metaContentType =  extractor.getMetaContentType(article)
 
       extractor.calculateBestNodeBasedOnClustering(article) match {
         case Some(node: Element) => {
@@ -94,7 +101,7 @@ class Crawler(config: Configuration) {
     article
   }
 
-  def extractArticle(crawlCandidate: CrawlCandidate, outputFormat: String = "ARTICLE"): Option[Article] = {
+  def extractArticle(crawlCandidate: CrawlCandidate, outputFormat: String = "ARTICLE"): HtmlExtractResponse = {
 
     val OUTPUT_FORMATS = Array("HTML", "HTML_STYLE", "ARTICLE")
 
@@ -133,7 +140,6 @@ class Crawler(config: Configuration) {
         article.tags = extractor.extractTags(article)
         // before we do any calcs on the body itself let's clean up the document
         article.doc =  docCleaner.clean(article)
-        article.metaContentType =  extractor.getMetaContentType(article)
 
         extractor.calculateBestNodeBasedOnClustering(article) match {
           case Some(node: Element) => {
@@ -152,18 +158,20 @@ class Crawler(config: Configuration) {
       val validArticle = isValidArticle(article)
 
       if (article_found && validArticle){
-        Some(article)
-      }  else {
-         if (!validArticle) {println(s"Article is not Valid: ${crawlCandidate.url}")}
-        else {
-           println(s"Article not Found: ${crawlCandidate.url}")
-         }
-        None
+        HtmlExtractResponse(html=article.cleanedArticleSimpleHTML, status = HTMLExtractStatus.OK)
+      }
+      else {
+        val msg = if (!validArticle) {
+          s"Article is not Valid"
+         } else {s"Article not Found"}
+        println(msg)
+        HtmlExtractResponse(html=article.cleanedArticleSimpleHTML, status = HTMLExtractStatus.FAILED, msg=msg)
       }
     } catch{
       case _ => {
-        println(s"Error Processing The Article: ${crawlCandidate.url}")
-        None
+        val msg = s"Error Processing The Article"
+        println(msg)
+        HtmlExtractResponse(html=article.cleanedArticleSimpleHTML, status = HTMLExtractStatus.FAILED , msg=msg)
       }
     }
   }
@@ -176,7 +184,6 @@ class Crawler(config: Configuration) {
       val mim_paragraph_words = 4
       val min_paragraphs = 1
 
-      // paragraphs must contains text or any paragraph_inner_valid_tags
       val n_paragraphs = article.cleanedArticleSimpleHTMLDoc.get.select("p").asScala.filter(
         p => p.text().length() > mim_paragraph_words || paragraph_inner_valid_tags.map(tag => p.select(tag).size() > 0).reduce((a,b) => a || b)
       ).length
@@ -188,7 +195,6 @@ class Crawler(config: Configuration) {
     else{
       false
     }
-
 
    }
 
