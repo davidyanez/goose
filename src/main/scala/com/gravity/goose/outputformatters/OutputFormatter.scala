@@ -134,13 +134,15 @@ trait OutputFormatter {
                  else
                    ""
                }else if (Array("br", "hr").contains(e.tagName())) {
-                 if (e.tagName() != e.previousElementSibling().tagName()){
+                 if (e.previousElementSibling() != null &&  e.tagName() != e.previousElementSibling().tagName()){
                    // avoid to have this tag repeated consecutively
                    s"${e.outerHtml()}"
                  } else{
                    ""
                  }
                }
+
+
                else if (e.tagName() == "video") {
                  s"<div class='video-wrap'>${e.outerHtml()}</div>"
                }
@@ -374,9 +376,15 @@ trait OutputFormatter {
       for (tag <- p.children()){
         if (!ACCEPTED_TAGS.contains(tag.tagName())  ){
           tag.remove()
-        }else if (tag.tagName() == "a" && tag.select("img").length > 0){
-          tag.remove()
         }
+      if (tag.tagName() == "a" && tag.hasAttr("href")){
+
+        val href = tag.attr("href")
+        tag.attributes().map(attr => tag.removeAttr(attr.getKey))
+        tag.attr("href", href)
+        tag.attr("target", "_blank")
+      }
+
       }
       p.html
     }
