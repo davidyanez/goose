@@ -522,9 +522,71 @@ class NewExtractionsTest {
      out_html.close()
     }
 
+  @Test
+  def qivo_4890() {
+
+   implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+   val url = "http://www.sciencemag.org/news/2016/03/rich-sexual-past-between-modern-humans-and-neandertals-revealed?utm_source=sciencemagazine&utm_medium=facebook-text&utm_campaign=neanderpast-3042"
+   val article = TestUtils.getArticle(url = url)
+   println(article.cleanedArticleSimpleHTML)
+
+   val out_html = new PrintWriter(new File("./"+output_folder+"/"+"qivo_4890.html"))
+   out_html.write(article.cleanedArticleSimpleHTML)
+
+   out_html.close()
+  }
+
+  @Test
+    def qivo_1647() {
+
+     implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+     val url = "http://www.bistroisakaya.com/"
+     val article = TestUtils.getArticle(url = url)
+     println(article.cleanedArticleSimpleHTML)
+
+     val out_html = new PrintWriter(new File("./"+output_folder+"/"+"qivo_1647.html"))
+     out_html.write(article.cleanedArticleSimpleHTML)
+
+     out_html.close()
+    }
+
+
+  @Test
+  def qivo_1832() {
+
+   implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+   val url = "http://m.nzherald.co.nz/lifestyle/news/article.cfm?c_id=6&objectid=11553026"
+   val article = TestUtils.getArticle(url = url)
+   println(article.cleanedArticleSimpleHTML)
+
+   val out_html = new PrintWriter(new File("./"+output_folder+"/"+"qivo_1832.html"))
+   out_html.write(article.cleanedArticleSimpleHTML)
+
+   out_html.close()
+  }
+
+  @Test
+  def qivo_1840() {
+
+   implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+   val url = "http://www.glamour.com/fashion/2014/12/new-years-eve-outfit-ideas/1"
+   val article = TestUtils.getArticle(url = url)
+   println(article.cleanedArticleSimpleHTML)
+
+   val out_html = new PrintWriter(new File("./"+output_folder+"/"+"qivo_1840.html"))
+   out_html.write(article.cleanedArticleSimpleHTML)
+
+   out_html.close()
+  }
 
 
   //
+
+  //  http://www.sciencemag.org/news/2016/03/rich-sexual-past-between-modern-humans-and-neandertals-revealed?utm_source=sciencemagazine&utm_medium=facebook-text&utm_campaign=neanderpast-3042
   // http://www.oddee.com/item_91848.aspx
   // http://www.bbc.com/news/in-pictures-34880592
   // http://business.financialpost.com/news/mining/canadian-miner-lucara-uncovers-1111-carat-diamond-believed-to-be-second-largest-ever-found
