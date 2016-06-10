@@ -168,8 +168,8 @@ class Crawler(config: Configuration) {
         HtmlExtractResponse(html=article.cleanedArticleSimpleHTML, status = HTMLExtractStatus.FAILED, msg=msg)
       }
     } catch{
-      case _ => {
-        val msg = s"Error Processing The Article"
+      case e => {
+        val msg = s"Error Processing The Article: ${e.getMessage}"
         println(msg)
         HtmlExtractResponse(html=article.cleanedArticleSimpleHTML, status = HTMLExtractStatus.FAILED , msg=msg)
       }
