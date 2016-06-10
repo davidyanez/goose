@@ -28,7 +28,6 @@ import org.jsoup.parser.Tag
 import com.gravity.goose.text.StopWords
 import scala.collection.JavaConversions._
 import org.slf4j.Logger
-import java.util.Date;
 
 import scala.collection.immutable.List
 
@@ -141,8 +140,6 @@ trait OutputFormatter {
                    ""
                  }
                }
-
-
                else if (e.tagName() == "video") {
                  s"<div class='video-wrap'>${e.outerHtml()}</div>"
                }
