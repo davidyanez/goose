@@ -152,6 +152,7 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
         }
         catch {
           case e: Exception => {
+            encodingType = "UTF-8"
             if (logger.isDebugEnabled) {
               trace("Unable to get charset for: " + cleanUrl)
               trace("Encoding Type is: " + encodingType)
@@ -243,7 +244,8 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
         }
       }
       else {
-        throw new NotHtmlException(cleanUrl)
+        return Some(htmlResult)
+//        throw new NotHtmlException(cleanUrl)
       }
     }
     catch {
