@@ -136,13 +136,23 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
             if (start_ix > 0){
               encodingType = contentType.substring(start_ix+9)
             } else {
-              val entity2 = httpClient.execute(httpget, localContext).getEntity
-              if (entity2 != null) {
-                val rawlHtml = EntityUtils.toString(entity2)
-                val is = new ByteArrayInputStream(rawlHtml.getBytes())
-                val doc = Jsoup.parse(rawlHtml)
-                encodingType = getCharSet(doc)
+//              val entity2 = httpClient.execute(httpget, localContext).getEntity
+//              if (entity2 != null) {
+//                val rawlHtml = EntityUtils.toString(entity2)
+//                val is = new ByteArrayInputStream(rawlHtml.getBytes())
+//                val doc = Jsoup.parse(rawlHtml)
+//                encodingType = getCharSet(doc)
+//              }
+              if(instream.available() == 0){
+                entity = httpClient.execute(httpget, localContext).getEntity()
+                instream = entity.getContent
               }
+
+              val rawlHtml =  EntityUtils.toString(entity)
+              val is = new ByteArrayInputStream(rawlHtml.getBytes())
+              val doc = Jsoup.parse(rawlHtml)
+              encodingType = getCharSet(doc)
+
             }
           }
 //          encodingType =  getContentCharSet(entity2) // EntityUtils.getContentCharSet(entity)
@@ -160,6 +170,10 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
           }
         }
         try {
+          if(instream.available() == 0){
+            entity = httpClient.execute(httpget, localContext).getEntity()
+            instream = entity.getContent
+          }
           htmlResult = HtmlFetcher.convertStreamToString(instream, 15728640, encodingType).trim
           new String(htmlResult.getBytes("UTF-8"), "UTF8")
 
