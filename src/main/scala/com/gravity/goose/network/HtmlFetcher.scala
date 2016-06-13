@@ -98,6 +98,7 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
     var entity: HttpEntity = null
     var instream: InputStream = null
     var encodingType: String = "UTF-8"
+    import org.apache.http.client.params.ClientPNames
 
     // Identified the the apache http client does not drop URL fragments before opening the request to the host
     // more info: http://stackoverflow.com/questions/4251841/400-error-with-httpclient-for-a-link-with-an-anchor
@@ -112,9 +113,11 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
       httpget = new HttpGet(cleanUrl)
       HttpProtocolParams.setUserAgent(httpClient.getParams, config.getBrowserUserAgent());
 
-      val params = httpClient.getParams
+      val params = httpClient.getParams.setParameter(ClientPNames.ALLOW_CIRCULAR_REDIRECTS, true)
+
       HttpConnectionParams.setConnectionTimeout(params, config.getConnectionTimeout())
       HttpConnectionParams.setSoTimeout(params, config.getSocketTimeout())
+
 
       trace("Setting UserAgent To: " + HttpProtocolParams.getUserAgent(httpClient.getParams))
       val response: HttpResponse = httpClient.execute(httpget, localContext)
@@ -136,12 +139,7 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
             if (start_ix > 0){
               encodingType = contentType.substring(start_ix+9)
             } else {
-//              val entity2 = httpClient.execute(httpget, localContext).getEntity
-//              if (entity2 != null) {
-//                val rawlHtml = EntityUtils.toString(entity2)
-//                val is = new ByteArrayInputStream(rawlHtml.getBytes())
-//                val doc = Jsoup.parse(rawlHtml)
-//                encodingType = getCharSet(doc)
+
 //              }
               if(instream.available() == 0){
                 entity = httpClient.execute(httpget, localContext).getEntity()
@@ -155,7 +153,7 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
 
             }
           }
-//          encodingType =  getContentCharSet(entity2) // EntityUtils.getContentCharSet(entity)
+
           if (encodingType == null) {
             encodingType = "UTF-8"//"UTF-8" ISO-8859-15
           }
