@@ -615,7 +615,7 @@ class NewExtractionsTest {
 
 
   @Test
-  def qivo_x() {
+  def qivo_2675() {
 
    implicit val config = TestUtils.NO_IMAGE_CONFIG
 
@@ -624,6 +624,54 @@ class NewExtractionsTest {
    println(article.cleanedArticleSimpleHTML)
 
    val out_html = new PrintWriter(new File("./"+output_folder+"/"+"qivo_x.html"))
+   out_html.write(article.cleanedArticleSimpleHTML)
+
+   out_html.close()
+  }
+  //
+
+  @Test
+  def qivo_2676() {
+
+   implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+   val url = "http://ohsheglows.com/2014/05/20/feel-good-hearty-granola-bars/"
+   val article = TestUtils.getArticle(url = url)
+   println(article.cleanedArticleSimpleHTML)
+
+   val out_html = new PrintWriter(new File("./"+output_folder+"/"+"qivo_2676.html"))
+   out_html.write(article.cleanedArticleSimpleHTML)
+
+   out_html.close()
+  }
+  //
+
+  @Test
+  def qivo_2747() {
+
+   implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+   val url = "http://news.nationalgeographic.com/2015/11/151113-datapoints-china-one-child-policy"
+   val article = TestUtils.getArticle(url = url)
+   println(article.cleanedArticleSimpleHTML)
+
+   val out_html = new PrintWriter(new File("./"+output_folder+"/"+"qivo_2747.html"))
+   out_html.write(article.cleanedArticleSimpleHTML)
+
+   out_html.close()
+  }
+
+  // http://firstround.com/review/this-is-how-you-design-a-lasting-brand-an-inside-look-at-gustos-reinvention
+  @Test
+  def qivo_2836() {
+
+   implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+   val url = "http://firstround.com/review/this-is-how-you-design-a-lasting-brand-an-inside-look-at-gustos-reinvention"
+   val article = TestUtils.getArticle(url = url)
+   println(article.cleanedArticleSimpleHTML)
+
+   val out_html = new PrintWriter(new File("./"+output_folder+"/"+"qivo_2836.html"))
    out_html.write(article.cleanedArticleSimpleHTML)
 
    out_html.close()
