@@ -583,13 +583,52 @@ class NewExtractionsTest {
    out_html.close()
   }
 
+  @Test
+  def qivo_2190() {
 
-  //
+   implicit val config = TestUtils.NO_IMAGE_CONFIG
 
-  //  http://www.sciencemag.org/news/2016/03/rich-sexual-past-between-modern-humans-and-neandertals-revealed?utm_source=sciencemagazine&utm_medium=facebook-text&utm_campaign=neanderpast-3042
-  // http://www.oddee.com/item_91848.aspx
-  // http://www.bbc.com/news/in-pictures-34880592
-  // http://business.financialpost.com/news/mining/canadian-miner-lucara-uncovers-1111-carat-diamond-believed-to-be-second-largest-ever-found
-  // http://www.buzzfeed.com/stephaniemlee/wearing-this-bracelet-could-lower-your-stress-levels#.akO3aAVzX
+   val url = "http://philosophy.hku.hk/think/logic/hardest.php"
+   val article = TestUtils.getArticle(url = url)
+   println(article.cleanedArticleSimpleHTML)
+
+   val out_html = new PrintWriter(new File("./"+output_folder+"/"+"qivo_2190.html"))
+   out_html.write(article.cleanedArticleSimpleHTML)
+
+   out_html.close()
+  }
+
+  @Test
+  def qivo_2233() {
+
+   implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+   val url = "http://www.bbc.com/sport/0/football/35144652"
+   val article = TestUtils.getArticle(url = url)
+   println(article.cleanedArticleSimpleHTML)
+
+   val out_html = new PrintWriter(new File("./"+output_folder+"/"+"qivo_2233.html"))
+   out_html.write(article.cleanedArticleSimpleHTML)
+
+   out_html.close()
+  }
+
+
+  @Test
+  def qivo_x() {
+
+   implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+   val url = "http://ohsheglows.com/2014/02/05/my-favourite-vegan-chili-with-homemade-sour-cream/"
+   val article = TestUtils.getArticle(url = url)
+   println(article.cleanedArticleSimpleHTML)
+
+   val out_html = new PrintWriter(new File("./"+output_folder+"/"+"qivo_x.html"))
+   out_html.write(article.cleanedArticleSimpleHTML)
+
+   out_html.close()
+  }
+
+  "TODO: NotHtmlException: No HTML returned for url:  http://firstround.com/review/the-30-best-pieces-of-advice-for-entrepreneurs-in-2015"
 
 }
