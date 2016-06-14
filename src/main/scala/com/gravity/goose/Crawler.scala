@@ -101,7 +101,7 @@ class Crawler(config: Configuration) {
     article
   }
 
-  def extractArticle(crawlCandidate: CrawlCandidate, outputFormat: String = "ARTICLE"): HtmlExtractResponse = {
+  def extractArticle(crawlCandidate: CrawlCandidate, outputFormat: String = "ARTICLE", verbose: Boolean = false): HtmlExtractResponse = {
 
     val OUTPUT_FORMATS = Array("HTML", "HTML_STYLE", "ARTICLE")
 
@@ -155,6 +155,11 @@ class Crawler(config: Configuration) {
         }
         releaseResources(article)
       }
+      if (verbose){
+        println("Article HTML:")
+        println(article.cleanedArticleSimpleHTML)
+      }
+
       val validArticle = isValidArticle(article)
 
       if (article_found && validArticle){
@@ -188,11 +193,16 @@ class Crawler(config: Configuration) {
         p => p.text().length() > mim_paragraph_words || paragraph_inner_valid_tags.map(tag => p.select(tag).size() > 0).reduce((a,b) => a || b)
       ).length
 
+
        if  (n_paragraphs >= min_paragraphs) {
          true
-       }  else {false}
+       }  else {
+         println(s"n_paragraphs = $n_paragraphs")
+         false
+       }
     }
     else{
+      println("cleanedArticleSimpleHTMLDoc not Defined")
       false
     }
 
