@@ -375,7 +375,7 @@ trait OutputFormatter {
           tag.remove()
         }
       if (tag.tagName() == "a" && tag.hasAttr("href")){
-
+//        TODO:  only accept text, and images tags.
         val href = tag.attr("href")
         tag.attributes().map(attr => tag.removeAttr(attr.getKey))
         tag.attr("href", href)
@@ -468,7 +468,7 @@ trait OutputFormatter {
         try {
 
           val stopWords = StopWords.getStopWordCount(el.text)
-          if (!IGNORE_TAGS.contains(el.tagName())  && INNER_SAFE_TAGS.forall(tag => el.getElementsByTag(tag).isEmpty) && stopWords.getStopWordCount <= 3 && el.getElementsByTag("object").size == 0 && el.getElementsByTag("embed").size == 0) {
+          if (!IGNORE_TAGS.contains(el.tagName())  && INNER_SAFE_TAGS.forall(tag => el.getElementsByTag(tag).isEmpty) && stopWords.getStopWordCount <= 5 && el.getElementsByTag("object").size == 0 && el.getElementsByTag("embed").size == 0) {
             logger.debug("removeParagraphsWithFewWords - swcnt: %d removing text: %s".format(stopWords.getStopWordCount, el.text()))
             el.remove()
           }
