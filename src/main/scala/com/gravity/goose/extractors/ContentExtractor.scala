@@ -220,6 +220,9 @@ trait ContentExtractor {
     var i: Int = 0
     val parentNodes = mutable.HashSet[Element]()
     val nodesWithText = mutable.Buffer[Element]()
+
+//    println(s"nodesToCheck.size: ${nodesToCheck.size}")
+
     for (node <- nodesToCheck) {
       val nodeText: String = node.text
       val wordStats: WordStats = StopWords.getStopWordCount(nodeText)
@@ -231,6 +234,8 @@ trait ContentExtractor {
     val numberOfNodes: Int = nodesWithText.size
     val negativeScoring: Int = 0
     val bottomNodesForNegativeScore: Double = numberOfNodes * 0.25
+
+//    println(s"numberOfNodes: $numberOfNodes")
 
     trace(logPrefix + "About to inspect num of nodes with text: " + numberOfNodes)
 
@@ -288,8 +293,9 @@ trait ContentExtractor {
         topNode = e
       }
     }
+
     printTraceLog(topNode)
-    if (topNode == null) None else Some(topNode)
+    if (topNode == null) {println("No Top Node Found");None} else Some(topNode)
   }
 
   def printTraceLog(topNode: Element) {
@@ -768,7 +774,7 @@ trait ContentExtractor {
       val nodeText: String = node.text
       val wordStats: WordStats = StopWords.getStopWordCount(nodeText)
       val highLinkDensity: Boolean = isHighLinkDensity(node)
-      if (wordStats.getStopWordCount > 2 && !highLinkDensity) {
+      if (wordStats.getStopWordCount > 5 && !highLinkDensity) {
         numberOfParagraphs += 1;
         scoreOfParagraphs += wordStats.getStopWordCount
       }
