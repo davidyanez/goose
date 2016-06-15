@@ -141,6 +141,7 @@ class Crawler(config: Configuration) {
         // before we do any calcs on the body itself let's clean up the document
         article.doc =  docCleaner.clean(article)
 
+
         extractor.calculateBestNodeBasedOnClustering(article) match {
           case Some(node: Element) => {
             article.topNode = node
@@ -151,7 +152,7 @@ class Crawler(config: Configuration) {
             article.cleanedArticleSimpleHTML = article.cleanedArticleSimpleHTMLDoc.get.html
 
           }
-          case _ => {trace("NO ARTICLE FOUND");article_found=false }
+          case _ => {println("NO ARTICLE FOUND");article_found=false }
         }
         releaseResources(article)
       }
