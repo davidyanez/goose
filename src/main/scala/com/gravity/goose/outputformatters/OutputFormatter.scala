@@ -365,6 +365,30 @@ trait OutputFormatter {
       }
     }
 
+
+    private def cleanLink(tag: Element): Unit = {
+
+      if (tag.tagName() == "a" && tag.hasAttr("href")){
+
+              val href = tag.attr("href")
+              tag.attributes().map(attr => tag.removeAttr(attr.getKey))
+      //        tag.attr("href", href)
+      //        tag.attr("target", "_blank")
+              val newDoc = new Document("/")
+              val newTag = newDoc.createElement("a")
+              newTag.text(tag.text())
+              newTag.attr("href", href)
+              newTag.attr("target", "_blank")
+
+              for (img <- tag.select("img")) {
+                newTag.appendChild(img.clone())
+              }
+              tag.replaceWith(newTag)
+
+            }
+
+    }
+
     private def getcleanParagraphHTML(paragraph: Element): String = {
 
       val ACCEPTED_TAGS  = List("b", "strong", "em", "a", "hr", "br", "span")
@@ -375,11 +399,7 @@ trait OutputFormatter {
           tag.remove()
         }
       if (tag.tagName() == "a" && tag.hasAttr("href")){
-//        TODO:  only accept text, and images tags.
-        val href = tag.attr("href")
-        tag.attributes().map(attr => tag.removeAttr(attr.getKey))
-        tag.attr("href", href)
-        tag.attr("target", "_blank")
+        cleanLink(tag)
       }
 
       }
