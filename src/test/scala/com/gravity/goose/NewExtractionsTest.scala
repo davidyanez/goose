@@ -677,6 +677,23 @@ class NewExtractionsTest {
    out_html.close()
   }
 
+
+  @Test
+  def qivo_1734() {
+
+   implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+   val url = "https://www.theguardian.com/film/2015/may/03/unfriended-review-mark-kermode-blair-witch-for-the-broadband-generation"
+   val article = TestUtils.getArticle(url = url)
+   println(article.cleanedArticleSimpleHTML)
+
+   val out_html = new PrintWriter(new File("./"+output_folder+"/"+"qivo_1734.html"))
+   out_html.write(article.cleanedArticleSimpleHTML)
+
+   out_html.close()
+  }
+
+
   "TODO: NotHtmlException: No HTML returned for url:  http://firstround.com/review/the-30-best-pieces-of-advice-for-entrepreneurs-in-2015"
 
 }
