@@ -147,7 +147,7 @@ trait OutputFormatter {
                  s"<div class='list'>${e.outerHtml()}</div>"
                }
                else if (keep_tags.contains(e.tagName())) {
-                 s"${e.outerHtml()}"
+                 s"${e.text}"
                }
                else if (e.tagName() == "img") {
 
@@ -188,7 +188,7 @@ trait OutputFormatter {
                  // to avoid having two h1 headers in the top , title and first h1 tag.
                  val tag_name =  if (e.tagName() == "h1") "h2" else e.tagName()
                  if (e.text() != article.title)
-                   s"<${tag_name}>${e.html}</${tag_name}>"
+                   s"<${tag_name}>${e.text}</${tag_name}>"
                  else {""}
                }
                else {""}

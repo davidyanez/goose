@@ -145,6 +145,7 @@ class Crawler(config: Configuration) {
         extractor.calculateBestNodeBasedOnClustering(article) match {
           case Some(node: Element) => {
             article.topNode = node
+
             val imageExtractor = getImageExtractor(article)
             imageExtractor.RemoveBadImages(article)
 
