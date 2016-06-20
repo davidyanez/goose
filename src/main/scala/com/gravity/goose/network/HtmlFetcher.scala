@@ -21,13 +21,18 @@ package com.gravity.goose.network
 import org.apache.http.HttpEntity
 import org.apache.http.HttpResponse
 import org.apache.http.HttpVersion
-import org.apache.http.client.CookieStore
-import org.apache.http.client.HttpClient
+import org.apache.http.client.{RedirectStrategy, CookieStore, HttpClient}
+import org.apache.http.client.config.RequestConfig
 import org.apache.http.client.methods.HttpGet
+import org.apache.commons.httpclient.methods.GetMethod
+import org.apache.http.client.utils.URIBuilder
+
+import org.apache.http.conn.ssl.{SSLConnectionSocketFactory, TrustSelfSignedStrategy, SSLSocketFactory}
+import org.apache.http.ssl.{SSLContextBuilder}
+
 import org.apache.http.client.params.CookiePolicy
 import org.apache.http.client.protocol.ClientContext
 import org.apache.http.conn.scheme.PlainSocketFactory
-import org.apache.http.conn.ssl.SSLSocketFactory
 import org.apache.http.conn.scheme.Scheme
 import org.apache.http.conn.scheme.SchemeRegistry
 import org.apache.http.cookie.Cookie
@@ -40,15 +45,13 @@ import org.apache.http.protocol.BasicHttpContext
 import org.apache.http.protocol.HttpContext
 import org.apache.http.util.EntityUtils
 import java.io._
-import java.net.SocketException
-import java.net.SocketTimeoutException
-import java.net.URLConnection
+import java.net.{URL, SocketException, SocketTimeoutException, URLConnection}
 import java.util.ArrayList
 import java.util.Date
 import java.util.List
 import com.gravity.goose.utils.Logging
 import com.gravity.goose.Configuration
-import org.apache.http.impl.client.{DefaultHttpRequestRetryHandler, AbstractHttpClient, DefaultHttpClient}
+import org.apache.http.impl.client.{HttpClients, DefaultHttpRequestRetryHandler, AbstractHttpClient, DefaultHttpClient}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
@@ -107,20 +110,39 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
       if (foundAt >= 0) url.substring(0, foundAt) else url
     }
 
+    val uriBuilder = new URIBuilder(cleanUrl).setParameters();
+
+    val request_config = RequestConfig.custom()
+        .setConnectTimeout(config.getConnectionTimeout()).setCircularRedirectsAllowed(true)
+        .setSocketTimeout(config.getSocketTimeout).setRedirectsEnabled(true).setMaxRedirects(3)
+        .build();
+
     try {
       val localContext: HttpContext = new BasicHttpContext
+
+
       localContext.setAttribute(ClientContext.COOKIE_STORE, HtmlFetcher.emptyCookieStore)
       httpget = new HttpGet(cleanUrl)
-      HttpProtocolParams.setUserAgent(httpClient.getParams, config.getBrowserUserAgent());
+      httpget.setHeader("User-Agent", config.getBrowserUserAgent())
 
-      val params = httpClient.getParams.setParameter(ClientPNames.ALLOW_CIRCULAR_REDIRECTS, true)
+//      HttpProtocolParams.setUserAgent(httpClient.getParams, config.getBrowserUserAgent());
 
-      HttpConnectionParams.setConnectionTimeout(params, config.getConnectionTimeout())
-      HttpConnectionParams.setSoTimeout(params, config.getSocketTimeout())
+      val is_ssl = cleanUrl.contains("https:")
+//      SSL Support
+      if (is_ssl) {
+        val builder = new SSLContextBuilder();
+        builder.loadTrustMaterial(null, new TrustSelfSignedStrategy())
+        val sslsf = new SSLConnectionSocketFactory(builder.build());
+        httpClient = HttpClients.custom().setSSLSocketFactory(
+                    sslsf).setDefaultRequestConfig(request_config).build()
+      } else{
+        httpClient = HttpClients.custom().setDefaultRequestConfig(request_config).build()
+      }
 
 
-      trace("Setting UserAgent To: " + HttpProtocolParams.getUserAgent(httpClient.getParams))
-      val response: HttpResponse = httpClient.execute(httpget, localContext)
+      val response: HttpResponse = if (is_ssl) httpClient.execute(httpget) else
+        httpClient.execute(httpget, localContext)
+//      val response: HttpResponse = httpClient.execute(httpget, localContext)
 
       HttpStatusValidator.validate(cleanUrl, response.getStatusLine.getStatusCode) match {
         case Left(ex) => throw ex
