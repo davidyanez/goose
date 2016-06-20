@@ -693,6 +693,38 @@ class NewExtractionsTest {
    out_html.close()
   }
 
+  @Test
+  def qivo_1805() {
+//    Failing because content is wrapped by a div with id containing the word footer.
+
+   implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+   val url = "http://brightside.me/article/15-pictures-of-the-most-radiant-smiles-youve-ever-seen-38955/"
+   val article = TestUtils.getArticle(url = url)
+   println(article.cleanedArticleSimpleHTML)
+
+   val out_html = new PrintWriter(new File("./"+output_folder+"/"+"qivo_1805.html"))
+   out_html.write(article.cleanedArticleSimpleHTML)
+
+   out_html.close()
+  }
+
+  @Test
+  def qivo_1817() {
+  //    Failing because content is wrapped by a div with id containing the word footer.
+
+   implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+   val url = "https://techcrunch.com/2015/11/27/cards-against-humanity-has-made-over-54k-selling-nothing-on-black-friday/#.pldh6l:5K2B"
+   val article = TestUtils.getArticle(url = url)
+   println(article.cleanedArticleSimpleHTML)
+
+   val out_html = new PrintWriter(new File("./"+output_folder+"/"+"qivo_1817.html"))
+   out_html.write(article.cleanedArticleSimpleHTML)
+
+   out_html.close()
+  }
+
 
   "TODO: NotHtmlException: No HTML returned for url:  http://firstround.com/review/the-30-best-pieces-of-advice-for-entrepreneurs-in-2015"
 
