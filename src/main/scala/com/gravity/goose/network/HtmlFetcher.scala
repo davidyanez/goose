@@ -18,9 +18,7 @@
 
 package com.gravity.goose.network
 
-import org.apache.http.HttpEntity
-import org.apache.http.HttpResponse
-import org.apache.http.HttpVersion
+import org.apache.http.{ProtocolVersion, HttpEntity, HttpResponse, HttpVersion}
 import org.apache.http.client.{RedirectStrategy, CookieStore, HttpClient}
 import org.apache.http.client.config.RequestConfig
 import org.apache.http.client.methods.HttpGet
@@ -75,7 +73,8 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
    * holds the HttpClient object for making requests
    */
   private var httpClient: HttpClient = null
-  initClient()
+  initHttpClient()
+//  initClient()
 
 
   def getHttpClient: HttpClient = {
@@ -96,6 +95,7 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
    * @throws MaxBytesException()
    */
   def getHtml(config: Configuration, url: String): Option[String] = {
+
     var httpget: HttpGet = null
     var htmlResult: String = null
     var entity: HttpEntity = null
@@ -110,38 +110,20 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
       if (foundAt >= 0) url.substring(0, foundAt) else url
     }
 
-    val uriBuilder = new URIBuilder(cleanUrl).setParameters();
-
-    val request_config = RequestConfig.custom()
-        .setConnectTimeout(config.getConnectionTimeout()).setCircularRedirectsAllowed(true)
-        .setSocketTimeout(config.getSocketTimeout).setRedirectsEnabled(true).setMaxRedirects(3)
-        .build();
 
     try {
       val localContext: HttpContext = new BasicHttpContext
 
-
       localContext.setAttribute(ClientContext.COOKIE_STORE, HtmlFetcher.emptyCookieStore)
-      httpget = new HttpGet(cleanUrl)
+
+      httpget = initHttpGet(cleanUrl, config)
       httpget.setHeader("User-Agent", config.getBrowserUserAgent())
 
-//      HttpProtocolParams.setUserAgent(httpClient.getParams, config.getBrowserUserAgent());
+//      httpClient = initHttpClient2(config)
+      val response: HttpResponse = httpClient.execute(httpget)
 
-      val is_ssl = cleanUrl.contains("https:")
-//      SSL Support
-      if (is_ssl) {
-        val builder = new SSLContextBuilder();
-        builder.loadTrustMaterial(null, new TrustSelfSignedStrategy())
-        val sslsf = new SSLConnectionSocketFactory(builder.build());
-        httpClient = HttpClients.custom().setSSLSocketFactory(
-                    sslsf).setDefaultRequestConfig(request_config).build()
-      } else{
-        httpClient = HttpClients.custom().setDefaultRequestConfig(request_config).build()
-      }
-
-
-      val response: HttpResponse = if (is_ssl) httpClient.execute(httpget) else
-        httpClient.execute(httpget, localContext)
+//      val response: HttpResponse = if (is_ssl) httpClient.execute(httpget) else
+//        httpClient.execute(httpget, localContext)
 //      val response: HttpResponse = httpClient.execute(httpget, localContext)
 
       HttpStatusValidator.validate(cleanUrl, response.getStatusLine.getStatusCode) match {
@@ -350,6 +332,35 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
       }
 
     encodingCharSet
+  }
+
+  private def initHttpClient(config: Configuration = null): HttpClient = {
+
+    val connection_timeout = if (config != null) config.getConnectionTimeout() else 10000
+    val socket_timeout = if (config != null) config.getSocketTimeout() else 10000
+
+    val request_config = RequestConfig.custom()
+     .setConnectTimeout(connection_timeout).setCircularRedirectsAllowed(true)
+     .setSocketTimeout(socket_timeout).setRedirectsEnabled(true).setMaxRedirects(3)
+     .build();
+
+    val builder = new SSLContextBuilder();
+    builder.loadTrustMaterial(null, new TrustSelfSignedStrategy())
+    val sslsf = new SSLConnectionSocketFactory(builder.build());
+    httpClient = HttpClients.custom().setSSLSocketFactory(
+                sslsf).setDefaultRequestConfig(request_config).build()
+    httpClient
+  }
+
+  private def initHttpGet(url: String, config: Configuration): HttpGet ={
+    val httpget = new HttpGet(url)
+    httpget.setHeader("User-Agent", config.getBrowserUserAgent())
+    httpget.setHeader("Accept-Language", "en-us")
+    httpget.setHeader("Accept", "application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5")
+    httpget.setHeader("Cache-Control", "max-age=0")
+//    httpget.setProtocolVersion(new ProtocolVersion("HTTP", 1, 1))
+
+    httpget
   }
 
   private def initClient() {
