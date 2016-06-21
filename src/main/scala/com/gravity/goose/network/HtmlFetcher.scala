@@ -354,6 +354,7 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
 
   private def initHttpGet(url: String, config: Configuration): HttpGet ={
     val httpget = new HttpGet(url)
+
     httpget.setHeader("User-Agent", config.getBrowserUserAgent())
     httpget.setHeader("Accept-Language", "en-us")
     httpget.setHeader("Accept", "application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5")
