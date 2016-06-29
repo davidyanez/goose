@@ -743,7 +743,55 @@ class NewExtractionsTest {
 
    out_html.close()
   }
+  // http://time.com/4099712/food-refrigeration-guide/?xid=time_socialflow_facebook
 
+  @Test
+  def qivo_4764() {
+  //    Failing because content is wrapped by a div with id containing the word footer.
+
+   implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+   val url = "http://time.com/4099712/food-refrigeration-guide/?xid=time_socialflow_facebook"
+   val article = TestUtils.getArticle(url = url)
+   println(article.cleanedArticleSimpleHTML)
+
+   val out_html = new PrintWriter(new File("./"+output_folder+"/"+"qivo_4764.html"))
+   out_html.write(article.cleanedArticleSimpleHTML)
+
+   out_html.close()
+  }
+
+  @Test
+  def qivo_timeout() {
+
+   implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+   val url = "http://goo.gl/Yzar67"
+   val article = TestUtils.getArticle(url = url)
+   println(article.cleanedArticleSimpleHTML)
+
+   val out_html = new PrintWriter(new File("./"+output_folder+"/"+"qivo_timeout.html"))
+   out_html.write(article.cleanedArticleSimpleHTML)
+
+   out_html.close()
+  }
+
+  //
+  @Test
+    def qivo_4766() {
+    //    Failing because content is wrapped by a div with id containing the word footer.
+
+     implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+     val url = "http://venturebeat.com/2016/03/13/how-my-kickstarter-blew-up-my-life/?utm_source=CB+Insights+Newsletter&utm_campaign=600a0376ae-Bubble_3_15_2016&utm_medium=email&utm_term=0_9dc0513989-600a0376ae-86985821"
+     val article = TestUtils.getArticle(url = url)
+     println(article.cleanedArticleSimpleHTML)
+
+     val out_html = new PrintWriter(new File("./"+output_folder+"/"+"qivo_4766.html"))
+     out_html.write(article.cleanedArticleSimpleHTML)
+
+     out_html.close()
+    }
 
   "TODO: NotHtmlException: No HTML returned for url:  http://firstround.com/review/the-30-best-pieces-of-advice-for-entrepreneurs-in-2015"
 

@@ -117,14 +117,9 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
       localContext.setAttribute(ClientContext.COOKIE_STORE, HtmlFetcher.emptyCookieStore)
 
       httpget = initHttpGet(cleanUrl, config)
-      httpget.setHeader("User-Agent", config.getBrowserUserAgent())
+//      httpget.setHeader("User-Agent", config.getBrowserUserAgent())
 
-//      httpClient = initHttpClient2(config)
       val response: HttpResponse = httpClient.execute(httpget)
-
-//      val response: HttpResponse = if (is_ssl) httpClient.execute(httpget) else
-//        httpClient.execute(httpget, localContext)
-//      val response: HttpResponse = httpClient.execute(httpget, localContext)
 
       HttpStatusValidator.validate(cleanUrl, response.getStatusLine.getStatusCode) match {
         case Left(ex) => throw ex
@@ -337,9 +332,10 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
   private def initHttpClient(config: Configuration = null): HttpClient = {
 
     val connection_timeout = if (config != null) config.getConnectionTimeout() else 10000
-    val socket_timeout = if (config != null) config.getSocketTimeout() else 10000
+    val socket_timeout = if (config != null) config.getSocketTimeout() else 60000
+    val request_timeout = if (config != null) config.getRequestconnectionTimeout() else 20000
 
-    val request_config = RequestConfig.custom()
+    val request_config = RequestConfig.custom().setConnectionRequestTimeout(request_timeout)
      .setConnectTimeout(connection_timeout).setCircularRedirectsAllowed(true)
      .setSocketTimeout(socket_timeout).setRedirectsEnabled(true).setMaxRedirects(3)
      .build();
