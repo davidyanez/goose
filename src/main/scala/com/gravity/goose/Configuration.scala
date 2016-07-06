@@ -55,12 +55,15 @@ class Configuration {
   * path to your imagemagick convert executable, on the mac using mac ports this is the default listed
   */
   @BeanProperty
-  var imagemagickConvertPath: String = "/opt/local/bin/convert"
+  var imagemagickConvertPath: String = "D:\\Program Files\\ImageMagick\\convert.exe"
   /**
   *  path to your imagemagick identify executable
   */
   @BeanProperty
-  var imagemagickIdentifyPath: String = "/opt/local/bin/identify"
+  var imagemagickIdentifyPath: String = "D:\\Program Files\\ImageMagick\\identify.exe"
+
+  @BeanProperty
+  var useImageMagic: Boolean = false
 
   @BeanProperty
   var connectionTimeout: Int = 10000
@@ -68,11 +71,14 @@ class Configuration {
   @BeanProperty
   var socketTimeout: Int = 10000
 
+  @BeanProperty
+  var RequestconnectionTimeout: Int = 10000
+
   /**
   * used as the user agent that is sent with your web requests to extract an article
   */
   @BeanProperty
-  var browserUserAgent: String = "Mozilla/5.0 (X11; U; Linux x86_64; de; rv:1.9.2.8) Gecko/20100723 Ubuntu/10.04 (lucid) Firefox/3.6.8"
+  var browserUserAgent: String = "Mozilla/5.0 (X11; U; Linux x86_64; de; rv:1.9.2.8) Gecko/20100723 Ubuntu/10.04 (lucid) Firefox/47.0.1"
 
   var contentExtractor: ContentExtractor = StandardContentExtractor
 
@@ -123,6 +129,7 @@ class Configuration {
 
   /**
   * Pass in to extract article publish dates.
+    *
     * @param extractor a concrete instance of {@link PublishDateExtractor}
   * @throws IllegalArgumentException if the instance passed in is <code>null</code>
   */
@@ -137,6 +144,7 @@ class Configuration {
 
   /**
   * Pass in to extract any additional data not defined within {@link Article}
+    *
     * @param extractor a concrete instance of {@link AdditionalDataExtractor}
   * @throws IllegalArgumentException if the instance passed in is <code>null</code>
   */

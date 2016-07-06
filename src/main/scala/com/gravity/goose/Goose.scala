@@ -25,6 +25,8 @@ import java.io.File
  * Created by Jim Plush - Gravity.com
  * Date: 8/14/11
  */
+
+
 class Goose(config: Configuration = new Configuration) {
 
 
@@ -32,8 +34,7 @@ class Goose(config: Configuration = new Configuration) {
 
   /**
   * Main method to extract an article object from a URL, pass in a url and get back a Article
-  * @url The url that you want to extract
-  */
+  **/
   def extractContent(url: String, rawHTML: String): Article = {
     val cc = new CrawlCandidate(config, url, rawHTML)
     sendToActor(cc)
@@ -43,6 +44,12 @@ class Goose(config: Configuration = new Configuration) {
     val cc = new CrawlCandidate(config, url, null)
     sendToActor(cc)
   }
+
+  def extractSimpleHTML(url: String, outputFormat: String = "ARTICLE", verbose: Boolean=false): HtmlExtractResponse = {
+    val cc = new CrawlCandidate(config, url, null)
+    val crawler = new Crawler(config)
+    crawler.extractArticle(cc, outputFormat, verbose)
+    }
 
   def shutdownNetwork() {
     HtmlFetcher.getHttpClient.getConnectionManager.shutdown()

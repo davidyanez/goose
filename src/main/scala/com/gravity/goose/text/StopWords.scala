@@ -35,6 +35,7 @@ object StopWords {
   val STOP_WORDS = FileHelper.loadResourceFile("stopwords-en.txt", StopWords.getClass).split(sys.props("line.separator")).toSet
 
 
+
   def removePunctuation(str: String): String = {
     PUNCTUATION.replaceAll(str)
   }
@@ -49,12 +50,15 @@ object StopWords {
 
     val overlappingStopWords: List[String] = new ArrayList[String]
 
-    candidateWords.foreach(w => {
-       if (STOP_WORDS.contains(w.toLowerCase)) overlappingStopWords.add(w.toLowerCase)
-    })
+//    candidateWords.foreach(w => {
+//       if (STOP_WORDS.contains(w.toLowerCase)) overlappingStopWords.add(w.toLowerCase)
+//    })
+
     ws.setWordCount(candidateWords.length)
-    ws.setStopWordCount(overlappingStopWords.size)
+    ws.setStopWordCount(candidateWords.length)
     ws.setStopWords(overlappingStopWords)
+//    ws.setStopWordCount(overlappingStopWords.size)
+//    ws.setStopWords(overlappingStopWords)
     ws
   }
 

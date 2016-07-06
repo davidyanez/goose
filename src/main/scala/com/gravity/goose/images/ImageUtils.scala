@@ -40,6 +40,8 @@ import org.apache.http.util.EntityUtils
 import org.apache.commons.io.IOUtils
 import com.gravity.goose.network.{ImageFetchException, HtmlFetcher}
 
+import javax.imageio.ImageIO
+
 object ImageUtils extends Logging {
   val spaceRegex = " ".r
   val xRegex = "x".r
@@ -80,6 +82,7 @@ object ImageUtils extends Logging {
     imageDetails
   }
 
+
   /**
   * gets the image dimensions for an image file, pass in the path to the image who's dimensions you want to get, uses the built in java commands
   *
@@ -91,28 +94,39 @@ object ImageUtils extends Logging {
     try {
       val f: File = new File(filePath)
       image = ImageIO.read(f)
-      val results: HashMap[String, Integer] = new HashMap[String, Integer]
-      results.put("height", image.getHeight)
-      results.put("width", image.getWidth)
-      results
+
     }
     catch {
       case e: CMMException => {
         logger.error("ERROR READING FILE: " + filePath + " \n", e)
-        throw new IOException("Unable to read file: " + filePath)
+//        throw new IOException("Unable to read file: " + filePath)
       }
     }
     finally {
+
+      var width = 0
+      var height = 0
       if (image != null) {
         try {
           image.flush
+          width = image.getWidth
+          height = image.getHeight
         }
-        catch {
-          case e: Exception => {
-          }
-        }
+
+      }else{
+
+        val results: HashMap[String, Integer] = new HashMap[String, Integer]
+        results.put("height", image.getHeight)
+        results.put("width", image.getWidth)
+        results
       }
+
     }
+    val results: HashMap[String, Integer] = new HashMap[String, Integer]
+    results.put("height", image.getHeight)
+    results.put("width", image.getWidth)
+    results
+
   }
 
   /**
@@ -217,13 +231,21 @@ object ImageUtils extends Logging {
     if (imageFile.exists()) {
       try {
         trace("Reading image from disk: " + localImageName)
-        val imageDetails = getImageDimensions(config.imagemagickIdentifyPath, localImageName)
-        val fileExtension = getFileExtensionName(imageDetails)
-        Some(LocallyStoredImage(imageSrc, localImageName, linkhash, imageFile.length(), fileExtension, imageDetails.getHeight, imageDetails.getWidth))
+
+        if (config.getUseImageMagic){
+          val imageDetails = getImageDimensions(config.imagemagickIdentifyPath, localImageName)
+          val fileExtension = getFileExtensionName(imageDetails)
+          Some(LocallyStoredImage(imageSrc, localImageName, linkhash, imageFile.length(), fileExtension, imageDetails.getHeight, imageDetails.getWidth))
+
+        } else{
+          val Dimensions = getImageDimensionsJava(localImageName)
+          Some(LocallyStoredImage(imageSrc, localImageName, linkhash, imageFile.length(), "", Dimensions.get("height") , Dimensions.get("width")))
+        }
+
       } catch {
         case e: Exception => {
           trace(e, "Unable to get image file dimensions & extension name!")
-          None
+          Some(LocallyStoredImage(imageSrc, localImageName, linkhash, imageFile.length(), "", 500 , 500))
         }
       }
     } else {
@@ -252,10 +274,12 @@ object ImageUtils extends Logging {
         case e: Exception => info(e, e.toString)
       }
     }
-    //    entity.writeTo(outstream)
+
     EntityUtils.consume(entity)
     trace("Content Length: " + entity.getContentLength)
-    readExistingFileInfo(linkhash, imageSrc, config)
+    try{
+      readExistingFileInfo(linkhash, imageSrc, config)
+    }
 
   }
 

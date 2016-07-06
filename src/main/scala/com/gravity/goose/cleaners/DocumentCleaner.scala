@@ -20,11 +20,13 @@ package com.gravity.goose.cleaners
 import com.gravity.goose.utils.Logging
 import java.util.regex.{Matcher, Pattern}
 import org.jsoup.nodes.{TextNode, Node, Element, Document}
-import com.gravity.goose.text.ReplaceSequence
+import com.gravity.goose.text.{StopWords, ReplaceSequence}
 import scala.collection.JavaConversions._
 import com.gravity.goose.Article
 import collection.mutable.ListBuffer
 import org.jsoup.select.{TagsEvaluator, Collector, Elements}
+
+import scala.util.control.Breaks
 
 trait DocumentCleaner {
 
@@ -39,12 +41,13 @@ trait DocumentCleaner {
 
   import DocumentCleaner._
 
-
   def clean(article: Article): Document = {
 
     trace("Starting cleaning phase with DefaultDocumentCleaner")
 
     var docToClean: Document = article.doc
+
+    docToClean = convertImgDataSrc(docToClean)
     docToClean = cleanEmTags(docToClean)
     docToClean = removeDropCaps(docToClean)
     docToClean = removeScriptsAndStyles(docToClean)
@@ -54,13 +57,45 @@ trait DocumentCleaner {
     docToClean = removeNodesViaRegEx(docToClean, entriesPattern)
     docToClean = removeNodesViaRegEx(docToClean, facebookPattern)
     docToClean = removeNodesViaRegEx(docToClean, twitterPattern)
-    docToClean = cleanUpSpanTagsInParagraphs(docToClean)
-    docToClean = convertWantedTagsToParagraphs(docToClean, articleRootTags)
-//    docToClean = convertDivsToParagraphs(docToClean, "div")
-//    docToClean = convertDivsToParagraphs(docToClean, "span")
 
-    //    docToClean = convertDivsToParagraphs(docToClean, "span")
+    docToClean =  removeBadTags(docToClean)
+
+    docToClean = convertDivsToParagraphs(docToClean, "div")
+
+    docToClean = cleanUpSpanTagsInParagraphs(docToClean)
+    docToClean = convertElementsToParagraphs(docToClean, "li")
+
+    docToClean = cleanParagraphs(docToClean)
+
     docToClean
+  }
+
+
+  private def cleanParagraphs(doc: Document): Document = {
+
+    val max_link_words_percent = 0.7
+    val loop = new Breaks;
+
+    for (p <- doc.select("p")){
+      val text_world_count = StopWords.getStopWordCount(p.text()).getWordCount
+      loop.breakable {
+        for (tag <- p.select("a")) {
+
+          val link_world_count = StopWords.getStopWordCount(tag.text()).getWordCount
+          if (link_world_count.toFloat > max_link_words_percent * text_world_count) {
+            // this is a link paragraph and should be removed
+            try {
+              p.remove()
+              loop.break()
+            } catch {
+              case _ => {}
+            }
+
+          }
+        }
+      }
+    }
+    doc
   }
 
   /**
@@ -86,9 +121,10 @@ trait DocumentCleaner {
   * e.g. businessweek2.txt
   */
   private def cleanUpSpanTagsInParagraphs(doc: Document) = {
+    val PARAGRAPH_TAGS = List("li", "p")
     val spans: Elements = doc.getElementsByTag("span")
     for (item <- spans) {
-      if (item.parent().nodeName() == "p") {
+      if ( PARAGRAPH_TAGS.contains(item.parent().nodeName())) {
         val tn: TextNode = new TextNode(item.text, doc.baseUri)
         item.replaceWith(tn)
         trace("Replacing nested span with TextNode: " + item.text())
@@ -107,6 +143,18 @@ trait DocumentCleaner {
       val tn: TextNode = new TextNode(item.text, doc.baseUri)
       item.replaceWith(tn)
     }
+    doc
+  }
+
+
+  private def removeBadTags(doc: Document): Document = {
+     for (tag <- tagsToRemove){
+       val items: Elements = doc.select(tag)
+       for (item <- items) {
+         item.remove()
+       }
+
+     }
     doc
   }
 
@@ -199,7 +247,8 @@ trait DocumentCleaner {
 
   /**
   * Apparently jsoup expects the node's parent to not be null and throws if it is. Let's be safe.
-  * @param node the node to remove from the doc
+    *
+    * @param node the node to remove from the doc
   */
   private def removeNode(node: Element) {
     if (node == null || node.parent == null) return
@@ -213,6 +262,7 @@ trait DocumentCleaner {
     newNode.append(div.html)
     div.replaceWith(newNode)
   }
+
 
   private def convertWantedTagsToParagraphs(doc: Document, wantedTags: TagsEvaluator): Document = {
 
@@ -237,6 +287,20 @@ trait DocumentCleaner {
     doc
   }
 
+  private def convertImgDataSrc(doc: Document): Document = {
+
+    val IMG_EXTENSIONS = Array(".jpg", ".png", ".jpeg", ".bmp", ".gif", ".tif")
+    val elements = doc.getElementsByAttribute("data-src")
+    for (elem <- elements) {
+      val data_src = elem.attr("data-src")
+      if ( IMG_EXTENSIONS.map(ext => data_src.contains(ext)).reduce((a,b) => a || b)  ){
+        var ImgNode: Node =  doc.createElement("img")
+        ImgNode.attr("src", data_src)
+        elem.appendChild(ImgNode)
+      }
+    }
+    doc
+  }
 
   private def convertDivsToParagraphs(doc: Document, domType: String): Document = {
     trace("Starting to replace bad divs...")
@@ -282,6 +346,43 @@ trait DocumentCleaner {
 
     doc
   }
+
+  private def convertElementsToParagraphs(doc: Document, domType: String): Document = {
+     trace("Starting to replace bad divs...")
+     var badDivs: Int = 0
+     var convertedTextNodes: Int = 0
+     val divs: Elements = doc.getElementsByTag(domType)
+     var divIndex = 0
+     val max_link_words_percent = 0.7
+
+
+     for (div <- divs) {
+       try {
+
+         val text_world_count = StopWords.getStopWordCount(div.text()).getWordCount
+         // convert it only if the element text moslty a link
+
+         if (div.select("a").map(a => StopWords.getStopWordCount(a.text()).wordCount).sum > max_link_words_percent * text_world_count){
+           replaceElementsWithPara(doc, div)
+         }
+
+
+       }
+       catch {
+         case e: NullPointerException => {
+           logger.error(e.toString)
+         }
+       }
+       divIndex += 1
+     }
+
+     trace("Found %d total %s with %d bad ones replaced and %d textnodes converted inside %s"
+         .format(divs.size, domType, badDivs, convertedTextNodes, domType))
+
+
+     doc
+   }
+
 
   /**
   * go through all the div's nodes and clean up dangling text nodes and get rid of obvious jank
@@ -365,11 +466,11 @@ trait DocumentCleaner {
       replacementText.clear()
     }
 
-
     nodesToRemove.foreach(_.remove())
     nodesToReturn
 
   }
+
 
 
 }
@@ -379,9 +480,9 @@ object DocumentCleaner extends Logging {
   var sb: StringBuilder = new StringBuilder
 
   // create negative elements
-  sb.append("^side$|combx|retweet|mediaarticlerelated|menucontainer|navbar|comment|PopularQuestions|contact|foot|footer|Footer|footnote|cnn_strycaptiontxt|links|meta$|scroll|shoutbox|sponsor")
-  sb.append("|tags|socialnetworking|socialNetworking|cnnStryHghLght|cnn_stryspcvbx|^inset$|pagetools|post-attributes|welcome_form|contentTools2|the_answers|remember-tool-tip")
-  sb.append("|communitypromo|runaroundLeft|subscribe|vcard|articleheadings|date|^print$|popup|author-dropdown|tools|socialtools|byline|konafilter|KonaFilter|breadcrumbs|^fn$|wp-caption-text")
+  sb.append("^side$|combx|retweet|mediaarticlerelated|menucontainer|navbar|comment|PopularQuestions|contact|foot|footer|Footer|footnote|cnn_strycaptiontxt|links|meta$|shoutbox|sponsor|^pb|error|reviews")
+  sb.append("|tags|socialnetworking|socialNetworking|cnnStryHghLght|cnn_stryspcvbx|^inset$|pagetools|post-attributes|welcome_form|contentTools2|the_answers|remember-tool-tip|article-media-overlay|carousel")
+  sb.append("|communitypromo|runaroundLeft|subscribe|vcard|articleheadings|date|^print$|popup|author-dropdown|tools|socialtools|byline|konafilter|KonaFilter|breadcrumbs|^fn$|wp-caption-text|related")
 
   /**
   * this regex is used to remove undesirable nodes from our doc
@@ -392,12 +493,14 @@ object DocumentCleaner extends Logging {
   val queryNaughtyClasses = "[class~=(" + regExRemoveNodes + ")]"
   val queryNaughtyNames = "[name~=(" + regExRemoveNodes + ")]"
   val tabsAndNewLinesReplacements = ReplaceSequence.create("\n", "\n\n").append("\t").append("^\\s+$")
+  val tagsToRemove: List[String] = List("aside")
+
   /**
   * regex to detect if there are block level elements inside of a div element
   */
-  val divToPElementsPattern: Pattern = Pattern.compile("<(a|blockquote|dl|div|img|ol|p|pre|table|ul)")
+  val divToPElementsPattern: Pattern = Pattern.compile("<(a|blockquote|dl|div|picture|ol|p|pre|table|ul|li|video|section|figcaption)")
 
-  val blockElemementTags = TagsEvaluator("a", "blockquote", "dl", "div", "img", "ol", "p", "pre", "table", "ul")
+  val blockElemementTags = TagsEvaluator("a", "blockquote", "dl", "div", "ol", "p", "pre", "table", "ul", "section", "img", "video", "object")
   val articleRootTags = TagsEvaluator("div", "span", "article")
 
   val captionPattern: Pattern = Pattern.compile("^caption$")

@@ -4,3 +4,9 @@ target/
 /goose.iws
 
 .idea
+*.html
+/goose_2.11.iml
+/hs_err_pid16120.log
+/hs_err_pid24364.log
+/replay_pid16120.log
+/replay_pid24364.log
