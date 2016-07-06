@@ -75,7 +75,27 @@ trait OutputFormatter {
     convertLinksToText(topNode)
     replaceTagsWithText(topNode)
     removeElementsWithFewWords(topNode)
+
     convertToText(topNode)
+
+  }
+
+  def removeDuplicatedImages(topNode: Element): Unit =  {
+
+    val image_nodes = topNode.select("img")
+
+    for (image_node <- image_nodes) {
+      val src = image_node.attr("src")
+      val duplicated_tags = topNode.getElementsByAttributeValue("src", src)
+
+      if (duplicated_tags.length > 1){
+        for ( duplicated_tag <- duplicated_tags.drop(1)){
+          duplicated_tag.remove()
+        }
+
+      }
+
+    }
   }
 
   /**
@@ -94,9 +114,11 @@ trait OutputFormatter {
     cleanHeaders(topNode)
     cleanParagraphs(topNode)
     removeElementsWithFewWords(topNode)
+    removeDuplicatedImages(topNode)
+
     val doc = getSimpleHTMLDoc(topNode, article)
     if (doc.isDefined)
-      removeElementsWithFewWords(doc.get.body(), Array("div"))
+      removeElementsWithFewWords(doc.get.body())
     doc
   }
 
