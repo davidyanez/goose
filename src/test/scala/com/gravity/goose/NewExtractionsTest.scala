@@ -776,22 +776,37 @@ class NewExtractionsTest {
    out_html.close()
   }
 
-  //
+
   @Test
-    def qivo_4766() {
-    //    Failing because content is wrapped by a div with id containing the word footer.
+    def qivo_7152() {
 
      implicit val config = TestUtils.NO_IMAGE_CONFIG
 
-     val url = "http://venturebeat.com/2016/03/13/how-my-kickstarter-blew-up-my-life/?utm_source=CB+Insights+Newsletter&utm_campaign=600a0376ae-Bubble_3_15_2016&utm_medium=email&utm_term=0_9dc0513989-600a0376ae-86985821"
+     val url = "http://www.cnn.com/videos/world/2016/07/04/justin-trudeau-toronto-pride-orig-emarticke.cnn?sr=fbCNN070416justin-trudeau-toronto-pride-orig-emarticke.cnn0710PMVideoVideo&linkId=26204814"
      val article = TestUtils.getArticle(url = url)
      println(article.cleanedArticleSimpleHTML)
 
-     val out_html = new PrintWriter(new File("./"+output_folder+"/"+"qivo_4766.html"))
+     val out_html = new PrintWriter(new File("./"+output_folder+"/"+"qivo_7152.html"))
      out_html.write(article.cleanedArticleSimpleHTML)
 
      out_html.close()
     }
+  // http://www.bbc.com/news/video_and_audio/features/magazine-36398439/36398439
+
+  @Test
+  def bbc_video() {
+
+   implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+   val url = "http://www.bbc.com/news/uk-england-coventry-warwickshire-36672947"
+   val article = TestUtils.getArticle(url = url)
+   println(article.cleanedArticleSimpleHTML)
+
+   val out_html = new PrintWriter(new File("./"+output_folder+"/"+"bbc_video.html"))
+   out_html.write(article.cleanedArticleSimpleHTML)
+
+   out_html.close()
+  }
 
   "TODO: NotHtmlException: No HTML returned for url:  http://firstround.com/review/the-30-best-pieces-of-advice-for-entrepreneurs-in-2015"
 
