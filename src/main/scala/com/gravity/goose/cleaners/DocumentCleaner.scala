@@ -500,7 +500,7 @@ object DocumentCleaner extends Logging {
   */
   val divToPElementsPattern: Pattern = Pattern.compile("<(a|blockquote|dl|div|picture|ol|p|pre|table|ul|li|video|section|figcaption)")
 
-  val blockElemementTags = TagsEvaluator("a", "blockquote", "dl", "div", "ol", "p", "pre", "table", "ul", "section", "img", "video")
+  val blockElemementTags = TagsEvaluator("a", "blockquote", "dl", "div", "ol", "p", "pre", "table", "ul", "section", "img", "video", "object")
   val articleRootTags = TagsEvaluator("div", "span", "article")
 
   val captionPattern: Pattern = Pattern.compile("^caption$")

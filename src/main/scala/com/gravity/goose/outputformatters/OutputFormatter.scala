@@ -162,7 +162,7 @@ trait OutputFormatter {
                    ""
                  }
                }
-               else if (e.tagName() == "video") {
+               else if (e.tagName() == "video" || e.tagName() == "object") {
                  s"<div class='video-wrap'>${e.outerHtml()}</div>"
                }
                else if (e.tagName().contains(List("ol", "ul"))) {
@@ -501,7 +501,7 @@ trait OutputFormatter {
       if (logger.isDebugEnabled) {
         logger.debug("removeParagraphsWithFewWords starting...")
       }
-      val IGNORE_TAGS = Array("img", "iframe", "picture", "video","figure","hr", "h1", "h2", "h3", "h4", "br", "b", "strong", "a", "li") ++ ignore_tags
+      val IGNORE_TAGS = Array("img", "iframe", "picture", "video","figure","hr", "h1", "h2", "h3", "h4", "br", "b", "strong", "a", "li", "object") ++ ignore_tags
       val INNER_SAFE_TAGS = Array("img", "iframe", "picture", "video", "figure", "strong")  // do not delete paragraphs containing this tags
 
       val allNodes = topNode.getAllElements
