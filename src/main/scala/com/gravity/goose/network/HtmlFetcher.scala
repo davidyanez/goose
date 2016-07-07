@@ -167,13 +167,17 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
           }
         }
         try {
-          if(instream.available() == 0){
-            entity = httpClient.execute(httpget, localContext).getEntity()
-            instream = entity.getContent
+          try{
+            instream.available()
+          }  catch {
+            case e: IOException => {
+              entity = httpClient.execute(httpget, localContext).getEntity()
+              instream = entity.getContent
+            }
+
           }
           htmlResult = HtmlFetcher.convertStreamToString(instream, 15728640, encodingType).trim
           new String(htmlResult.getBytes("UTF-8"), "UTF8")
-
         }
         finally {
           EntityUtils.consume(entity)
