@@ -132,7 +132,7 @@ trait OutputFormatter {
 
     removeNodesWithNegativeScores(topNode)
     cleanLinks(topNode)
-    cleanHeaders(topNode)
+//    cleanHeaders(topNode)
     cleanParagraphs(topNode)
     removeElementsWithFewWords(topNode)
     removeDuplicatedImages(topNode)
@@ -221,8 +221,8 @@ trait OutputFormatter {
        ) {
 
          var iframe_attributes = e.attributes().filter((a: Attribute) => a.getKey() != "style").
-           map((a: Attribute) => if (a.getKey == "src" && a.getValue.startsWith("//")) a.getKey + "=\"http:" + a.getValue + "\""
-           else a.getKey + "=\"" + a.getValue + "\"").mkString(" ")
+           map((a: Attribute) => if (a.getKey == "src" && a.getValue.startsWith("//")) a.getKey + "=\"https:" + a.getValue + "\""
+           else a.getKey + "=\"" + a.getValue.replace("http:", "https:") + "\"").mkString(" ")
 
          val wrapper_div_style = "position:relative;padding-bottom: 56.25%;padding-top: 25px;height:0;"
          val iframe_style = "position:absolute;top=0;left:0;width:100%;height:95%;"
@@ -524,7 +524,7 @@ trait OutputFormatter {
         logger.debug("removeParagraphsWithFewWords starting...")
       }
       val IGNORE_TAGS = Array("img", "iframe", "picture", "video","figure","hr", "h1", "h2", "h3", "h4", "br", "b", "strong", "a", "li", "object") ++ ignore_tags
-      val INNER_SAFE_TAGS = Array("img", "iframe", "picture", "video", "figure", "strong")  // do not delete paragraphs containing this tags
+      val INNER_SAFE_TAGS = Array("img", "iframe", "picture", "video", "figure", "strong", "h1", "h2", "h3", "h4")  // do not delete paragraphs containing this tags
 
       val allNodes = topNode.getAllElements
 
