@@ -82,18 +82,39 @@ trait OutputFormatter {
 
   def removeDuplicatedImages(topNode: Element): Unit =  {
 
-    val image_nodes = topNode.select("img")
+      val image_nodes = topNode.select("img")
 
-    for (image_node <- image_nodes) {
-      val src = image_node.attr("src")
-      val duplicated_tags = topNode.getElementsByAttributeValue("src", src)
+      for (image_node <- image_nodes) {
+        val src = image_node.attr("src")
+        val duplicated_tags = topNode.getElementsByAttributeValue("src", src)
 
-      if (duplicated_tags.length > 1){
-        for ( duplicated_tag <- duplicated_tags.drop(1)){
-          duplicated_tag.remove()
+        if (duplicated_tags.length > 1){
+          for ( duplicated_tag <- duplicated_tags.drop(1)){
+            duplicated_tag.remove()
+          }
+
         }
 
       }
+    }
+
+  def removeDuplicatedtext(topNode: Element): Unit =  {
+
+    val all_nodes = topNode.getAllElements
+    val MIN_TEXT_WORDS = 10
+
+
+    for (node <- all_nodes) {
+      val text = node.text()
+      if (text.length > 1 && StopWords.getStopWordCount(text).getWordCount >= MIN_TEXT_WORDS){
+        val duplicated_tags = topNode.getElementsContainingOwnText(text)
+        if (duplicated_tags.length > 1){
+          for ( duplicated_tag <- duplicated_tags.drop(1)){
+            duplicated_tag.remove()
+          }
+        }
+      }
+
 
     }
   }
@@ -115,6 +136,7 @@ trait OutputFormatter {
     cleanParagraphs(topNode)
     removeElementsWithFewWords(topNode)
     removeDuplicatedImages(topNode)
+    removeDuplicatedtext(topNode)
 
     val doc = getSimpleHTMLDoc(topNode, article)
     if (doc.isDefined)
