@@ -840,6 +840,41 @@ class NewExtractionsTest {
     out_html.close()
   }
 
+  //
+  @Test
+    def psychologytoday() {
+
+      implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+      val url = "https://www.psychologytoday.com/blog/singletons/201509/3-types-parents-who-get-bullied-their-own-children?utm_source=FacebookPost&utm_medium=FBPost&utm_campaign=FBPost"
+      val article = TestUtils.getArticle(url = url)
+      println(article.cleanedArticleSimpleHTML)
+
+      val out_html = new PrintWriter(new File("./"+output_folder+"/"+"psychologytoday.html"))
+      out_html.write(article.cleanedArticleSimpleHTML)
+
+      out_html.close()
+    }
+  // http://www.futbox.com/en
+
+  @Test
+  def footbox() {
+
+    implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+    val url = "http://www.futbox.com/en"
+    val article = TestUtils.getArticle(url = url)
+    println(article.cleanedArticleSimpleHTML)
+
+    val out_html = new PrintWriter(new File("./"+output_folder+"/"+"futbox.html"))
+    out_html.write(article.cleanedArticleSimpleHTML)
+
+    out_html.close()
+  }
+
+
+
+
 
   "TODO: NotHtmlException: No HTML returned for url:  http://firstround.com/review/the-30-best-pieces-of-advice-for-entrepreneurs-in-2015"
 
