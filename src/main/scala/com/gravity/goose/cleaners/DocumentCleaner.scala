@@ -479,18 +479,28 @@ trait DocumentCleaner {
 object DocumentCleaner extends Logging {
   var sb: StringBuilder = new StringBuilder
 
+  var class_sb: StringBuilder = new StringBuilder
+
   // create negative elements
-  sb.append("^side$|combx|retweet|mediaarticlerelated|menucontainer|navbar|comment|PopularQuestions|contact|foot|footer|Footer|footnote|cnn_strycaptiontxt|links|meta$|shoutbox|sponsor|^pb|error|reviews")
+  sb.append("^side$|combx|retweet|mediaarticlerelated|menucontainer|navbar|comments|PopularQuestions|contact|foot|footer|Footer|footnote|cnn_strycaptiontxt|links|meta$|shoutbox|sponsor|^pb|error|reviews")
   sb.append("|tags|socialnetworking|socialNetworking|cnnStryHghLght|cnn_stryspcvbx|^inset$|pagetools|post-attributes|welcome_form|contentTools2|the_answers|remember-tool-tip|article-media-overlay|carousel")
   sb.append("|communitypromo|runaroundLeft|subscribe|vcard|articleheadings|date|^print$|popup|author-dropdown|tools|socialtools|byline|konafilter|KonaFilter|breadcrumbs|^fn$|wp-caption-text|related")
 
-  /**
+  class_sb.append("^side$|combx|retweet|mediaarticlerelated|menucontainer|navbar|PopularQuestions|footer|Footer|footnote|cnn_strycaptiontxt|meta$|shoutbox|sponsor|^pb|error|reviews")
+  class_sb.append("|socialnetworking|socialNetworking|cnnStryHghLght|cnn_stryspcvbx|^inset$|pagetools|post-attributes|welcome_form|contentTools2|the_answers|remember-tool-tip|article-media-overlay")
+  class_sb.append("|communitypromo|runaroundLeft|vcard|articleheadings|date|^print$|popup|author-dropdown|socialtools|byline|konafilter|KonaFilter|breadcrumbs|^fn$|wp-caption-text")
+
+
+
+  /**                        00
   * this regex is used to remove undesirable nodes from our doc
   * indicate that something maybe isn't content but more of a comment, footer or some other undesirable node
   */
   val regExRemoveNodes = sb.toString()
+  val classRegExRemoveNodes = class_sb.toString()
+
   val queryNaughtyIDs = "[id~=(" + regExRemoveNodes + ")]"
-  val queryNaughtyClasses = "[class~=(" + regExRemoveNodes + ")]"
+  val queryNaughtyClasses = "[class~=(" + classRegExRemoveNodes + ")]"
   val queryNaughtyNames = "[name~=(" + regExRemoveNodes + ")]"
   val tabsAndNewLinesReplacements = ReplaceSequence.create("\n", "\n\n").append("\t").append("^\\s+$")
   val tagsToRemove: List[String] = List("aside")
