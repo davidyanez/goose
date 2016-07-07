@@ -171,73 +171,73 @@ trait OutputFormatter {
 
      val article_div_html = topNode.getAllElements.map((e: Element) => {
 
-               if (e.tagName() == "p") {
-                 if (e.text() != article.title)
-                   s"<p>${getcleanParagraphHTML(e)}</p>"
-                 else
-                   ""
-               }else if (Array("br", "hr").contains(e.tagName())) {
-                 if (e.previousElementSibling() != null &&  e.tagName() != e.previousElementSibling().tagName()){
-                   // avoid to have this tag repeated consecutively
-                   s"${e.outerHtml()}"
-                 } else{
-                   ""
-                 }
-               }
-               else if (e.tagName() == "video" || e.tagName() == "object") {
-                 s"<div class='video-wrap'>${e.outerHtml()}</div>"
-               }
-               else if (e.tagName().contains(List("ol", "ul"))) {
-                 s"<div class='list'>${e.outerHtml()}</div>"
-               }
-               else if (keep_tags.contains(e.tagName())) {
-                 s"${e.text}"
-               }
-               else if (e.tagName() == "img") {
+       if (e.tagName() == "p") {
+         if (e.text() != article.title)
+           s"<p>${getcleanParagraphHTML(e)}</p>"
+         else
+           ""
+       }else if (Array("br", "hr").contains(e.tagName())) {
+         if (e.previousElementSibling() != null &&  e.tagName() != e.previousElementSibling().tagName()){
+           // avoid to have this tag repeated consecutively
+           s"${e.outerHtml()}"
+         } else{
+           ""
+         }
+       }
+       else if (e.tagName() == "video" || e.tagName() == "object") {
+         s"<div class='video-wrap'>${e.outerHtml()}</div>"
+       }
+       else if (e.tagName().contains(List("ol", "ul"))) {
+         s"<div class='list'>${e.outerHtml()}</div>"
+       }
+       else if (keep_tags.contains(e.tagName())) {
+         s"${e.text}"
+       }
+       else if (e.tagName() == "img" ||  (e.tagName() == "source" && e.parent().tagName() == "picture")) {
 
-                 if (e.hasAttr("src") && (e.attr("src").startsWith("http"))) {}
-                 else if (e.hasAttr("src") && e.attr("src").startsWith("//")) {
-                   e.attr("src", "http:" + e.attr("src"))
-                 }
-                 else {
-                   e.attr("src", "http://" + article.domain + e.attr("src"))
-                 }
-                 if (e.hasAttr("srcset") && e.attr("srcset").length > 0) {
-                   var img_sources = e.attr("srcset").split(",").map((url: String) => url.trim())
-                   img_sources = img_sources.map(src => if (src.startsWith("http")) src
-                   else if (src.startsWith("//")) "http:" + src else "http://" + article.domain + src)
-                   val srcset = String.join(", ", img_sources.toList)
-                   e.attr("srcset", srcset)
-                 }
-                 var img_attributes = e.attributes().filter((a: Attribute) => !SKIP_ATTRIBUTES.contains(a.getKey())).
-                   map((a: Attribute) => a.getKey + "=\"" + a.getValue + "\"").mkString(" ")
+         if (e.hasAttr("src") && (e.attr("src").startsWith("http"))) {}
+         else if (e.hasAttr("src") && e.attr("src").startsWith("//")) {
+           e.attr("src", "http:" + e.attr("src"))
+         }
+         else {
+           e.attr("src", "http://" + article.domain + e.attr("src"))
+         }
+         if (e.hasAttr("srcset") && e.attr("srcset").length > 0) {
+           var img_sources = e.attr("srcset").split(",").map((url: String) => url.trim())
+           img_sources = img_sources.map(src => if (src.startsWith("http")) src
+           else if (src.startsWith("//")) "http:" + src else "http://" + article.domain + src)
+           val srcset = String.join(", ", img_sources.toList)
+           e.attr("srcset", srcset)
+         }
+         var img_attributes = e.attributes().filter((a: Attribute) => !SKIP_ATTRIBUTES.contains(a.getKey())).
+           map((a: Attribute) => a.getKey + "=\"" + a.getValue + "\"").mkString(" ")
 
-                 s"<div class='image-wrap'><img class='image' $img_attributes></div>"
+         s"<div class='image-wrap'><img class='image' $img_attributes></div>"
 
-               } else if (e.tagName() == "iframe"
-                 && (e.attr("src").contains("//www.youtube.com/embed/")
-                 || e.attr("src").contains("//player.vimeo.com/video/"))
-                 ||  e.hasAttr("allowfullscreen ")
-               ) {
+       } else if (e.tagName() == "iframe"
+         && (e.attr("src").contains("//www.youtube.com/embed/")
+         || e.attr("src").contains("//player.vimeo.com/video/"))
+         ||  e.hasAttr("allowfullscreen ")
+       ) {
 
-                 var iframe_attributes = e.attributes().filter((a: Attribute) => a.getKey() != "style").
-                   map((a: Attribute) => if (a.getKey == "src" && a.getValue.startsWith("//")) a.getKey + "=\"http:" + a.getValue + "\""
-                   else a.getKey + "=\"" + a.getValue + "\"").mkString(" ")
+         var iframe_attributes = e.attributes().filter((a: Attribute) => a.getKey() != "style").
+           map((a: Attribute) => if (a.getKey == "src" && a.getValue.startsWith("//")) a.getKey + "=\"http:" + a.getValue + "\""
+           else a.getKey + "=\"" + a.getValue + "\"").mkString(" ")
 
-                 val wrapper_div_style = "position:relative;padding-bottom: 56.25%;padding-top: 25px;height:0;"
-                 val iframe_style = "position:absolute;top=0;left:0;width:100%;height:95%;"
-                 "<div class='video-iframe-wrap'>" + "<iframe class='video-iframe'" + iframe_attributes + "></iframe></div>"
-               }
-               else if (HEADERS.contains(e.tagName())) {
-                 // to avoid having two h1 headers in the top , title and first h1 tag.
-                 val tag_name =  if (e.tagName() == "h1") "h2" else e.tagName()
-                 if (e.text() != article.title)
-                   s"<${tag_name}>${e.text}</${tag_name}>"
-                 else {""}
-               }
-               else {""}
+         val wrapper_div_style = "position:relative;padding-bottom: 56.25%;padding-top: 25px;height:0;"
+         val iframe_style = "position:absolute;top=0;left:0;width:100%;height:95%;"
+         "<div class='video-iframe-wrap'>" + "<iframe class='video-iframe'" + iframe_attributes + "></iframe></div>"
+       }
+       else if (HEADERS.contains(e.tagName())) {
+         // to avoid having two h1 headers in the top , title and first h1 tag.
+         val tag_name =  if (e.tagName() == "h1") "h2" else e.tagName()
+         if (e.text() != article.title)
+           s"<${tag_name}>${e.text}</${tag_name}>"
+         else {""}
+       }
+       else {""}
 
-             }).toList.mkString("")
+     }).toList.mkString("")
 
      import java.util.Calendar;
      import java.text.SimpleDateFormat;
