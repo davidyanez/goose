@@ -114,8 +114,6 @@ trait OutputFormatter {
           }
         }
       }
-
-
     }
   }
 
@@ -132,15 +130,18 @@ trait OutputFormatter {
 
     removeNodesWithNegativeScores(topNode)
     cleanLinks(topNode)
-//    cleanHeaders(topNode)
     cleanParagraphs(topNode)
     removeElementsWithFewWords(topNode)
     removeDuplicatedImages(topNode)
     removeDuplicatedtext(topNode)
 
     val doc = getSimpleHTMLDoc(topNode, article)
-    if (doc.isDefined)
+    if (doc.isDefined) {
       removeElementsWithFewWords(doc.get.body())
+      cleanHeaders(doc.get.body())
+    }
+
+
     doc
   }
 
@@ -367,8 +368,17 @@ trait OutputFormatter {
     val ACCEPTED_TAGS = TagsEvaluator("p","img","video","figure","picture", "ol", "iframe", "div")
     val HEADER_TAGS = TagsEvaluator("h1","h2","h3","h4","h5","h6")
 
-    val headers = Collector.collect(HEADER_TAGS, topNode)
+    var headers = Collector.collect(HEADER_TAGS, topNode)
+
     for (header <- headers) {
+      if (header.text().length < 1) {
+         header.remove()
+      }
+    }
+
+    headers = Collector.collect(HEADER_TAGS, topNode)
+
+    for (header <- headers.drop(1)) {
       //      check if next sibling contains ACCEPTED_TAGS
       val sibling_good_elements = Collector.collect(ACCEPTED_TAGS, header.nextElementSibling())
       if (sibling_good_elements.length == 0) {
