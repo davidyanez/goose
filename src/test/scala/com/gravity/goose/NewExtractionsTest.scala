@@ -270,17 +270,17 @@ class NewExtractionsTest {
      }
 
   @Test
-      def fool_bombardier_order() {
+  def fool_bombardier_order() {
 
-        implicit val config = TestUtils.NO_IMAGE_CONFIG
+    implicit val config = TestUtils.NO_IMAGE_CONFIG
 
-        val url = "http://www.fool.ca/2016/04/28/bombardier-inc-gets-another-order/"
-        val article = TestUtils.getArticle(url = url)
-        println(article.cleanedArticleSimpleHTML)
-        val out_html = new PrintWriter(new File("./"+output_folder+"/"+"fool_bombardier_order.html"))
-        out_html.write(article.cleanedArticleSimpleHTML)
-        out_html.close()
-      }
+    val url = "http://www.fool.ca/2016/04/28/bombardier-inc-gets-another-order/"
+    val article = TestUtils.getArticle(url = url)
+    println(article.cleanedArticleSimpleHTML)
+    val out_html = new PrintWriter(new File("./"+output_folder+"/"+"fool_bombardier_order.html"))
+    out_html.write(article.cleanedArticleSimpleHTML)
+    out_html.close()
+  }
 
   @Test
    def stradigi() {
@@ -761,20 +761,20 @@ class NewExtractionsTest {
    out_html.close()
   }
 
-  @Test
-  def qivo_timeout() {
-
-   implicit val config = TestUtils.NO_IMAGE_CONFIG
-
-   val url = "http://goo.gl/Yzar67"
-   val article = TestUtils.getArticle(url = url)
-   println(article.cleanedArticleSimpleHTML)
-
-   val out_html = new PrintWriter(new File("./"+output_folder+"/"+"qivo_timeout.html"))
-   out_html.write(article.cleanedArticleSimpleHTML)
-
-   out_html.close()
-  }
+//  @Test
+//  def qivo_timeout() {
+//
+//   implicit val config = TestUtils.NO_IMAGE_CONFIG
+//
+//   val url = "http://goo.gl/Yzar67"
+//   val article = TestUtils.getArticle(url = url)
+//   println(article.cleanedArticleSimpleHTML)
+//
+//   val out_html = new PrintWriter(new File("./"+output_folder+"/"+"qivo_timeout.html"))
+//   out_html.write(article.cleanedArticleSimpleHTML)
+//
+//   out_html.close()
+//  }
 
 
   @Test
@@ -871,10 +871,6 @@ class NewExtractionsTest {
 
     out_html.close()
   }
-
-
-
-
 
   "TODO: NotHtmlException: No HTML returned for url:  http://firstround.com/review/the-30-best-pieces-of-advice-for-entrepreneurs-in-2015"
 
