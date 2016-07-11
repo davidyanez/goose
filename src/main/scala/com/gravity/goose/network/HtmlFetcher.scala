@@ -19,6 +19,8 @@
 package com.gravity.goose.network
 
 
+import java.util.concurrent.TimeUnit
+
 import org.apache.http.{ProtocolVersion, HttpEntity, HttpResponse, HttpVersion}
 import org.apache.http.client.{RedirectStrategy, CookieStore, HttpClient}
 import org.apache.http.client.config.RequestConfig
@@ -102,7 +104,7 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
    * @throws UnhandledStatusCodeException(String, Int)
    * @throws MaxBytesException()
    */
-  def getHtml(config: Configuration, url: String): Option[String] = {
+  def getHtml(config: Configuration, url: String, use_browser: Boolean): Option[String] = {
 
     var httpget: HttpGet = null
     var htmlResult: String = null
@@ -119,18 +121,12 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
       if (foundAt >= 0) url.substring(0, foundAt) else url
     }
 
-    var firefox_profile = new FirefoxProfile()
-//    firefox_profile.setPreference("permissions.default.stylesheet", 2)
-    firefox_profile.setPreference("permissions.default.image", 2)
-    firefox_profile.setPreference("dom.ipc.plugins.enabled.libflashplayer.so", false)
-
-//    var capabilities = DesiredCapabilities.htmlUnit()
-//    capabilities.setBrowserName("Mozilla/5.0 (X11; Linux x86_64; rv:24.0) Gecko/20100101 Firefox/24.0")
-//    capabilities.setVersion("24.0");
-//    capabilities.setJavascriptEnabled(true);
-
-    implicit val webDriver: WebDriver = new FirefoxDriver(firefox_profile)
-    webDriver.get(cleanUrl)
+//    var firefox_profile = new FirefoxProfile()
+//    firefox_profile.setPreference("permissions.default.image", 2)
+//    firefox_profile.setPreference("dom.ipc.plugins.enabled.libflashplayer.so", false)
+//
+//    implicit val webDriver: WebDriver = new FirefoxDriver(firefox_profile)
+//    webDriver.get(cleanUrl)
 
 
     try {
@@ -188,17 +184,49 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
           }
         }
         try {
-          try{
-            instream.available()
-          }  catch {
-            case e: IOException => {
-              entity = httpClient.execute(httpget, localContext).getEntity()
-              instream = entity.getContent
-            }
 
+          var browser_ok = true
+
+          if (use_browser) {
+            var firefox_profile = new FirefoxProfile()
+            firefox_profile.setPreference("permissions.default.image", 2)
+            firefox_profile.setPreference("dom.ipc.plugins.enabled.libflashplayer.so", false)
+
+            val capability  =  DesiredCapabilities.firefox()
+            capability.setJavascriptEnabled(true)
+            capability.setCapability(FirefoxDriver.PROFILE, firefox_profile)
+            implicit val webDriver: WebDriver = new FirefoxDriver(capability)
+
+            try{
+
+              webDriver.manage().timeouts().pageLoadTimeout(20, TimeUnit.SECONDS)
+              webDriver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS)
+              webDriver.get(cleanUrl)
+              htmlResult = webDriver.getPageSource
+
+            }catch {
+              case _ : Exception => {
+                 browser_ok = false
+              }
+            }finally  {
+              webDriver.close()
+            }
           }
-          htmlResult = HtmlFetcher.convertStreamToString(instream, 15728640, encodingType).trim
-          new String(htmlResult.getBytes("UTF-8"), "UTF8")
+
+          if (!use_browser || (use_browser && !browser_ok) ){
+            try{
+              instream.available()
+            }
+            catch {
+              case e: IOException => {
+                entity = httpClient.execute(httpget, localContext).getEntity()
+                instream = entity.getContent
+              }
+            }
+            htmlResult = HtmlFetcher.convertStreamToString(instream, 15728640, encodingType).trim
+            new String(htmlResult.getBytes("UTF-8"), "UTF8")
+          }
+
         }
         finally {
           EntityUtils.consume(entity)
