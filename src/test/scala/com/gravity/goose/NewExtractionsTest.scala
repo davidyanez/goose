@@ -623,7 +623,7 @@ class NewExtractionsTest {
    val article = TestUtils.getArticle(url = url)
    println(article.cleanedArticleSimpleHTML)
 
-   val out_html = new PrintWriter(new File("./"+output_folder+"/"+"qivo_x.html"))
+   val out_html = new PrintWriter(new File("./"+output_folder+"/"+"qivo_2675.html"))
    out_html.write(article.cleanedArticleSimpleHTML)
 
    out_html.close()
