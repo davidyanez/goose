@@ -306,15 +306,19 @@ trait DocumentCleaner {
 
   private def convertBackgroundImageToImage(doc: Document): Document = {
 
-      val elements = doc.getAllElements.filter(element => element.hasAttr("style") && element.attr("style").contains("background-image:"))
+      val elements = doc.getAllElements.filter(element => element.hasAttr("style") && element.attr("style").contains("background-image: url("))
       for (elem <- elements) {
         val style = elem.attr("style")
-        val url_start_pos = style.indexOfSlice("url(")
-        val url_end_pos = style.substring(url_start_pos).indexOfSlice(")")
-        val url = style.substring(url_start_pos, url_end_pos)
-        val imgNode: Element = doc.createElement("img")
-        imgNode.attr("src", url)
-        elem.replaceWith(imgNode)
+        val url_start_pos = style.indexOfSlice("background-image: url(") +  "background-image: url(".length
+        if (url_start_pos > 0){
+          val url_end_pos = style.substring(url_start_pos).indexOfSlice(")") + url_start_pos
+          if (url_end_pos > url_start_pos) {
+            val url = style.substring(url_start_pos, url_end_pos)
+            val imgNode: Element = doc.createElement("img")
+            imgNode.attr("src", url)
+            elem.replaceWith(imgNode)
+          }
+        }
       }
       doc
     }
