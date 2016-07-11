@@ -324,7 +324,6 @@ trait DocumentCleaner {
     }
 
 
-
   private def convertDivsToParagraphs(doc: Document, domType: String): Document = {
     trace("Starting to replace bad divs...")
     var badDivs: Int = 0
@@ -531,7 +530,7 @@ object DocumentCleaner extends Logging {
   /**
   * regex to detect if there are block level elements inside of a div element
   */
-  val divToPElementsPattern: Pattern = Pattern.compile("<(a|blockquote|dl|div|picture|ol|p|pre|table|ul|li|video|section|figcaption)")
+  val divToPElementsPattern: Pattern = Pattern.compile("<(a|blockquote|dl|div|ol|p|pre|table|ul|li|video|section|figcaption)")
 
   val blockElemementTags = TagsEvaluator("a", "blockquote", "dl", "div", "ol", "p", "pre", "table", "ul", "section", "img", "video", "object")
   val articleRootTags = TagsEvaluator("div", "span", "article")
