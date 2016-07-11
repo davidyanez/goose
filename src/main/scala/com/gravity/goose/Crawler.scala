@@ -84,8 +84,8 @@ class Crawler(config: Configuration) {
         case Some(node: Element) => {
           article.topNode = node
 
-          val imageExtractor = getImageExtractor(article)
-          imageExtractor.RemoveBadImages(article)
+//          val imageExtractor = getImageExtractor(article)
+//          imageExtractor.RemoveBadImages(article)
 
           article.cleanedArticleSimpleHTMLDoc =  outputFormatter.getFormattedHTML(article)
           article.cleanedArticleSimpleHTML = article.cleanedArticleSimpleHTMLDoc.get.html
@@ -98,6 +98,7 @@ class Crawler(config: Configuration) {
       article
     }
     val validArticle = isValidArticle(article)
+    System.gc()
     article
   }
 
@@ -140,7 +141,6 @@ class Crawler(config: Configuration) {
         article.tags = extractor.extractTags(article)
         // before we do any calcs on the body itself let's clean up the document
         article.doc =  docCleaner.clean(article)
-
 
         extractor.calculateBestNodeBasedOnClustering(article) match {
           case Some(node: Element) => {
@@ -214,7 +214,7 @@ class Crawler(config: Configuration) {
     if (crawlCandidate.rawHTML != null) {
       Some(crawlCandidate.rawHTML)
     } else {
-      config.getHtmlFetcher.getHtml(config, parsingCandidate.url.toString) match {
+      config.getHtmlFetcher.getHtml(config, parsingCandidate.url.toString, true) match {
         case Some(html) => {
           Some(html)
         }
