@@ -20,7 +20,7 @@ trait AbstractHtmlFetcher {
    * @param url the address to access and retrieve content from
    * @return `Some` `String` of the response from the specified `url` or `None` if failed to retrieve HTML.
    */
-  def getHtml(config: Configuration, url: String): Option[String]
+  def getHtml(config: Configuration, url: String, use_browser: Boolean): Option[String]
 
   def getCharSet(doc: Document): String
 
