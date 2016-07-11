@@ -366,7 +366,7 @@ trait OutputFormatter {
     */
   private def cleanHeaders(topNode: Element): Unit ={
 
-    val ACCEPTED_TAGS = TagsEvaluator("p","img","video","figure","picture", "ol", "iframe", "div")
+    val ACCEPTED_TAGS = TagsEvaluator("p","img","video","figure","picture", "ol", "iframe", "div", "source")
     val HEADER_TAGS = TagsEvaluator("h1","h2","h3","h4","h5","h6")
 
     var headers = Collector.collect(HEADER_TAGS, topNode)
@@ -534,7 +534,7 @@ trait OutputFormatter {
       if (logger.isDebugEnabled) {
         logger.debug("removeParagraphsWithFewWords starting...")
       }
-      val IGNORE_TAGS = Array("img", "iframe", "picture", "video","figure","hr", "h1", "h2", "h3", "h4", "br", "b", "strong", "a", "li", "object") ++ ignore_tags
+      val IGNORE_TAGS = Array("img", "iframe", "picture", "video","figure","hr", "h1", "h2", "h3", "h4", "br", "b", "strong", "a", "li", "object", "source") ++ ignore_tags
       val INNER_SAFE_TAGS = Array("img", "iframe", "picture", "video", "figure", "strong", "h1", "h2", "h3", "h4")  // do not delete paragraphs containing this tags
 
       val allNodes = topNode.getAllElements
