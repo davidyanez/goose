@@ -18,6 +18,7 @@
 
 package com.gravity.goose.network
 
+
 import org.apache.http.{ProtocolVersion, HttpEntity, HttpResponse, HttpVersion}
 import org.apache.http.client.{RedirectStrategy, CookieStore, HttpClient}
 import org.apache.http.client.config.RequestConfig
@@ -52,6 +53,13 @@ import com.gravity.goose.Configuration
 import org.apache.http.impl.client.{HttpClients, DefaultHttpRequestRetryHandler, AbstractHttpClient, DefaultHttpClient}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+//import org.openqa.selenium.WebDriver
+//import org.openqa.selenium.htmlunit.HtmlUnitDriver
+import org.openqa.selenium.remote.DesiredCapabilities
+
+import org.openqa.selenium._;
+import org.openqa.selenium.firefox.{FirefoxProfile, FirefoxDriver}
+;
 
 
 /**
@@ -101,6 +109,7 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
     var entity: HttpEntity = null
     var instream: InputStream = null
     var encodingType: String = "UTF-8"
+
     import org.apache.http.client.params.ClientPNames
 
     // Identified the the apache http client does not drop URL fragments before opening the request to the host
@@ -109,6 +118,19 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
       val foundAt = url.indexOf("#")
       if (foundAt >= 0) url.substring(0, foundAt) else url
     }
+
+    var firefox_profile = new FirefoxProfile()
+//    firefox_profile.setPreference("permissions.default.stylesheet", 2)
+    firefox_profile.setPreference("permissions.default.image", 2)
+    firefox_profile.setPreference("dom.ipc.plugins.enabled.libflashplayer.so", false)
+
+//    var capabilities = DesiredCapabilities.htmlUnit()
+//    capabilities.setBrowserName("Mozilla/5.0 (X11; Linux x86_64; rv:24.0) Gecko/20100101 Firefox/24.0")
+//    capabilities.setVersion("24.0");
+//    capabilities.setJavascriptEnabled(true);
+
+    implicit val webDriver: WebDriver = new FirefoxDriver(firefox_profile)
+    webDriver.get(cleanUrl)
 
 
     try {
@@ -139,7 +161,6 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
               encodingType = contentType.substring(start_ix+9)
             } else {
 
-//              }
               if(instream.available() == 0){
                 entity = httpClient.execute(httpget, localContext).getEntity()
                 instream = entity.getContent
