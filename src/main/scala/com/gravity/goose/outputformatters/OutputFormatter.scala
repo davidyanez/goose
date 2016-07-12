@@ -257,6 +257,7 @@ trait OutputFormatter {
        s"<hr><a class='link' href='${article.finalUrl}' target='_blank'>Read on ${article.domain}</a>" +
        s"<div class='scraped_date'>Pulled on $today_str </div>"
 
+
      article_div_html + article_footer
    }
 
@@ -283,6 +284,11 @@ trait OutputFormatter {
             slideshow_container.appendChild(slideshow_img_wrap_)
             ne = ne.nextElementSibling()
           }
+          val prev = doc.createElement("a").attr("class", "prev").attr("onclick", "plusSlides(-1)")
+          val next = doc.createElement("a").attr("class", "next").attr("onclick", "plusSlides(1)")
+
+          slideshow_container.appendChild(prev)
+          slideshow_container.appendChild(next)
           e.replaceWith(slideshow_container)
         }
       } else {
@@ -294,65 +300,98 @@ trait OutputFormatter {
 
   }
 
-  def slideshow_css(): String ={
+  def SlideshowCSS(): String ={
     /* Caption text */
     val slideshow_css =
       """
-
-
-    .text {
-      color: #f2f2f2;
-      font-size: 15px;
-      padding: 8px 12px;
-      position: absolute;
-      bottom: 8px;
-      width: 100%;
-      text-align: center;
-    }
-
-    /* Number text (1/3 etc) */
-    .numbertext {
-      color: #f2f2f2;
-      font-size: 12px;
-      padding: 8px 12px;
-      position: absolute;
-      top: 0;
-    }
-
-    /* The dots/bullets/indicators */
-    .dot {
-      cursor:pointer;
-      height: 13px;
-      width: 13px;
-      margin: 0 2px;
-      background-color: #bbb;
-      border-radius: 50%;
-      display: inline-block;
-      transition: background-color 0.6s ease;
-    }
-
-    .active, .dot:hover {
-      background-color: #717171;
-    }
-
-    /* Fading animation */
-    .fade {
-      -webkit-animation-name: fade;
-      -webkit-animation-duration: 1.5s;
-      animation-name: fade;
-      animation-duration: 1.5s;
-    }
-
-    @-webkit-keyframes fade {
-      from {opacity: .4}
-      to {opacity: 1}
-    }
-
-    @keyframes fade {
-      from {opacity: .4}
-      to {opacity: 1}
-    }
-    """
+        |/* Slideshow container */
+        |.slideshow-container {
+        |  max-width: 1000px;
+        |  position: relative;
+        |  margin: auto;
+        |}
+        |
+        |/* Next & previous buttons */
+        |.prev, .next {
+        |  cursor: pointer;
+        |  position: absolute;
+        |  top: 0;
+        |  top: 50%;
+        |  width: auto;
+        |  margin-top: -22px;
+        |  padding: 16px;
+        |  color: white;
+        |  font-weight: bold;
+        |  font-size: 18px;
+        |  transition: 0.6s ease;
+        |  border-radius: 0 3px 3px 0;
+        |}
+        |
+        |/* Position the "next button" to the right */
+        |.next {
+        |  right: 0;
+        |  border-radius: 3px 0 0 3px;
+        |}
+        |
+        |/* On hover, add a black background color with a little bit see-through */
+        |.prev:hover, .next:hover {
+        |  background-color: rgba(0,0,0,0.8);
+        |}
+        |
+        |/* Caption text */
+        |.text {
+        |  color: #f2f2f2;
+        |  font-size: 15px;
+        |  padding: 8px 12px;
+        |  position: absolute;
+        |  bottom: 8px;
+        |  width: 100%;
+        |  text-align: center;
+        |}
+        |
+        |/* Number text (1/3 etc) */
+        |.numbertext {
+        |  color: #f2f2f2;
+        |  font-size: 12px;
+        |  padding: 8px 12px;
+        |  position: absolute;
+        |  top: 0;
+        |}
+        |
+        |/* The dots/bullets/indicators */
+        |.dot {
+        |  cursor:pointer;
+        |  height: 13px;
+        |  width: 13px;
+        |  margin: 0 2px;
+        |  background-color: #bbb;
+        |  border-radius: 50%;
+        |  display: inline-block;
+        |  transition: background-color 0.6s ease;
+        |}
+        |
+        |.active, .dot:hover {
+        |  background-color: #717171;
+        |}
+        |
+        |/* Fading animation */
+        |.fade {
+        |  -webkit-animation-name: fade;
+        |  -webkit-animation-duration: 1.5s;
+        |  animation-name: fade;
+        |  animation-duration: 1.5s;
+        |}
+        |
+        |@-webkit-keyframes fade {
+        |  from {opacity: .4}
+        |  to {opacity: 1}
+        |}
+        |
+        |@keyframes fade {
+        |  from {opacity: .4}
+        |  to {opacity: 1}
+        |}
+    """.stripMargin
     slideshow_css
   }
 
@@ -377,35 +416,7 @@ trait OutputFormatter {
     """.stripMargin
   }
 
-  def slideshowJS(): String = {
-     """
-       |var slideIndex = 1;
-       |showSlides(slideIndex);
-       |
-       |function plusSlides(n) {
-       |  showSlides(slideIndex += n);
-       |}
-       |
-       |function currentSlide(n) {
-       |  showSlides(slideIndex = n);
-       |}
-       |
-       |function showSlides(n) {
-       |  var i;
-       |  var slides = document.getElementsByClassName("mySlides");
-       |  var dots = document.getElementsByClassName("dot");
-       |  if (n > slides.length) {slideIndex = 1}
-       |  if (n < 1) {slideIndex = slides.length}
-       |  for (i = 0; i < slides.length; i++) {
-       |      slides[i].style.display = "none";
-       |  }
-       |  for (i = 0; i < dots.length; i++) {
-       |      dots[i].className = dots[i].className.replace(" active", "");
-       |  }
-       |  slides[slideIndex-1].style.display = "block";
-       |  dots[slideIndex-1].className += " active";
-     """.stripMargin
-  }
+
 
   def getSimpleHTMLDoc(topNode: Element, article: Article): Option[Document] = topNode match {
 
@@ -427,6 +438,8 @@ trait OutputFormatter {
 
         val FOLLOW_HEADER_TAGS : List[String] = List("p", "img", "iframe", "video", "picture", "figure", "hr")
 
+
+
         if (article.outputFormat == "HTML" || article.outputFormat == "HTML_STYLE"){
 
           val root = doc.appendElement("html")
@@ -440,20 +453,22 @@ trait OutputFormatter {
 
           if (article.outputFormat == "HTML_STYLE"){
             val head_meta_style =
-              "<style>"+basic_css+slideshow_css+"</style>".stripMargin
+              "<style>"+basic_css+SlideshowCSS+"</style>".stripMargin
             head.append(head_meta_style)
           }
-          val head_script = s"<script>${slideshowJS()}</script>"
-          head.append(head_script)
 
           val article_div =  create_article_div()
           body.appendChild(article_div)
+          val script_node = doc.createElement("script").attr("src", "script.js")
+          body.appendChild(script_node)
 
         } else if(article.outputFormat == "ARTICLE"){
           doc.appendChild(create_article_div())
+
         }else{
           doc.appendChild(create_article_div())
         }
+
 
         Some(doc)
       }
@@ -671,7 +686,7 @@ trait OutputFormatter {
       if (logger.isDebugEnabled) {
         logger.debug("removeParagraphsWithFewWords starting...")
       }
-      val IGNORE_TAGS = Array("img", "iframe", "picture", "video","figure","hr", "h1", "h2", "h3", "h4", "br", "b", "strong", "a", "li", "object", "source") ++ ignore_tags
+      val IGNORE_TAGS = Array("img", "iframe", "picture", "video","figure","hr", "h1", "h2", "h3", "h4", "br", "b", "strong", "a", "li", "object", "source", "script") ++ ignore_tags
       val INNER_SAFE_TAGS = Array("img", "iframe", "picture", "video", "figure", "strong", "h1", "h2", "h3", "h4")  // do not delete paragraphs containing this tags
 
       val allNodes = topNode.getAllElements
