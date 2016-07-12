@@ -132,6 +132,7 @@ trait OutputFormatter {
     removeNodesWithNegativeScores(topNode)
     cleanLinks(topNode)
     cleanParagraphs(topNode)
+//    cleanHeaders(topNode)
     removeElementsWithFewWords(topNode)
     removeDuplicatedImages(topNode)
     removeDuplicatedtext(topNode)
@@ -140,6 +141,7 @@ trait OutputFormatter {
     if (doc.isDefined) {
       removeElementsWithFewWords(doc.get.body())
       cleanHeaders(doc.get.body())
+      addSlideShows(doc.get.body())
     }
 
 
@@ -162,7 +164,6 @@ trait OutputFormatter {
 
     }
 
-
    def article_html(article: Article): String ={
 
      val keep_tags: List[String] = List("hr", "figcaption", "br")
@@ -170,6 +171,8 @@ trait OutputFormatter {
      val HEADERS: List[String] = List("h1","h2", "h3", "h4", "h5", "h6")
 
      val topNode = article.topNode
+     var inSlideShow = false
+     var slideShow_number = 1
 
      val article_div_html = topNode.getAllElements.map((e: Element) => {
 
@@ -202,7 +205,7 @@ trait OutputFormatter {
            e.attr("src", "http:" + e.attr("src"))
          }
          else {
-           e.attr("src", "http://" + article.domain + e.attr("src"))
+           e.attr("src", "http://" + article.domain + "/" + e.attr("src"))
          }
          if (e.hasAttr("srcset") && e.attr("srcset").length > 0) {
            var img_sources = e.attr("srcset").split(",").map((url: String) => url.trim())
@@ -214,7 +217,8 @@ trait OutputFormatter {
          var img_attributes = e.attributes().filter((a: Attribute) => !SKIP_ATTRIBUTES.contains(a.getKey())).
            map((a: Attribute) => a.getKey + "=\"" + a.getValue + "\"").mkString(" ")
 
-         s"<div class='image-wrap'><img class='image' $img_attributes></div>"
+         val image_wrap = s"<div class='image-wrap'><img class='image' $img_attributes></div>"
+         image_wrap
 
        } else if (e.tagName() == "iframe"
          && (e.attr("src").contains("//www.youtube.com/embed/")
@@ -256,6 +260,153 @@ trait OutputFormatter {
      article_div_html + article_footer
    }
 
+  private def addSlideShows(element: Element): Unit ={
+
+    var inSlideShow = false
+    var n_skip = 0
+    for (e <- element.select("div[class=image-wrap]")) {
+      if (n_skip == 0) {
+        def is_next_image(ne: Element): Boolean = {
+          ne.tagName() == "div" && ne.hasAttr("class") && ne.attr("class") == "image-wrap"
+        }
+
+        if (is_next_image(e.nextElementSibling())) {
+          n_skip += 1
+          val doc = new Document("/")
+          val slideshow_container = doc.createElement("div").attr("class", "slideshow-container")
+          val slideshow_img_wrap = doc.createElement("div").attr("class", "mySlides fade").appendChild(e.clone())
+          slideshow_container.appendChild(slideshow_img_wrap)
+          var ne = e.nextElementSibling()
+          while (is_next_image(ne)) {
+            n_skip += 1
+            val slideshow_img_wrap_ = doc.createElement("div").attr("class", "mySlides fade").appendChild(ne.clone)
+            slideshow_container.appendChild(slideshow_img_wrap_)
+            ne = ne.nextElementSibling()
+          }
+          e.replaceWith(slideshow_container)
+        }
+      } else {
+        e.remove()
+        n_skip -= 1
+      }
+
+    }
+
+  }
+
+  def slideshow_css(): String ={
+    /* Caption text */
+    val slideshow_css =
+      """
+
+
+    .text {
+      color: #f2f2f2;
+      font-size: 15px;
+      padding: 8px 12px;
+      position: absolute;
+      bottom: 8px;
+      width: 100%;
+      text-align: center;
+    }
+
+    /* Number text (1/3 etc) */
+    .numbertext {
+      color: #f2f2f2;
+      font-size: 12px;
+      padding: 8px 12px;
+      position: absolute;
+      top: 0;
+    }
+
+    /* The dots/bullets/indicators */
+    .dot {
+      cursor:pointer;
+      height: 13px;
+      width: 13px;
+      margin: 0 2px;
+      background-color: #bbb;
+      border-radius: 50%;
+      display: inline-block;
+      transition: background-color 0.6s ease;
+    }
+
+    .active, .dot:hover {
+      background-color: #717171;
+    }
+
+    /* Fading animation */
+    .fade {
+      -webkit-animation-name: fade;
+      -webkit-animation-duration: 1.5s;
+      animation-name: fade;
+      animation-duration: 1.5s;
+    }
+
+    @-webkit-keyframes fade {
+      from {opacity: .4}
+      to {opacity: 1}
+    }
+
+    @keyframes fade {
+      from {opacity: .4}
+      to {opacity: 1}
+    }
+    """
+    slideshow_css
+  }
+
+  def basic_css(): String ={
+
+    """
+    #web-article {}
+    #web-article h1 {font-size: 2.5em; font-color: red;}
+    #web-article h2 {}
+    #web-article h3 {}
+    #web-article h4 {}
+    #web-article h5 {}
+    #web-article h6 {}
+    #web-article p {font-size:1.25em; }
+
+    #web-article .video-wrap {}
+    #web-article .image-wrap { width: 90%;}
+    #web-article .image { max-width: 100%; height: auto; }
+    #web-article .video-iframe-wrap { position:relative;padding-bottom: 56.25%;padding-top: 25px;height:0; }
+    #web-article .video-iframe { position:absolute;top=0;left:0;width:100%;height:95%; }
+    #web-article .list {}
+    """.stripMargin
+  }
+
+  def slideshowJS(): String = {
+     """
+       |var slideIndex = 1;
+       |showSlides(slideIndex);
+       |
+       |function plusSlides(n) {
+       |  showSlides(slideIndex += n);
+       |}
+       |
+       |function currentSlide(n) {
+       |  showSlides(slideIndex = n);
+       |}
+       |
+       |function showSlides(n) {
+       |  var i;
+       |  var slides = document.getElementsByClassName("mySlides");
+       |  var dots = document.getElementsByClassName("dot");
+       |  if (n > slides.length) {slideIndex = 1}
+       |  if (n < 1) {slideIndex = slides.length}
+       |  for (i = 0; i < slides.length; i++) {
+       |      slides[i].style.display = "none";
+       |  }
+       |  for (i = 0; i < dots.length; i++) {
+       |      dots[i].className = dots[i].className.replace(" active", "");
+       |  }
+       |  slides[slideIndex-1].style.display = "block";
+       |  dots[slideIndex-1].className += " active";
+     """.stripMargin
+  }
+
   def getSimpleHTMLDoc(topNode: Element, article: Article): Option[Document] = topNode match {
 
       case null => None
@@ -276,7 +427,6 @@ trait OutputFormatter {
 
         val FOLLOW_HEADER_TAGS : List[String] = List("p", "img", "iframe", "video", "picture", "figure", "hr")
 
-
         if (article.outputFormat == "HTML" || article.outputFormat == "HTML_STYLE"){
 
           val root = doc.appendElement("html")
@@ -289,26 +439,13 @@ trait OutputFormatter {
           head.append(head_meta_description)
 
           if (article.outputFormat == "HTML_STYLE"){
-            val head_meta_style = """<style>
-                            #web-article {}
-                            #web-article h1 {font-size: 2.5em; font-color: red;}
-                            #web-article h2 {}
-                            #web-article h3 {}
-                            #web-article h4 {}
-                            #web-article h5 {}
-                            #web-article h6 {}
-                            #web-article p {font-size:1.25em; }
-
-                            #web-article .video-wrap {}
-                            #web-article .image-wrap { width: 90%;}
-                            #web-article .image { max-width: 100%; height: auto; }
-                            #web-article .video-iframe-wrap { position:relative;padding-bottom: 56.25%;padding-top: 25px;height:0; }
-                            #web-article .video-iframe { position:absolute;top=0;left:0;width:100%;height:95%; }
-                            #web-article .list {}
-                            </style>""".stripMargin
-
+            val head_meta_style =
+              "<style>"+basic_css+slideshow_css+"</style>".stripMargin
             head.append(head_meta_style)
           }
+          val head_script = s"<script>${slideshowJS()}</script>"
+          head.append(head_script)
+
           val article_div =  create_article_div()
           body.appendChild(article_div)
 
