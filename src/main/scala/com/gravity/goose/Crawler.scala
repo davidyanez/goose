@@ -84,8 +84,8 @@ class Crawler(config: Configuration) {
         case Some(node: Element) => {
           article.topNode = node
 
-//          val imageExtractor = getImageExtractor(article)
-//          imageExtractor.RemoveBadImages(article)
+          val imageExtractor = getImageExtractor(article)
+          imageExtractor.RemoveBadImages(article)
 
           article.cleanedArticleSimpleHTMLDoc =  outputFormatter.getFormattedHTML(article)
           article.cleanedArticleSimpleHTML = article.cleanedArticleSimpleHTMLDoc.get.html
