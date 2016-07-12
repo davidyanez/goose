@@ -121,14 +121,6 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
       if (foundAt >= 0) url.substring(0, foundAt) else url
     }
 
-//    var firefox_profile = new FirefoxProfile()
-//    firefox_profile.setPreference("permissions.default.image", 2)
-//    firefox_profile.setPreference("dom.ipc.plugins.enabled.libflashplayer.so", false)
-//
-//    implicit val webDriver: WebDriver = new FirefoxDriver(firefox_profile)
-//    webDriver.get(cleanUrl)
-
-
     try {
       val localContext: HttpContext = new BasicHttpContext
 
@@ -191,6 +183,7 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
             var firefox_profile = new FirefoxProfile()
             firefox_profile.setPreference("permissions.default.image", 2)
             firefox_profile.setPreference("dom.ipc.plugins.enabled.libflashplayer.so", false)
+            firefox_profile.setPreference("plugin.state.flash", 0);
 
             val capability  =  DesiredCapabilities.firefox()
             capability.setJavascriptEnabled(true)
