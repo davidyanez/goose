@@ -249,10 +249,11 @@ trait OutputFormatter {
 
 
      val article_footer =
-       "<div class=\"reflink\">"+ "<span> Read on the original source </span>"
-       s"<a class='link' href='${article.finalUrl}' target='_blank'>Read on ${article.domain}</a>" +
-       s"<div class='scraped_date'>Pulled on $today_str </div>"+
-       s"</div>"
+       "<hr><div class=\"reflink\">"+
+         "<span> Read on the original source </span>"+
+         s"<a class='link' href='${article.finalUrl}' target='_blank'>Read on ${article.domain}</a>" +
+         s"<div class='scraped_date'>Pulled on $today_str </div>"+
+      s"</div>"
       ""
 
      article_div_html + article_footer
