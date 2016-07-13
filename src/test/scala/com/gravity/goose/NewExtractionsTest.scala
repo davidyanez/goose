@@ -270,17 +270,17 @@ class NewExtractionsTest {
      }
 
   @Test
-      def fool_bombardier_order() {
+  def fool_bombardier_order() {
 
-        implicit val config = TestUtils.NO_IMAGE_CONFIG
+    implicit val config = TestUtils.NO_IMAGE_CONFIG
 
-        val url = "http://www.fool.ca/2016/04/28/bombardier-inc-gets-another-order/"
-        val article = TestUtils.getArticle(url = url)
-        println(article.cleanedArticleSimpleHTML)
-        val out_html = new PrintWriter(new File("./"+output_folder+"/"+"fool_bombardier_order.html"))
-        out_html.write(article.cleanedArticleSimpleHTML)
-        out_html.close()
-      }
+    val url = "http://www.fool.ca/2016/04/28/bombardier-inc-gets-another-order/"
+    val article = TestUtils.getArticle(url = url)
+    println(article.cleanedArticleSimpleHTML)
+    val out_html = new PrintWriter(new File("./"+output_folder+"/"+"fool_bombardier_order.html"))
+    out_html.write(article.cleanedArticleSimpleHTML)
+    out_html.close()
+  }
 
   @Test
    def stradigi() {
@@ -761,20 +761,20 @@ class NewExtractionsTest {
    out_html.close()
   }
 
-  @Test
-  def qivo_timeout() {
-
-   implicit val config = TestUtils.NO_IMAGE_CONFIG
-
-   val url = "http://goo.gl/Yzar67"
-   val article = TestUtils.getArticle(url = url)
-   println(article.cleanedArticleSimpleHTML)
-
-   val out_html = new PrintWriter(new File("./"+output_folder+"/"+"qivo_timeout.html"))
-   out_html.write(article.cleanedArticleSimpleHTML)
-
-   out_html.close()
-  }
+//  @Test
+//  def qivo_timeout() {
+//
+//   implicit val config = TestUtils.NO_IMAGE_CONFIG
+//
+//   val url = "http://goo.gl/Yzar67"
+//   val article = TestUtils.getArticle(url = url)
+//   println(article.cleanedArticleSimpleHTML)
+//
+//   val out_html = new PrintWriter(new File("./"+output_folder+"/"+"qivo_timeout.html"))
+//   out_html.write(article.cleanedArticleSimpleHTML)
+//
+//   out_html.close()
+//  }
 
 
   @Test
@@ -806,6 +806,70 @@ class NewExtractionsTest {
    out_html.write(article.cleanedArticleSimpleHTML)
 
    out_html.close()
+  }
+
+     // http://thenextweb.com/gadgets/2016/07/01/amazon-echo-can-actually-order-things-amazon-now/
+
+  @Test
+  def tnw_echo_order() {
+
+   implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+   val url = "http://thenextweb.com/gadgets/2016/07/01/amazon-echo-can-actually-order-things-amazon-now/"
+   val article = TestUtils.getArticle(url = url)
+   println(article.cleanedArticleSimpleHTML)
+
+   val out_html = new PrintWriter(new File("./"+output_folder+"/"+"tnw_echo_order.html"))
+   out_html.write(article.cleanedArticleSimpleHTML)
+
+   out_html.close()
+  }
+
+  @Test
+  def nat_geo_jupiter() {
+
+    implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+    val url = "http://news.nationalgeographic.com/2016/07/nasa-juno-mission-jupiter-arrives-orbit-planets-space/?utm_source=Facebook&utm_medium=Social&utm_content=link_fb20160703news-junorisks&utm_campaign=Content&sf30195484=1"
+    val article = TestUtils.getArticle(url = url)
+    println(article.cleanedArticleSimpleHTML)
+
+    val out_html = new PrintWriter(new File("./"+output_folder+"/"+"nat_geo_jupiter.html"))
+    out_html.write(article.cleanedArticleSimpleHTML)
+
+    out_html.close()
+  }
+
+  //
+  @Test
+    def psychologytoday() {
+
+      implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+      val url = "https://www.psychologytoday.com/blog/singletons/201509/3-types-parents-who-get-bullied-their-own-children?utm_source=FacebookPost&utm_medium=FBPost&utm_campaign=FBPost"
+      val article = TestUtils.getArticle(url = url)
+      println(article.cleanedArticleSimpleHTML)
+
+      val out_html = new PrintWriter(new File("./"+output_folder+"/"+"psychologytoday.html"))
+      out_html.write(article.cleanedArticleSimpleHTML)
+
+      out_html.close()
+    }
+  // http://www.futbox.com/en
+
+  @Test
+  def footbox() {
+
+    implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+    val url = "http://www.futbox.com/en"
+    val article = TestUtils.getArticle(url = url)
+    println(article.cleanedArticleSimpleHTML)
+
+    val out_html = new PrintWriter(new File("./"+output_folder+"/"+"futbox.html"))
+    out_html.write(article.cleanedArticleSimpleHTML)
+
+    out_html.close()
   }
 
   "TODO: NotHtmlException: No HTML returned for url:  http://firstround.com/review/the-30-best-pieces-of-advice-for-entrepreneurs-in-2015"
