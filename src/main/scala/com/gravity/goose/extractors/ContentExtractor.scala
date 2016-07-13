@@ -628,7 +628,7 @@ trait ContentExtractor {
       */
     private def cleanHeaders(topNode: Element): Unit ={
 
-      val ACCEPTED_TAGS = TagsEvaluator("p","img","video","figure","picture")
+      val ACCEPTED_TAGS = TagsEvaluator("p","img","video","figure","picture","source")
       val HEADER_TAGS = TagsEvaluator("h1","h2","h3","h4","h5","h6")
 
       val headers = Collector.collect(HEADER_TAGS, topNode)

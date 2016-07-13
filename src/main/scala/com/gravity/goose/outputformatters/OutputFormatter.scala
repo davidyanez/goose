@@ -85,14 +85,15 @@ trait OutputFormatter {
       val image_nodes = topNode.select("img")
 
       for (image_node <- image_nodes) {
-        val src = image_node.attr("src")
-        val duplicated_tags = topNode.getElementsByAttributeValue("src", src)
+        if (image_node.hasAttr("src")){
+          val src = image_node.attr("src")
+          val duplicated_tags = topNode.getElementsByAttributeValue("src", src)
 
-        if (duplicated_tags.length > 1){
-          for ( duplicated_tag <- duplicated_tags.drop(1)){
-            duplicated_tag.remove()
+          if (duplicated_tags.length > 1){
+            for ( duplicated_tag <- duplicated_tags.drop(1)){
+              duplicated_tag.remove()
+            }
           }
-
         }
 
       }

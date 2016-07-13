@@ -306,19 +306,22 @@ trait DocumentCleaner {
 
   private def convertBackgroundImageToImage(doc: Document): Document = {
 
-      val elements = doc.getAllElements.filter(element => element.hasAttr("style") && element.attr("style").contains("background-image:"))
+      val elements = doc.getAllElements.filter(element => element.hasAttr("style") && element.attr("style").contains("background-image: url("))
       for (elem <- elements) {
         val style = elem.attr("style")
-        val url_start_pos = style.indexOfSlice("url(")
-        val url_end_pos = style.substring(url_start_pos).indexOfSlice(")")
-        val url = style.substring(url_start_pos, url_end_pos)
-        val imgNode: Element = doc.createElement("img")
-        imgNode.attr("src", url)
-        elem.replaceWith(imgNode)
+        val url_start_pos = style.indexOfSlice("background-image: url(") +  "background-image: url(".length
+        if (url_start_pos > 0){
+          val url_end_pos = style.substring(url_start_pos).indexOfSlice(")") + url_start_pos
+          if (url_end_pos > url_start_pos) {
+            val url = style.substring(url_start_pos, url_end_pos)
+            val imgNode: Element = doc.createElement("img")
+            imgNode.attr("src", url)
+            elem.replaceWith(imgNode)
+          }
+        }
       }
       doc
     }
-
 
 
   private def convertDivsToParagraphs(doc: Document, domType: String): Document = {
@@ -503,7 +506,7 @@ object DocumentCleaner extends Logging {
   // create negative elements
   sb.append("^side$|combx|retweet|mediaarticlerelated|menucontainer|navbar|comments|PopularQuestions|contact|foot|footer|Footer|footnote|cnn_strycaptiontxt|links|meta$|shoutbox|sponsor|^pb|error|reviews")
   sb.append("|tags|socialnetworking|socialNetworking|cnnStryHghLght|cnn_stryspcvbx|^inset$|pagetools|post-attributes|welcome_form|contentTools2|the_answers|remember-tool-tip|article-media-overlay|carousel")
-  sb.append("|communitypromo|runaroundLeft|subscribe|vcard|articleheadings|date|^print$|popup|author-dropdown|tools|socialtools|byline|konafilter|KonaFilter|breadcrumbs|^fn$|wp-caption-text|related|aside")
+  sb.append("|communitypromo|runaroundLeft|subscribe|vcard|articleheadings|date|^print$|popup|author-dropdown|tools|socialtools|byline|konafilter|KonaFilter|breadcrumbs|^fn$|wp-caption-text|related|aside|videoLink")
 
   class_sb.append("^side$|combx|retweet|mediaarticlerelated|menucontainer|navbar|PopularQuestions|footer|Footer|footnote|cnn_strycaptiontxt|meta$|shoutbox|sponsor|^pb|error|reviews")
   class_sb.append("|socialnetworking|socialNetworking|cnnStryHghLght|cnn_stryspcvbx|^inset$|pagetools|post-attributes|welcome_form|contentTools2|the_answers|remember-tool-tip|article-media-overlay")
@@ -527,7 +530,7 @@ object DocumentCleaner extends Logging {
   /**
   * regex to detect if there are block level elements inside of a div element
   */
-  val divToPElementsPattern: Pattern = Pattern.compile("<(a|blockquote|dl|div|picture|ol|p|pre|table|ul|li|video|section|figcaption)")
+  val divToPElementsPattern: Pattern = Pattern.compile("<(a|blockquote|dl|div|ol|p|pre|table|ul|li|video|section|figcaption)")
 
   val blockElemementTags = TagsEvaluator("a", "blockquote", "dl", "div", "ol", "p", "pre", "table", "ul", "section", "img", "video", "object")
   val articleRootTags = TagsEvaluator("div", "span", "article")
