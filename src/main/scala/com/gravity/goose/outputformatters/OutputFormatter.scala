@@ -439,9 +439,9 @@ trait OutputFormatter {
               newTag.attr("href", href)
               newTag.attr("target", "_blank")
 
-              for (img <- tag.select("img")) {
-                newTag.appendChild(img.clone())
-              }
+//              for (img <- tag.select("img")) {
+//                newTag.appendChild(img.clone())
+//              }
               tag.replaceWith(newTag)
 
             }
