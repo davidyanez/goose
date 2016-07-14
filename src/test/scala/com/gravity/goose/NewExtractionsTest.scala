@@ -872,6 +872,40 @@ class NewExtractionsTest {
     out_html.close()
   }
 
+  //
+  @Test
+  def ten_reason_rio() {
+
+    implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+    val url = "http://www.avenlylanetravel.com/10-reasons-why-rio-de-janeiro-is-the-best-city-to-visit-on-earth/"
+    val article = TestUtils.getArticle(url = url)
+    println(article.cleanedArticleSimpleHTML)
+
+    val out_html = new PrintWriter(new File("./"+output_folder+"/"+"ten_reason_rio.html"))
+    out_html.write(article.cleanedArticleSimpleHTML)
+
+    out_html.close()
+  }
+
+// https://topmusclecars.wordpress.com/
+
+  @Test
+  def topmusclecars() {
+
+    implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+    val url = "https://topmusclecars.wordpress.com/"
+    val article = TestUtils.getArticle(url = url)
+    println(article.cleanedArticleSimpleHTML)
+
+    val out_html = new PrintWriter(new File("./"+output_folder+"/"+"topmusclecars.html"))
+    out_html.write(article.cleanedArticleSimpleHTML)
+
+    out_html.close()
+  }
+
+
   "TODO: NotHtmlException: No HTML returned for url:  http://firstround.com/review/the-30-best-pieces-of-advice-for-entrepreneurs-in-2015"
 
 }
