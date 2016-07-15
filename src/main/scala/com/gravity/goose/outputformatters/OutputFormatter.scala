@@ -140,6 +140,7 @@ trait OutputFormatter {
     if (doc.isDefined) {
       removeElementsWithFewWords(doc.get.body())
       cleanHeaders(doc.get.body())
+      keepFirstImagesOnly(doc.get.body())
     }
 
 
@@ -483,6 +484,19 @@ trait OutputFormatter {
         item.remove()
       }
     }
+  }
+
+  /**
+    * If there are many consecutives images, only keep the first Image.
+    */
+  def keepFirstImagesOnly(topNode: Element): Unit ={
+
+      for (image <- topNode.select("div[class=image-wrap]")){
+        val prev_img = image.previousElementSibling()
+        if (prev_img != null && prev_img.hasAttr("class") && prev_img.attr("class") == "image-wrap") {
+          image.remove()
+        }
+      }
   }
 
   /**
