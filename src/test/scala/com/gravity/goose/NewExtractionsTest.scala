@@ -970,6 +970,41 @@ class NewExtractionsTest {
     out_html.close()
   }
 
+  // http://edition.cnn.com/2016/06/23/foodanddrink/norway-coffee-culture/index.html
+  @Test
+  def cnn_coffee_q7030() {
+
+    implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+    val url = "http://edition.cnn.com/2016/06/23/foodanddrink/norway-coffee-culture/index.html"
+    val article = TestUtils.getArticle(url = url)
+    println(article.cleanedArticleSimpleHTML)
+
+    val out_html = new PrintWriter(new File("./"+output_folder+"/"+"cnn_coffee_q7030.html"))
+    out_html.write(article.cleanedArticleSimpleHTML)
+
+    out_html.close()
+  }
+//http://edition.cnn.com/2016/06/22/design/design-miami-basel-2016-highlights/index.html
+
+  // http://edition.cnn.com/2016/06/23/foodanddrink/norway-coffee-culture/index.html
+  @Test
+  def cnn_miami_design_q6939() {
+
+    implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+    val url = "http://edition.cnn.com/2016/06/23/foodanddrink/norway-coffee-culture/index.html"
+    val article = TestUtils.getArticle(url = url)
+    println(article.cleanedArticleSimpleHTML)
+
+    val out_html = new PrintWriter(new File("./"+output_folder+"/"+"cnn_coffee_q7030.html"))
+    out_html.write(article.cleanedArticleSimpleHTML)
+
+    out_html.close()
+  }
+
+
+
 
 
   "TODO: NotHtmlException: No HTML returned for url:  http://firstround.com/review/the-30-best-pieces-of-advice-for-entrepreneurs-in-2015"
