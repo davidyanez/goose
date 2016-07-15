@@ -55,7 +55,7 @@ trait ContentExtractor {
   val SPACE_SPLITTER: StringSplitter = new StringSplitter(" ")
   val NO_STRINGS = Set.empty[String]
   val A_REL_TAG_SELECTOR: String = "a[rel=tag], a[href*=/tag/]"
-  val TOP_NODE_TAGS = new TagsEvaluator(Set("p", "td", "pre", "div", "article"))
+  val TOP_NODE_TAGS = new TagsEvaluator(Set("p", "td", "pre", "div", "article", "section", "ol"))
 
   def getTitle(article: Article): String = {
     var title: String = string.empty
@@ -260,21 +260,32 @@ trait ContentExtractor {
 
       trace(logPrefix + "Location Boost Score: " + boostScore + " on interation: " + i + "' id='" + node.parent.id + "' class='" + node.parent.attr("class"))
 
+      val SuperTags = Array("article")   // SuperTags do not give point to their parents
+      val NodeScores = Map("p" -> 10, "img" -> 20, "iframe" -> 20, "video" -> 20, "article" -> 1000, "section"->20)
       val nodeText: String = node.text
       val wordStats: WordStats = StopWords.getStopWordCount(nodeText)
-      val tag_score = if (node.tagName() == "p") 10 else if (Array("img", "iframe", "video").contains(node.tagName())) 20 else 0
+      val tag_score = NodeScores.getOrElse(node.tagName(), 0)
 
-      val upscore: Int = (wordStats.getStopWordCount + boostScore + tag_score).asInstanceOf[Int]
-      updateScore(node.parent, upscore)
-      updateScore(node.parent.parent, upscore / 2)
-      updateNodeCount(node.parent, 1)
-      updateNodeCount(node.parent.parent, 1)
-      if (!parentNodes.contains(node.parent)) {
-        parentNodes.add(node.parent)
+      val upscore: Int =  (wordStats.getStopWordCount + boostScore + tag_score).asInstanceOf[Int]
+      if (!SuperTags.contains(node.tagName())){
+        updateScore(node.parent, upscore)
+        updateScore(node.parent.parent, upscore / 2)
+        updateNodeCount(node.parent, 1)
+        updateNodeCount(node.parent.parent, 1)
+        if (!parentNodes.contains(node.parent)) {
+          parentNodes.add(node.parent)
+        }
+        if (!parentNodes.contains(node.parent.parent)) {
+          parentNodes.add(node.parent.parent)
+        }
+      }  else {
+//        SuperTags do not give score to their parents
+        updateScore(node, upscore)
+        if (!parentNodes.contains(node)) {
+          parentNodes.add(node)
+        }
       }
-      if (!parentNodes.contains(node.parent.parent)) {
-        parentNodes.add(node.parent.parent)
-      }
+
 
       cnt += 1
       i += 1
@@ -628,7 +639,7 @@ trait ContentExtractor {
       */
     private def cleanHeaders(topNode: Element): Unit ={
 
-      val ACCEPTED_TAGS = TagsEvaluator("p","img","video","figure","picture")
+      val ACCEPTED_TAGS = TagsEvaluator("p","img","video","figure","picture","source")
       val HEADER_TAGS = TagsEvaluator("h1","h2","h3","h4","h5","h6")
 
       val headers = Collector.collect(HEADER_TAGS, topNode)

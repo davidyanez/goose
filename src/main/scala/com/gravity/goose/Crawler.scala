@@ -98,6 +98,7 @@ class Crawler(config: Configuration) {
       article
     }
     val validArticle = isValidArticle(article)
+    System.gc()
     article
   }
 
@@ -164,6 +165,8 @@ class Crawler(config: Configuration) {
 
       val validArticle = isValidArticle(article)
 
+      System.gc()
+
       if (article_found && validArticle){
         HtmlExtractResponse(html=article.cleanedArticleSimpleHTML, status = HTMLExtractStatus.OK)
       }
@@ -181,6 +184,7 @@ class Crawler(config: Configuration) {
         HtmlExtractResponse(html=article.cleanedArticleSimpleHTML, status = HTMLExtractStatus.FAILED , msg=msg)
       }
     }
+
   }
 
   def isValidArticle(article: Article): Boolean ={

@@ -85,14 +85,15 @@ trait OutputFormatter {
       val image_nodes = topNode.select("img")
 
       for (image_node <- image_nodes) {
-        val src = image_node.attr("src")
-        val duplicated_tags = topNode.getElementsByAttributeValue("src", src)
+        if (image_node.hasAttr("src")){
+          val src = image_node.attr("src")
+          val duplicated_tags = topNode.getElementsByAttributeValue("src", src)
 
-        if (duplicated_tags.length > 1){
-          for ( duplicated_tag <- duplicated_tags.drop(1)){
-            duplicated_tag.remove()
+          if (duplicated_tags.length > 1){
+            for ( duplicated_tag <- duplicated_tags.drop(1)){
+              duplicated_tag.remove()
+            }
           }
-
         }
 
       }
@@ -139,6 +140,7 @@ trait OutputFormatter {
     if (doc.isDefined) {
       removeElementsWithFewWords(doc.get.body())
       cleanHeaders(doc.get.body())
+      keepFirstImagesOnly(doc.get.body())
     }
 
 
@@ -201,12 +203,13 @@ trait OutputFormatter {
            e.attr("src", "http:" + e.attr("src"))
          }
          else {
-           e.attr("src", "http://" + article.domain + e.attr("src"))
+           val src =
+           e.attr("src", ("http://" + article.domain + '/' + e.attr("src")).replace("//", "/") )
          }
          if (e.hasAttr("srcset") && e.attr("srcset").length > 0) {
            var img_sources = e.attr("srcset").split(",").map((url: String) => url.trim())
            img_sources = img_sources.map(src => if (src.startsWith("http")) src
-           else if (src.startsWith("//")) "http:" + src else "http://" + article.domain + src)
+           else if (src.startsWith("//")) "http:" + src else ("http://" + article.domain + '/' + src).replace("//", "/"))
            val srcset = String.join(", ", img_sources.toList)
            e.attr("srcset", srcset)
          }
@@ -438,9 +441,9 @@ trait OutputFormatter {
               newTag.attr("href", href)
               newTag.attr("target", "_blank")
 
-              for (img <- tag.select("img")) {
-                newTag.appendChild(img.clone())
-              }
+//              for (img <- tag.select("img")) {
+//                newTag.appendChild(img.clone())
+//              }
               tag.replaceWith(newTag)
 
             }
@@ -482,6 +485,19 @@ trait OutputFormatter {
         item.remove()
       }
     }
+  }
+
+  /**
+    * If there are many consecutives images, only keep the first Image.
+    */
+  def keepFirstImagesOnly(topNode: Element): Unit ={
+
+      for (image <- topNode.select("div[class=image-wrap]")){
+        val prev_img = image.previousElementSibling()
+        if (prev_img != null && prev_img.hasAttr("class") && prev_img.attr("class") == "image-wrap") {
+          image.remove()
+        }
+      }
   }
 
   /**
@@ -546,7 +562,7 @@ trait OutputFormatter {
         try {
 
           val stopWords = StopWords.getStopWordCount(el.text)
-          if (!IGNORE_TAGS.contains(el.tagName())  && INNER_SAFE_TAGS.forall(tag => el.getElementsByTag(tag).isEmpty) && stopWords.getStopWordCount <= 5 && el.getElementsByTag("object").size == 0 && el.getElementsByTag("embed").size == 0) {
+          if (!IGNORE_TAGS.contains(el.tagName()) &&  el.parents().filter(parent => IGNORE_TAGS.contains(el.tagName())).length == 0 &&   !IGNORE_TAGS.contains(el.parent().tagName())   && INNER_SAFE_TAGS.forall(tag => el.getElementsByTag(tag).isEmpty) && stopWords.getStopWordCount <= 5 && el.getElementsByTag("object").size == 0 && el.getElementsByTag("embed").size == 0) {
             logger.debug("removeParagraphsWithFewWords - swcnt: %d removing text: %s".format(stopWords.getStopWordCount, el.text()))
             el.remove()
           }

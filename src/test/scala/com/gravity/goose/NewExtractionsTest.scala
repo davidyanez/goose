@@ -1,15 +1,9 @@
 package com.gravity.goose
 
 import java.io._
-import java.text.SimpleDateFormat
-import java.util.Date
 
-
-import com.gravity.goose.extractors.PublishDateExtractor
 import com.gravity.goose.utils.FileHelper
-import org.jsoup.nodes.Element
-import org.jsoup.select.Selector
-import org.junit.Assert._
+
 import org.junit.Test
 
 /**
@@ -623,7 +617,7 @@ class NewExtractionsTest {
    val article = TestUtils.getArticle(url = url)
    println(article.cleanedArticleSimpleHTML)
 
-   val out_html = new PrintWriter(new File("./"+output_folder+"/"+"qivo_x.html"))
+   val out_html = new PrintWriter(new File("./"+output_folder+"/"+"qivo_2675.html"))
    out_html.write(article.cleanedArticleSimpleHTML)
 
    out_html.close()
@@ -871,6 +865,154 @@ class NewExtractionsTest {
 
     out_html.close()
   }
+
+  //
+  @Test
+  def ten_reason_rio() {
+
+    implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+    val url = "http://www.avenlylanetravel.com/10-reasons-why-rio-de-janeiro-is-the-best-city-to-visit-on-earth/"
+    val article = TestUtils.getArticle(url = url)
+    println(article.cleanedArticleSimpleHTML)
+
+    val out_html = new PrintWriter(new File("./"+output_folder+"/"+"ten_reason_rio.html"))
+    out_html.write(article.cleanedArticleSimpleHTML)
+
+    out_html.close()
+  }
+
+// https://topmusclecars.wordpress.com/
+
+  @Test
+  def topmusclecars() {
+
+    implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+    val url = "https://topmusclecars.wordpress.com/"
+    val article = TestUtils.getArticle(url = url)
+    println(article.cleanedArticleSimpleHTML)
+
+    val out_html = new PrintWriter(new File("./"+output_folder+"/"+"topmusclecars.html"))
+    out_html.write(article.cleanedArticleSimpleHTML)
+
+    out_html.close()
+  }
+
+  // http://dogtime.com/dog-breeds/belgian-malinois#/slide/1
+  @Test
+  def belgian_malinois_qivo7214() {
+
+    implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+    val url = "http://dogtime.com/dog-breeds/belgian-malinois#/slide/1"
+    val article = TestUtils.getArticle(url = url)
+    println(article.cleanedArticleSimpleHTML)
+
+    val out_html = new PrintWriter(new File("./"+output_folder+"/"+"belgian_malinois_qivo7214.html"))
+    out_html.write(article.cleanedArticleSimpleHTML)
+
+    out_html.close()
+  }
+
+  // http://www.forbes.com/sites/dandiamond/2015/05/11/is-crossfit-good-for-you-what-60-minutes-didnt-say/#1f5ec7e83845
+
+  @Test
+  def forbes_crossfit_q7218() {
+
+    implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+    val url = "http://www.forbes.com/sites/dandiamond/2015/05/11/is-crossfit-good-for-you-what-60-minutes-didnt-say/#1f5ec7e83845"
+    val article = TestUtils.getArticle(url = url)
+    println(article.cleanedArticleSimpleHTML)
+
+    val out_html = new PrintWriter(new File("./"+output_folder+"/"+"forbes_crossfit_q7218.html"))
+    out_html.write(article.cleanedArticleSimpleHTML)
+
+    out_html.close()
+  }
+
+
+  @Test
+  def motorcycle_types_q7216() {
+
+    implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+    val url = "https://inthenation.nationwide.com/types-of-motorcycles/"
+    val article = TestUtils.getArticle(url = url)
+    println(article.cleanedArticleSimpleHTML)
+
+    val out_html = new PrintWriter(new File("./"+output_folder+"/"+"motorcycle_types_q7216.html"))
+    out_html.write(article.cleanedArticleSimpleHTML)
+
+    out_html.close()
+  }
+
+
+  @Test
+  def amazon_echo_7180() {
+
+    implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+    val url = "http://www.cnbc.com/2016/07/01/amazon-is-making-it-even-easier-to-buy-stuff-on-prime-with-just-your-voice.html"
+    val article = TestUtils.getArticle(url = url)
+    println(article.cleanedArticleSimpleHTML)
+
+    val out_html = new PrintWriter(new File("./"+output_folder+"/"+"amazon_echo_7180.html"))
+    out_html.write(article.cleanedArticleSimpleHTML)
+
+    out_html.close()
+  }
+
+  // http://edition.cnn.com/2016/06/23/foodanddrink/norway-coffee-culture/index.html
+  @Test
+  def cnn_coffee_q7030() {
+
+    implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+    val url = "http://edition.cnn.com/2016/06/23/foodanddrink/norway-coffee-culture/index.html"
+    val article = TestUtils.getArticle(url = url)
+    println(article.cleanedArticleSimpleHTML)
+
+    val out_html = new PrintWriter(new File("./"+output_folder+"/"+"cnn_coffee_q7030.html"))
+    out_html.write(article.cleanedArticleSimpleHTML)
+
+    out_html.close()
+  }
+
+  @Test
+  def cnn_miami_design_q6939() {
+
+    implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+    val url = "http://edition.cnn.com/2016/06/22/design/design-miami-basel-2016-highlights/index.html"
+    val article = TestUtils.getArticle(url = url)
+    println(article.cleanedArticleSimpleHTML)
+
+    val out_html = new PrintWriter(new File("./"+output_folder+"/"+"cnn_miami_design_q6939.html"))
+    out_html.write(article.cleanedArticleSimpleHTML)
+
+    out_html.close()
+  }
+
+
+  @Test
+    def authoritynutrition_egg_benefits_q6931() {
+
+      implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+      val url = "https://authoritynutrition.com/10-proven-health-benefits-of-eggs/"
+      val article = TestUtils.getArticle(url = url)
+      println(article.cleanedArticleSimpleHTML)
+
+      val out_html = new PrintWriter(new File("./"+output_folder+"/"+"authoritynutrition_egg_benefits_q6931.html"))
+      out_html.write(article.cleanedArticleSimpleHTML)
+
+      out_html.close()
+    }
+
+
+
 
   "TODO: NotHtmlException: No HTML returned for url:  http://firstround.com/review/the-30-best-pieces-of-advice-for-entrepreneurs-in-2015"
 
