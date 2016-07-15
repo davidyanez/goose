@@ -260,11 +260,13 @@ trait ContentExtractor {
 
       trace(logPrefix + "Location Boost Score: " + boostScore + " on interation: " + i + "' id='" + node.parent.id + "' class='" + node.parent.attr("class"))
 
+      val SuperTags = Array("article")   // SuperTags do not give point to their parents
+      val NodeScores = Map("p" -> 10, "img" -> 20, "iframe" -> 20, "video" -> 20, "article" -> 100)
       val nodeText: String = node.text
       val wordStats: WordStats = StopWords.getStopWordCount(nodeText)
-      val tag_score = if (node.tagName() == "p") 10 else if (Array("img", "iframe", "video").contains(node.tagName())) 20 else 0
+      val tag_score = NodeScores.getOrElse(node.tagName(), 0)
 
-      val upscore: Int = (wordStats.getStopWordCount + boostScore + tag_score).asInstanceOf[Int]
+      val upscore: Int = if (SuperTags.contains(node.tagName())) (wordStats.getStopWordCount + boostScore + tag_score).asInstanceOf[Int] else 0
       updateScore(node.parent, upscore)
       updateScore(node.parent.parent, upscore / 2)
       updateNodeCount(node.parent, 1)
