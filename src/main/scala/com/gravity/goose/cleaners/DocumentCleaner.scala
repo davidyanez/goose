@@ -530,10 +530,10 @@ object DocumentCleaner extends Logging {
   /**
   * regex to detect if there are block level elements inside of a div element
   */
-  val divToPElementsPattern: Pattern = Pattern.compile("<(a|blockquote|dl|div|ol|p|pre|table|ul|li|video|section|figcaption)")
+  val divToPElementsPattern: Pattern = Pattern.compile("<(a|blockquote|dl|div|ol|p|pre|table|ul|li|video|section|figcaption|section)")
 
-  val blockElemementTags = TagsEvaluator("a", "blockquote", "dl", "div", "ol", "p", "pre", "table", "ul", "section", "img", "video", "object")
-  val articleRootTags = TagsEvaluator("div", "span", "article")
+  val blockElemementTags = TagsEvaluator("a", "blockquote", "dl", "div", "ol", "p", "pre", "table", "ul", "section", "img", "video", "object", "section")
+  val articleRootTags = TagsEvaluator("div", "span", "article", "section")
 
   val captionPattern: Pattern = Pattern.compile("^caption$")
   val googlePattern: Pattern = Pattern.compile(" google ")
