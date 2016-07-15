@@ -923,6 +923,54 @@ class NewExtractionsTest {
 
   // http://www.forbes.com/sites/dandiamond/2015/05/11/is-crossfit-good-for-you-what-60-minutes-didnt-say/#1f5ec7e83845
 
+  @Test
+  def forbes_crossfit_q7218() {
+
+    implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+    val url = "http://www.forbes.com/sites/dandiamond/2015/05/11/is-crossfit-good-for-you-what-60-minutes-didnt-say/#1f5ec7e83845"
+    val article = TestUtils.getArticle(url = url)
+    println(article.cleanedArticleSimpleHTML)
+
+    val out_html = new PrintWriter(new File("./"+output_folder+"/"+"forbes_crossfit_q7218.html"))
+    out_html.write(article.cleanedArticleSimpleHTML)
+
+    out_html.close()
+  }
+
+
+  @Test
+  def motorcycle_types_q7216() {
+
+    implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+    val url = "https://inthenation.nationwide.com/types-of-motorcycles/"
+    val article = TestUtils.getArticle(url = url)
+    println(article.cleanedArticleSimpleHTML)
+
+    val out_html = new PrintWriter(new File("./"+output_folder+"/"+"motorcycle_types_q7216.html"))
+    out_html.write(article.cleanedArticleSimpleHTML)
+
+    out_html.close()
+  }
+
+
+  @Test
+  def amazon_echo_7180() {
+
+    implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+    val url = "http://www.cnbc.com/2016/07/01/amazon-is-making-it-even-easier-to-buy-stuff-on-prime-with-just-your-voice.html"
+    val article = TestUtils.getArticle(url = url)
+    println(article.cleanedArticleSimpleHTML)
+
+    val out_html = new PrintWriter(new File("./"+output_folder+"/"+"amazon_echo_7180.html"))
+    out_html.write(article.cleanedArticleSimpleHTML)
+
+    out_html.close()
+  }
+
+
 
   "TODO: NotHtmlException: No HTML returned for url:  http://firstround.com/review/the-30-best-pieces-of-advice-for-entrepreneurs-in-2015"
 
