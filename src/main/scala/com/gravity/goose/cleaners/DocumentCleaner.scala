@@ -510,7 +510,7 @@ object DocumentCleaner extends Logging {
 
   class_sb.append("^side$|combx|retweet|mediaarticlerelated|menucontainer|navbar|PopularQuestions|footer|Footer|footnote|cnn_strycaptiontxt|meta$|shoutbox|sponsor|^pb|error|reviews")
   class_sb.append("|socialnetworking|socialNetworking|cnnStryHghLght|cnn_stryspcvbx|^inset$|pagetools|post-attributes|welcome_form|contentTools2|the_answers|remember-tool-tip|article-media-overlay")
-  class_sb.append("|communitypromo|runaroundLeft|vcard|articleheadings|date|^print$|popup|author-dropdown|socialtools|byline|konafilter|KonaFilter|breadcrumbs|^fn$|wp-caption-text|carrout")
+  class_sb.append("|communitypromo|runaroundLeft|vcard|articleheadings|date|^print$|popup|author-dropdown|socialtools|byline|konafilter|KonaFilter|breadcrumbs|^fn$|wp-caption-text|carrout|related")
 
 
 
