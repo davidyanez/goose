@@ -261,22 +261,28 @@ trait ContentExtractor {
       trace(logPrefix + "Location Boost Score: " + boostScore + " on interation: " + i + "' id='" + node.parent.id + "' class='" + node.parent.attr("class"))
 
       val SuperTags = Array("article")   // SuperTags do not give point to their parents
-      val NodeScores = Map("p" -> 10, "img" -> 20, "iframe" -> 20, "video" -> 20, "article" -> 100, "section"->20)
+      val NodeScores = Map("p" -> 10, "img" -> 20, "iframe" -> 20, "video" -> 20, "article" -> 10000, "section"->20)
       val nodeText: String = node.text
       val wordStats: WordStats = StopWords.getStopWordCount(nodeText)
       val tag_score = NodeScores.getOrElse(node.tagName(), 0)
 
-      val upscore: Int = if (!SuperTags.contains(node.tagName())) (wordStats.getStopWordCount + boostScore + tag_score).asInstanceOf[Int] else 0
-      updateScore(node.parent, upscore)
-      updateScore(node.parent.parent, upscore / 2)
-      updateNodeCount(node.parent, 1)
-      updateNodeCount(node.parent.parent, 1)
-      if (!parentNodes.contains(node.parent)) {
-        parentNodes.add(node.parent)
+      val upscore: Int =  (wordStats.getStopWordCount + boostScore + tag_score).asInstanceOf[Int]
+      if (!SuperTags.contains(node.tagName())){
+        updateScore(node.parent, upscore)
+        updateScore(node.parent.parent, upscore / 2)
+        updateNodeCount(node.parent, 1)
+        updateNodeCount(node.parent.parent, 1)
+        if (!parentNodes.contains(node.parent)) {
+          parentNodes.add(node.parent)
+        }
+        if (!parentNodes.contains(node.parent.parent)) {
+          parentNodes.add(node.parent.parent)
+        }
+      }  else {
+//        SuperTags do not give score to their parents
+        updateScore(node, upscore)
       }
-      if (!parentNodes.contains(node.parent.parent)) {
-        parentNodes.add(node.parent.parent)
-      }
+
 
       cnt += 1
       i += 1
