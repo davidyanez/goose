@@ -1,15 +1,9 @@
 package com.gravity.goose
 
 import java.io._
-import java.text.SimpleDateFormat
-import java.util.Date
 
-
-import com.gravity.goose.extractors.PublishDateExtractor
 import com.gravity.goose.utils.FileHelper
-import org.jsoup.nodes.Element
-import org.jsoup.select.Selector
-import org.junit.Assert._
+
 import org.junit.Test
 
 /**
