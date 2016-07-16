@@ -138,13 +138,19 @@ trait OutputFormatter {
 
     val doc = getSimpleHTMLDoc(topNode, article)
     if (doc.isDefined) {
-      removeElementsWithFewWords(doc.get.body())
-      cleanHeaders(doc.get.body())
-      keepFirstImagesOnly(doc.get.body())
+      val el = doc.get.body()
+      removeElementsWithFewWords(el)
+      cleanHeaders(el)
+      keepFirstImagesOnly(el)
+    }
+    if (article.outputFormat == "ARTICLE" ){
+      var document =  new Document("/")
+      document.appendChild(doc.get.body())
+      Some(document)
+    }else{
+      doc
     }
 
-
-    doc
   }
 
   /**
@@ -283,46 +289,39 @@ trait OutputFormatter {
         val FOLLOW_HEADER_TAGS : List[String] = List("p", "img", "iframe", "video", "picture", "figure", "hr")
 
 
-        if (article.outputFormat == "HTML" || article.outputFormat == "HTML_STYLE"){
+        val root = doc.appendElement("html")
+        val head = root.appendElement("head")
+        val body = root.appendElement("body")
 
-          val root = doc.appendElement("html")
-          val head = root.appendElement("head")
-          val body = root.appendElement("body")
+        val head_meta_charset = s"<meta charset='UTF-8'>"
+        val head_meta_description = s"<meta name='keywords' content='${article.metaKeywords}'>"  + s"<meta name='description' content='${article.metaDescription}'>"
+        head.append(head_meta_charset)
+        head.append(head_meta_description)
 
-          val head_meta_charset = s"<meta charset='UTF-8'>"
-          val head_meta_description = s"<meta name='keywords' content='${article.metaKeywords}'>"  + s"<meta name='description' content='${article.metaDescription}'>"
-          head.append(head_meta_charset)
-          head.append(head_meta_description)
+        if (article.outputFormat == "HTML_STYLE"){
+          val head_meta_style = """<style>
+                          #web-article {}
+                          #web-article h1 {font-size: 2.5em; font-color: red;}
+                          #web-article h2 {}
+                          #web-article h3 {}
+                          #web-article h4 {}
+                          #web-article h5 {}
+                          #web-article h6 {}
+                          #web-article p {font-size:1.25em; }
 
-          if (article.outputFormat == "HTML_STYLE"){
-            val head_meta_style = """<style>
-                            #web-article {}
-                            #web-article h1 {font-size: 2.5em; font-color: red;}
-                            #web-article h2 {}
-                            #web-article h3 {}
-                            #web-article h4 {}
-                            #web-article h5 {}
-                            #web-article h6 {}
-                            #web-article p {font-size:1.25em; }
+                          #web-article .video-wrap {}
+                          #web-article .image-wrap { width: 90%;}
+                          #web-article .image { max-width: 100%; height: auto; }
+                          #web-article .video-iframe-wrap { position:relative;padding-bottom: 56.25%;padding-top: 25px;height:0; }
+                          #web-article .video-iframe { position:absolute;top=0;left:0;width:100%;height:95%; }
+                          #web-article .list {}
+                          </style>""".stripMargin
 
-                            #web-article .video-wrap {}
-                            #web-article .image-wrap { width: 90%;}
-                            #web-article .image { max-width: 100%; height: auto; }
-                            #web-article .video-iframe-wrap { position:relative;padding-bottom: 56.25%;padding-top: 25px;height:0; }
-                            #web-article .video-iframe { position:absolute;top=0;left:0;width:100%;height:95%; }
-                            #web-article .list {}
-                            </style>""".stripMargin
-
-            head.append(head_meta_style)
-          }
-          val article_div =  create_article_div()
-          body.appendChild(article_div)
-
-        } else if(article.outputFormat == "ARTICLE"){
-          doc.appendChild(create_article_div())
-        }else{
-          doc.appendChild(create_article_div())
+          head.append(head_meta_style)
         }
+        val article_div =  create_article_div()
+        body.appendChild(article_div)
+
 
         Some(doc)
       }

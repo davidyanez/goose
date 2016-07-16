@@ -1011,6 +1011,22 @@ class NewExtractionsTest {
       out_html.close()
     }
 
+  //
+  @Test
+  def techinsider_job_robots() {
+
+    implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+    val url = "http://en.vogue.fr/beauty-tips/buzz-day/diaporama/spirulina-superfood-sweets/23725#bonbons-maison-de-la-spiruline"
+    val article = TestUtils.getArticle(url = url)
+    println(article.cleanedArticleSimpleHTML)
+
+    val out_html = new PrintWriter(new File("./"+output_folder+"/"+"techinsider_job_robots.html"))
+    out_html.write(article.cleanedArticleSimpleHTML)
+
+    out_html.close()
+  }
+
 
 
 
