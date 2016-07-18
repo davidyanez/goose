@@ -552,7 +552,7 @@ trait OutputFormatter {
       if (logger.isDebugEnabled) {
         logger.debug("removeParagraphsWithFewWords starting...")
       }
-      val IGNORE_TAGS = Array("img", "iframe", "picture", "video","figure","hr", "h1", "h2", "h3", "h4", "br", "b", "strong", "a", "li", "object") ++ ignore_tags
+      val IGNORE_TAGS = Array("img", "iframe", "picture", "video","figure","hr", "h1", "h2", "h3", "h4", "br", "b", "strong", "a", "li", "object", "span") ++ ignore_tags
       val INNER_SAFE_TAGS = Array("img", "iframe", "picture", "video", "figure", "strong", "h1", "h2", "h3", "h4")  // do not delete paragraphs containing this tags
 
       val allNodes = topNode.getAllElements
