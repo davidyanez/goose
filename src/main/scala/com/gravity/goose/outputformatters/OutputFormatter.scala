@@ -561,7 +561,9 @@ trait OutputFormatter {
         try {
 
           val stopWords = StopWords.getStopWordCount(el.text)
-          if (!IGNORE_TAGS.contains(el.tagName()) &&  el.parents().filter(parent => IGNORE_TAGS.contains(el.tagName())).length == 0 &&   !IGNORE_TAGS.contains(el.parent().tagName())   && INNER_SAFE_TAGS.forall(tag => el.getElementsByTag(tag).isEmpty) && stopWords.getStopWordCount <= 5 && el.getElementsByTag("object").size == 0 && el.getElementsByTag("embed").size == 0) {
+          if (!IGNORE_TAGS.contains(el.tagName()) &&  el.parents().filter(parent => IGNORE_TAGS.contains(el.tagName())).length == 0 &&
+            !IGNORE_TAGS.contains(el.parent().tagName())   && INNER_SAFE_TAGS.forall(tag => el.getElementsByTag(tag).isEmpty)
+            && stopWords.getStopWordCount <= 5 && el.getElementsByTag("object").size == 0 && el.getElementsByTag("embed").size == 0) {
             logger.debug("removeParagraphsWithFewWords - swcnt: %d removing text: %s".format(stopWords.getStopWordCount, el.text()))
             el.remove()
           }
