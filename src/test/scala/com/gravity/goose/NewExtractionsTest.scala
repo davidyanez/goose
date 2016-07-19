@@ -1026,8 +1026,67 @@ class NewExtractionsTest {
 
     out_html.close()
   }
+  //
+
+  @Test
+  def rupissed_blood_alcohol_limits() {
+
+    implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+    val url = "http://www.rupissed.com/blood_alcohol_limits.html"
+    val article = TestUtils.getArticle(url = url)
+    println(article.cleanedArticleSimpleHTML)
+
+    val out_html = new PrintWriter(new File("./"+output_folder+"/"+"rupissed_blood_alcohol_limits.html"))
+    out_html.write(article.cleanedArticleSimpleHTML)
+
+    out_html.close()
+  }
+
+  @Test
+  def telegraph_world_best_airport() {
+
+    implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+    val url = "http://www.telegraph.co.uk/travel/galleries/The-worlds-best-airport-restaurants/"
+    val article = TestUtils.getArticle(url = url)
+    println(article.cleanedArticleSimpleHTML)
+
+    val out_html = new PrintWriter(new File("./"+output_folder+"/"+"telegraph_world_best_airport.html"))
+    out_html.write(article.cleanedArticleSimpleHTML)
+
+    out_html.close()
+  }
 
 
+
+  // http://www.telegraph.co.uk/travel/galleries/The-worlds-best-airport-restaurants/  Broken Image
+
+  // http://www.streetartutopia.com/   // don't show content
+
+  //http://time.com/3994409/worlds-best-beers/  don't show videos
+
+  // http://www.dailymail.co.uk/sciencetech/article-3697421/Is-MIND-CONTROL-future-warfare-Swarms-drones-developed-army-guided-brain-waves.html
+
+  // http://www.start-up365.net/Pages/Top10/Ultimate4Trading/2.php?AffiliateID=7449&SubAffiliateID=1065-ysa_BR&zone=102e84532f3d95881ba968a458428d
+
+//  http://www.boredpanda.com/men-women-differences-comic/
+
+  // http://www.mirror.co.uk/news/world-news/deadly-river-hot-can-boil-7392009    cannot play video
+
+  // http://useconomy.about.com/od/themarkets/f/Hedge_Impact.htm  cannot play videpo
+
+  // http://www.theoi.com/greek-mythology/greek-gods.html   do not show content
+
+//  http://www.historyworld.net/wrldhis/PlainTextHistories.asp?ParagraphID=cio
+
+//     http://www.explainthatstuff.com/timeline.html
+
+//     http://www.historyplace.com/worldwar2/timeline/ww2time.htm   dates removed
+
+//  http://www.cubandhealth.com/vitiligo_en.php  broken image  takes the current domain  should be replaced by the site domain.. looks link starts without /
+
+  // http://www.itbusinessedge.com/slideshows/show.aspx?c=86885&slide=2  broken links ,  relative links need to have the site domain.
 
 
   "TODO: NotHtmlException: No HTML returned for url:  http://firstround.com/review/the-30-best-pieces-of-advice-for-entrepreneurs-in-2015"
