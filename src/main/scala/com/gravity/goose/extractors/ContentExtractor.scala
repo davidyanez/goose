@@ -367,7 +367,7 @@ trait ContentExtractor {
   * @return
   */
   private def isHighLinkDensity(e: Element): Boolean = {
-    val links: Elements = e.getElementsByTag("a")
+    val links: List[Element] = e.getElementsByTag("a").filter(el =>  StopWords.getStopWordCount(el.text()).stopWordCount > 0).toList  // filter( )
     if (links.size == 0) {
       return false
     }
