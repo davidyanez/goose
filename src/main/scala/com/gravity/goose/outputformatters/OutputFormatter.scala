@@ -210,12 +210,12 @@ trait OutputFormatter {
          }
          else {
            val src =
-           e.attr("src", ("http://" + article.domain + '/' + e.attr("src")).replace("//", "/") )
+           e.attr("src", "http://" + (article.domain + '/' + e.attr("src")).replace("//", "/") )
          }
          if (e.hasAttr("srcset") && e.attr("srcset").length > 0) {
            var img_sources = e.attr("srcset").split(",").map((url: String) => url.trim())
            img_sources = img_sources.map(src => if (src.startsWith("http")) src
-           else if (src.startsWith("//")) "http:" + src else ("http://" + article.domain + '/' + src).replace("//", "/"))
+           else if (src.startsWith("//")) "http:" + src else "http://" + (article.domain + '/' + src).replace("//", "/"))
            val srcset = String.join(", ", img_sources.toList)
            e.attr("srcset", srcset)
          }
