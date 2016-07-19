@@ -1122,7 +1122,7 @@ class NewExtractionsTest {
 
   @Test
   def men_women_differences_comic() {
-// TODO: FIX
+// TODO: FIX  garbage content displayed
     implicit val config = TestUtils.NO_IMAGE_CONFIG
 
     val url = "http://www.boredpanda.com/men-women-differences-comic/"
@@ -1136,6 +1136,68 @@ class NewExtractionsTest {
   }
 
 
+  @Test
+    def mirror_deadly_hot_river() {
+  // TODO: FIX  video not playing
+      implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+      val url = "http://www.mirror.co.uk/news/world-news/deadly-river-hot-can-boil-7392009"
+      val article = TestUtils.getArticle(url = url)
+      println(article.cleanedArticleSimpleHTML)
+
+      val out_html = new PrintWriter(new File("./"+output_folder+"/"+"mirror_deadly_hot_river.html"))
+      out_html.write(article.cleanedArticleSimpleHTML)
+
+      out_html.close()
+    }
+
+  // http://www.theoi.com/greek-mythology/greek-gods.html
+  @Test
+  def theoi_greek_gods() {
+  // FIXED
+      implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+      val url = "http://www.theoi.com/greek-mythology/greek-gods.html"
+      val article = TestUtils.getArticle(url = url)
+      println(article.cleanedArticleSimpleHTML)
+
+      val out_html = new PrintWriter(new File("./"+output_folder+"/"+"theoi_greek_gods.html"))
+      out_html.write(article.cleanedArticleSimpleHTML)
+
+      out_html.close()
+    }
+
+  // http://www.historyworld.net/wrldhis/PlainTextHistories.asp?ParagraphID=cio
+  @Test
+  def historyworld() {
+    // NO HTML returned
+        implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+        val url = "http://www.historyworld.net/wrldhis/PlainTextHistories.asp?ParagraphID=cio"
+        val article = TestUtils.getArticle(url = url)
+        println(article.cleanedArticleSimpleHTML)
+
+        val out_html = new PrintWriter(new File("./"+output_folder+"/"+"historyworld.html"))
+        out_html.write(article.cleanedArticleSimpleHTML)
+
+        out_html.close()
+      }
+
+
+  @Test
+  def explainthatstuff_timeline() {
+    // TODO :  Fix   do not show correct content
+        implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+        val url = "http://www.explainthatstuff.com/timeline.html"
+        val article = TestUtils.getArticle(url = url)
+        println(article.cleanedArticleSimpleHTML)
+
+        val out_html = new PrintWriter(new File("./"+output_folder+"/"+"explainthatstuff_timeline.html"))
+        out_html.write(article.cleanedArticleSimpleHTML)
+
+        out_html.close()
+      }
 
 
   // http://www.telegraph.co.uk/travel/galleries/The-worlds-best-airport-restaurants/  Broken Image
