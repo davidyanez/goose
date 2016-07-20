@@ -1236,17 +1236,17 @@ class NewExtractionsTest {
   @Test
   def space_full_moon_calendar() {
   //
-      implicit val config = TestUtils.NO_IMAGE_CONFIG
+    implicit val config = TestUtils.NO_IMAGE_CONFIG
 
-      val url = "http://www.space.com/16830-full-moon-calendar.html?utm_source=facebook&utm_medium=facebook&utm_campaign=socialfbspc&cmpid=social_spc_514630"
-      val article = TestUtils.getArticle(url = url)
-      println(article.cleanedArticleSimpleHTML)
+    val url = "http://www.space.com/16830-full-moon-calendar.html?utm_source=facebook&utm_medium=facebook&utm_campaign=socialfbspc&cmpid=social_spc_514630"
+    val article = TestUtils.getArticle(url = url)
+    println(article.cleanedArticleSimpleHTML)
 
-      val out_html = new PrintWriter(new File("./"+output_folder+"/"+"space_full_moon_calendar.html"))
-      out_html.write(article.cleanedArticleSimpleHTML)
+    val out_html = new PrintWriter(new File("./"+output_folder+"/"+"space_full_moon_calendar.html"))
+    out_html.write(article.cleanedArticleSimpleHTML)
 
-      out_html.close()
-      }
+    out_html.close()
+  }
 
  //
 
