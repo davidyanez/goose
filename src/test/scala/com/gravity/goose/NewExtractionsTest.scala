@@ -1198,6 +1198,58 @@ class NewExtractionsTest {
 
         out_html.close()
       }
+//  http://www.historyplace.com/worldwar2/timeline/ww2time.htm
+
+  @Test
+  def cubandhealth() {
+  //
+      implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+      val url = "http://www.cubandhealth.com/vitiligo_en.php "
+      val article = TestUtils.getArticle(url = url)
+      println(article.cleanedArticleSimpleHTML)
+
+      val out_html = new PrintWriter(new File("./"+output_folder+"/"+"cubandhealth.html"))
+      out_html.write(article.cleanedArticleSimpleHTML)
+
+      out_html.close()
+  }
+
+  //
+
+  @Test
+    def chefs_scientists_spain() {
+    //
+        implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+        val url = "http://www.thelocal.es/20160720/top-chefs-scientists-to-gather-in-spain-to-explore-taste"
+        val article = TestUtils.getArticle(url = url)
+        println(article.cleanedArticleSimpleHTML)
+
+        val out_html = new PrintWriter(new File("./"+output_folder+"/"+"chefs_scientists_spain.html"))
+        out_html.write(article.cleanedArticleSimpleHTML)
+
+        out_html.close()
+    }
+
+
+  @Test
+  def space_full_moon_calendar() {
+  //
+      implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+      val url = "http://www.space.com/16830-full-moon-calendar.html?utm_source=facebook&utm_medium=facebook&utm_campaign=socialfbspc&cmpid=social_spc_514630"
+      val article = TestUtils.getArticle(url = url)
+      println(article.cleanedArticleSimpleHTML)
+
+      val out_html = new PrintWriter(new File("./"+output_folder+"/"+"space_full_moon_calendar.html"))
+      out_html.write(article.cleanedArticleSimpleHTML)
+
+      out_html.close()
+      }
+
+ //
+
 
 
   // http://www.telegraph.co.uk/travel/galleries/The-worlds-best-airport-restaurants/  Broken Image
