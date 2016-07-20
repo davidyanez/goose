@@ -127,6 +127,7 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
       }
 
       entity = response.getEntity
+      var rawlHtml = ""
       if (entity != null) {
         instream = entity.getContent
         var encodingType = EntityUtils.getContentCharSet(entity)
@@ -145,7 +146,7 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
                 instream = entity.getContent
               }
 
-              val rawlHtml =  EntityUtils.toString(entity)
+              rawlHtml =  EntityUtils.toString(entity)
               val is = new ByteArrayInputStream(rawlHtml.getBytes())
               val doc = Jsoup.parse(rawlHtml)
               encodingType = getCharSet(doc)
@@ -176,7 +177,7 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
             }
 
           }
-          htmlResult = HtmlFetcher.convertStreamToString(instream, 15728640, encodingType).trim
+          htmlResult = if (rawlHtml == "") HtmlFetcher.convertStreamToString(instream, 15728640, encodingType).trim else rawlHtml
           new String(htmlResult.getBytes("UTF-8"), "UTF8")
         }
         finally {

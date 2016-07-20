@@ -306,7 +306,7 @@ trait DocumentCleaner {
 
   private def convertBackgroundImageToImage(doc: Document): Document = {
 
-      val elements = doc.getAllElements.filter(element => element.hasAttr("style") && element.attr("style").contains("background-image: url("))
+      val elements = doc.select("div").filter(element => element.hasAttr("style") && element.attr("style").contains("background-image: url("))
       for (elem <- elements) {
         val style = elem.attr("style")
         val url_start_pos = style.indexOfSlice("background-image: url(") +  "background-image: url(".length

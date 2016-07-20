@@ -17,9 +17,6 @@
  */
 package com.gravity.goose.extractors
 
-import com.gravity.goose.utils.Logging
-
-
 /**
  * Created by Jim Plush
  * User: jim
