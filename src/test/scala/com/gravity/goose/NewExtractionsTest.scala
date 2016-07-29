@@ -1248,37 +1248,54 @@ class NewExtractionsTest {
     out_html.close()
   }
 
- //
+
+  @Test
+  def sciencealert_brain() {
+  //
+    implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+    val url = "http://www.sciencealert.com/a-man-who-lives-without-90-of-his-brain-is-challenging-our-understanding-of-consciousness"
+    val article = TestUtils.getArticle(url = url)
+    println(article.cleanedArticleSimpleHTML)
+
+    val out_html = new PrintWriter(new File("./"+output_folder+"/"+"sciencealert_brain.html"))
+    out_html.write(article.cleanedArticleSimpleHTML)
+
+    out_html.close()
+  }
+
+  @Test
+  def factmag_nes_classic() {
+  //
+    implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+    val url = "http://www.factmag.com/2016/07/21/nes-classic-edition-commercial/"
+    val article = TestUtils.getArticle(url = url)
+    println(article.cleanedArticleSimpleHTML)
+
+    val out_html = new PrintWriter(new File("./"+output_folder+"/"+"factmag_nes_classic.html"))
+    out_html.write(article.cleanedArticleSimpleHTML)
+
+    out_html.close()
+  }
 
 
+  @Test
+  def theverge_nes_classic() {
+  //
+    implicit val config = TestUtils.NO_IMAGE_CONFIG
 
-  // http://www.telegraph.co.uk/travel/galleries/The-worlds-best-airport-restaurants/  Broken Image
+    val url = "http://www.theverge.com/2016/7/21/12249536/nes-classic-edition-retro-commercial"
+    val article = TestUtils.getArticle(url = url)
+    println(article.cleanedArticleSimpleHTML)
 
-  // http://www.streetartutopia.com/  // don't show content
+    val out_html = new PrintWriter(new File("./"+output_folder+"/"+"theverge_nes_classic.html"))
+    out_html.write(article.cleanedArticleSimpleHTML)
 
-  //http://time.com/3994409/worlds-best-beers/  don't show videos
+    out_html.close()
+  }
 
-  // http://www.dailymail.co.uk/sciencetech/article-3697421/Is-MIND-CONTROL-future-warfare-Swarms-drones-developed-army-guided-brain-waves.html
 
-  // http://www.start-up365.net/Pages/Top10/Ultimate4Trading/2.php?AffiliateID=7449&SubAffiliateID=1065-ysa_BR&zone=102e84532f3d95881ba968a458428d
-
-//  http://www.boredpanda.com/men-women-differences-comic/
-
-  // http://www.mirror.co.uk/news/world-news/deadly-river-hot-can-boil-7392009    cannot play video
-
-  // http://useconomy.about.com/od/themarkets/f/Hedge_Impact.htm  cannot play videpo
-
-  // http://www.theoi.com/greek-mythology/greek-gods.html   do not show content
-
-//  http://www.historyworld.net/wrldhis/PlainTextHistories.asp?ParagraphID=cio
-
-//     http://www.explainthatstuff.com/timeline.html
-
-//     http://www.historyplace.com/worldwar2/timeline/ww2time.htm   dates removed
-
-//  http://www.cubandhealth.com/vitiligo_en.php  broken image  takes the current domain  should be replaced by the site domain.. looks link starts without /
-
-  // http://www.itbusinessedge.com/slideshows/show.aspx?c=86885&slide=2  broken links ,  relative links need to have the site domain.
 
 
   "TODO: NotHtmlException: No HTML returned for url:  http://firstround.com/review/the-30-best-pieces-of-advice-for-entrepreneurs-in-2015"

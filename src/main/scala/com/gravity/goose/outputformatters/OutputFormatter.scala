@@ -30,6 +30,8 @@ import scala.collection.JavaConversions._
 import org.slf4j.Logger
 
 import scala.collection.immutable.List
+import java.util.Calendar;
+     import java.text.SimpleDateFormat;
 
 /**
 * Created by Jim Plush
@@ -249,8 +251,7 @@ trait OutputFormatter {
 
      }).toList.mkString("")
 
-     import java.util.Calendar;
-     import java.text.SimpleDateFormat;
+
 
      val today = Calendar.getInstance().getTime()
      val formatter = new SimpleDateFormat("MMMMMMMMMM dd, yyyy")
@@ -260,7 +261,7 @@ trait OutputFormatter {
      val article_footer =
        "<hr><div class=\"reflink\">"+
          "<span> Read on the original source </span>"+
-         s"<a class='link' href='${article.finalUrl}' target='_blank'>Read on ${article.domain}</a>" +
+         s"<a class='link' href='${article.finalUrl}' target='_blank'>${article.domain}</a>" +
          s"<div class='scraped_date'>Pulled on $today_str </div>"+
       s"</div>"
       ""
@@ -553,6 +554,7 @@ trait OutputFormatter {
         logger.debug("removeParagraphsWithFewWords starting...")
       }
       val IGNORE_TAGS = Array("img", "iframe", "picture", "video","figure","hr", "h1", "h2", "h3", "h4", "br", "b", "strong", "a", "li", "object", "span") ++ ignore_tags
+      val IGNORE_CLASSES = Array("link", "scraped_date")
       val INNER_SAFE_TAGS = Array("img", "iframe", "picture", "video", "figure", "strong", "h1", "h2", "h3", "h4")  // do not delete paragraphs containing this tags
 
       val allNodes = topNode.getAllElements
@@ -562,6 +564,7 @@ trait OutputFormatter {
 
           val stopWords = StopWords.getStopWordCount(el.text)
           if (!IGNORE_TAGS.contains(el.tagName()) &&  el.parents().filter(parent => IGNORE_TAGS.contains(el.tagName())).length == 0 &&
+            !IGNORE_CLASSES.contains(el.attr("class")) &&
             !IGNORE_TAGS.contains(el.parent().tagName())   && INNER_SAFE_TAGS.forall(tag => el.getElementsByTag(tag).isEmpty)
             && stopWords.getStopWordCount <= 5 && el.getElementsByTag("object").size == 0 && el.getElementsByTag("embed").size == 0) {
             logger.debug("removeParagraphsWithFewWords - swcnt: %d removing text: %s".format(stopWords.getStopWordCount, el.text()))
