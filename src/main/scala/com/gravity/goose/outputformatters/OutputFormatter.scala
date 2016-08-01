@@ -262,8 +262,8 @@ trait OutputFormatter {
        "<hr><div class=\"reflink\">"+
          "<span> Read on the original source </span>"+
          s"<a class='link' href='${article.finalUrl}' target='_blank'>${article.domain}</a>" +
-         s"<div class='scraped_date'>Pulled on $today_str </div>"+
-      s"</div>"
+      s"</div>"+
+        s"<div class='scraped_date'>Pulled on $today_str </div>"+
       ""
 
      article_div_html + article_footer
