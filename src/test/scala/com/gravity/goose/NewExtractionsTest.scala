@@ -1295,6 +1295,54 @@ class NewExtractionsTest {
     out_html.close()
   }
 
+  // http://www.upi.com/Science_News/2016/08/01/Earths-creatures-ahead-of-their-time-from-cosmic-perspective/4951470071313/
+
+  @Test
+  def upi_earth_live() {
+  //
+    implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+    val url = "http://www.upi.com/Science_News/2016/08/01/Earths-creatures-ahead-of-their-time-from-cosmic-perspective/4951470071313/"
+    val article = TestUtils.getArticle(url = url)
+    println(article.cleanedArticleSimpleHTML)
+
+    val out_html = new PrintWriter(new File("./"+output_folder+"/"+"upi_earth_live.html"))
+    out_html.write(article.cleanedArticleSimpleHTML)
+
+    out_html.close()
+  }
+
+  @Test
+    def nytimes_obama_donal_trump() {
+    //
+      implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+      val url = "http://www.nytimes.com/2016/08/02/us/politics/obama-donald-trump-veterans-khan.html?_r=0"
+      val article = TestUtils.getArticle(url = url)
+      println(article.cleanedArticleSimpleHTML)
+
+      val out_html = new PrintWriter(new File("./"+output_folder+"/"+"nytimes_obama_donal_trump.html"))
+      out_html.write(article.cleanedArticleSimpleHTML)
+
+      out_html.close()
+    }
+
+  //
+
+  @Test
+  def elon_musk_production_hell() {
+  //
+    implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+    val url = "http://fortune.com/2016/08/03/elon-musk-production-hell/"
+    val article = TestUtils.getArticle(url = url)
+    println(article.cleanedArticleSimpleHTML)
+
+    val out_html = new PrintWriter(new File("./"+output_folder+"/"+"elon_musk_production_hell.html"))
+    out_html.write(article.cleanedArticleSimpleHTML)
+
+    out_html.close()
+  }
 
 
 
