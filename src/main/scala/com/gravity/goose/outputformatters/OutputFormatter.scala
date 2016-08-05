@@ -177,6 +177,7 @@ trait OutputFormatter {
      val keep_tags: List[String] = List("hr", "figcaption", "br")
      val SKIP_ATTRIBUTES: List[String] = List("style", "class", "alt", "width", "height", "max-width")
      val HEADERS: List[String] = List("h1","h2", "h3", "h4", "h5", "h6")
+     var header_count = 0
 
      val topNode = article.topNode
 
@@ -238,8 +239,11 @@ trait OutputFormatter {
        }
        else if (HEADERS.contains(e.tagName())) {
          // to avoid having two h1 headers in the top , title and first h1 tag.
-         val tag_name =  if (e.tagName() == "h1") "h2" else e.tagName()
-         if (e.text() != article.title)
+         val tag_name =  e.tagName()
+         header_count+=1
+         val similarity_th = 0.60
+
+         if (header_count == 1 &&  StringSimilarity.similarity(e.text(), StringEscapeUtils.unescapeHtml(article.title).trim) < similarity_th || header_count > 1)
            s"<${tag_name}>${e.text}</${tag_name}>"
          else {""}
        }
@@ -586,4 +590,50 @@ trait OutputFormatter {
       }
     }
   }
+
+
+  object StringSimilarity {
+
+    def similarity(s1: String, s2: String): Double = {
+      var longer = s1
+      var shorter = s2
+      if (s1.length < s2.length) {
+        longer = s2
+        shorter = s1
+      }
+      val longerLength = longer.length
+      if (longerLength == 0) {
+        return 1.0
+      }
+      (longerLength - editDistance(longer, shorter)) / longerLength.toDouble
+    }
+
+    def editDistance(str1: String, str2: String) = {
+      val s1 = str1.toLowerCase()
+      val s2 = str2.toLowerCase()
+      val costs = Array.ofDim[Int](s2.length + 1)
+      var i = 0
+      while (i <= s1.length) {
+        var lastValue = i
+        var j = 0
+        while (j <= s2.length) {
+          if (i == 0) costs(j) = j else {
+            if (j > 0) {
+              var newValue = costs(j - 1)
+              if (s1.charAt(i - 1) != s2.charAt(j - 1)) newValue = Math.min(Math.min(newValue, lastValue),
+                costs(j)) + 1
+              costs(j - 1) = lastValue
+              lastValue = newValue
+            }
+          }
+          j += 1
+        }
+        if (i > 0) costs(s2.length) = lastValue
+        i += 1
+      }
+      costs(s2.length)
+    }
+  }
+
+
 }
