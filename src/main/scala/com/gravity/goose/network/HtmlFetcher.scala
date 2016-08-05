@@ -100,8 +100,8 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
     var htmlResult: String = null
     var entity: HttpEntity = null
     var instream: InputStream = null
+    val defaultEncodingType = "UTF-8"
     var encodingType: String = "UTF-8"
-    import org.apache.http.client.params.ClientPNames
 
     // Identified the the apache http client does not drop URL fragments before opening the request to the host
     // more info: http://stackoverflow.com/questions/4251841/400-error-with-httpclient-for-a-link-with-an-anchor
@@ -146,10 +146,12 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
                 instream = entity.getContent
               }
 
-              rawlHtml =  EntityUtils.toString(entity)
+//              rawlHtml =  EntityUtils.toString(entity)
+              val rawlHtml = HtmlFetcher.convertStreamToString(instream, 15728640, defaultEncodingType).trim
               val is = new ByteArrayInputStream(rawlHtml.getBytes())
               val doc = Jsoup.parse(rawlHtml)
               encodingType = getCharSet(doc)
+
 
             }
           }
@@ -177,8 +179,10 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
             }
 
           }
-          htmlResult = if (rawlHtml == "") HtmlFetcher.convertStreamToString(instream, 15728640, encodingType).trim else rawlHtml
-          new String(htmlResult.getBytes("UTF-8"), "UTF8")
+          htmlResult = if (rawlHtml == "" || encodingType != defaultEncodingType) HtmlFetcher.convertStreamToString(instream, 15728640, encodingType).trim else rawlHtml
+          htmlResult =  HtmlFetcher.convertStreamToString(instream, 15728640, encodingType).trim
+
+          new String(htmlResult.getBytes("UTF-8"), "UTF-8")
         }
         finally {
           EntityUtils.consume(entity)
