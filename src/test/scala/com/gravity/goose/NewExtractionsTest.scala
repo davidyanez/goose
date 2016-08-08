@@ -1344,6 +1344,22 @@ class NewExtractionsTest {
     out_html.close()
   }
 
+  // http://dailysunknoxville.com/2017-bmw-3-series-attacks-tesla-model-3-like-nissan-leaf/920010133
+  @Test
+  def bmw_attacks_tesla() {
+  //
+    implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+    val url = "http://dailysunknoxville.com/2017-bmw-3-series-attacks-tesla-model-3-like-nissan-leaf/920010133"
+    val article = TestUtils.getArticle(url = url)
+    println(article.cleanedArticleSimpleHTML)
+
+    val out_html = new PrintWriter(new File("./"+output_folder+"/"+"bmw_attacks_tesla.html"))
+    out_html.write(article.cleanedArticleSimpleHTML)
+
+    out_html.close()
+  }
+
 
 
   "TODO: NotHtmlException: No HTML returned for url:  http://firstround.com/review/the-30-best-pieces-of-advice-for-entrepreneurs-in-2015"

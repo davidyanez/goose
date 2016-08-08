@@ -243,7 +243,7 @@ trait OutputFormatter {
          header_count+=1
          val similarity_th = 0.60
 
-         if (header_count == 1 &&  StringSimilarity.similarity(e.text(), StringEscapeUtils.unescapeHtml(article.title).trim) < similarity_th || header_count > 1)
+         if (StringSimilarity.similarity(e.text(), StringEscapeUtils.unescapeHtml(article.title).trim) < similarity_th )
            s"<${tag_name}>${e.text}</${tag_name}>"
          else {""}
        }
