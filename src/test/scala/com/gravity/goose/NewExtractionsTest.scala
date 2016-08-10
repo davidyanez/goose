@@ -1360,6 +1360,38 @@ class NewExtractionsTest {
     out_html.close()
   }
 
+  // http://www.cbc.ca/news/technology/how-does-a-computer-problem-shut-down-a-whole-airline-1.3712501
+  @Test
+  def cbc_delta_shutdown() {
+  //
+    implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+    val url = "http://www.cbc.ca/news/technology/how-does-a-computer-problem-shut-down-a-whole-airline-1.3712501"
+    val article = TestUtils.getArticle(url = url)
+    println(article.cleanedArticleSimpleHTML)
+
+    val out_html = new PrintWriter(new File("./"+output_folder+"/"+"cbc_delta_shutdown.html"))
+    out_html.write(article.cleanedArticleSimpleHTML)
+
+    out_html.close()
+  }
+
+//
+
+  @Test
+  def cyber_war() {
+  //
+    implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+    val url = "http://thescienceexplorer.com/technology/if-two-countries-waged-cyber-war-each-another-here-s-what-expect"
+    val article = TestUtils.getArticle(url = url)
+    println(article.cleanedArticleSimpleHTML)
+
+    val out_html = new PrintWriter(new File("./"+output_folder+"/"+"cyber_war.html"))
+    out_html.write(article.cleanedArticleSimpleHTML)
+
+    out_html.close()
+  }
 
 
   "TODO: NotHtmlException: No HTML returned for url:  http://firstround.com/review/the-30-best-pieces-of-advice-for-entrepreneurs-in-2015"
