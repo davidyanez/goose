@@ -689,7 +689,6 @@ class NewExtractionsTest {
 
   @Test
   def qivo_1805() {
-//    Failing because content is wrapped by a div with id containing the word footer.
 
    implicit val config = TestUtils.NO_IMAGE_CONFIG
 
@@ -705,7 +704,6 @@ class NewExtractionsTest {
 
   @Test
   def qivo_1817() {
-  //    Failing because content is wrapped by a div with id containing the word footer.
 
    implicit val config = TestUtils.NO_IMAGE_CONFIG
 
