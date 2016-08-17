@@ -80,12 +80,13 @@ class Crawler(config: Configuration) {
       // before we do any calcs on the body itself let's clean up the document
       article.doc =  docCleaner.clean(article)
 
+      article.topNode = article.doc.body()
+      val imageExtractor = getImageExtractor(article)
+      imageExtractor.RemoveBadImages(article)
+
       extractor.calculateBestNodeBasedOnClustering(article) match {
         case Some(node: Element) => {
           article.topNode = node
-
-          val imageExtractor = getImageExtractor(article)
-          imageExtractor.RemoveBadImages(article)
 
           article.cleanedArticleSimpleHTMLDoc =  outputFormatter.getFormattedHTML(article)
           article.cleanedArticleSimpleHTML = article.cleanedArticleSimpleHTMLDoc.get.html
@@ -141,13 +142,13 @@ class Crawler(config: Configuration) {
         article.tags = extractor.extractTags(article)
         // before we do any calcs on the body itself let's clean up the document
         article.doc =  docCleaner.clean(article)
+        article.topNode = article.doc.body()
+        val imageExtractor = getImageExtractor(article)
+        imageExtractor.RemoveBadImages(article)
 
         extractor.calculateBestNodeBasedOnClustering(article) match {
           case Some(node: Element) => {
             article.topNode = node
-
-            val imageExtractor = getImageExtractor(article)
-            imageExtractor.RemoveBadImages(article)
 
             article.cleanedArticleSimpleHTMLDoc =  outputFormatter.getFormattedHTML(article)
             article.cleanedArticleSimpleHTML = article.cleanedArticleSimpleHTMLDoc.get.html
