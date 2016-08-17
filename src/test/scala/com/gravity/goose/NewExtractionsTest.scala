@@ -1358,6 +1358,39 @@ class NewExtractionsTest {
     out_html.close()
   }
 
+  // http://aplus.com/a/25-unbelievable-places-on-earth
+  @Test
+  def aplus_25_unbelievablep_places_on_earth() {
+  //
+    implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+    val url = "http://aplus.com/a/25-unbelievable-places-on-earth"
+    val article = TestUtils.getArticle(url = url)
+    println(article.cleanedArticleSimpleHTML)
+
+    val out_html = new PrintWriter(new File("./"+output_folder+"/"+"aplus_25_unbelievablep_places_on_earth.html"))
+    out_html.write(article.cleanedArticleSimpleHTML)
+
+    out_html.close()
+  }
+
+  //http://www.pcworld.com/article/3108434/computers/intel-doubles-down-on-project-alloy-as-the-savior-of-the-pc.html
+  @Test
+  def pcworld_intel_alloy_vr() {
+  //
+    implicit val config = TestUtils.NO_IMAGE_CONFIG
+
+    val url = "http://www.pcworld.com/article/3108434/computers/intel-doubles-down-on-project-alloy-as-the-savior-of-the-pc.html"
+    val article = TestUtils.getArticle(url = url)
+    println(article.cleanedArticleSimpleHTML)
+
+    val out_html = new PrintWriter(new File("./"+output_folder+"/"+"pcworld_intel_alloy_vr.html"))
+    out_html.write(article.cleanedArticleSimpleHTML)
+
+    out_html.close()
+    }
+
+
 
 
   "TODO: NotHtmlException: No HTML returned for url:  http://firstround.com/review/the-30-best-pieces-of-advice-for-entrepreneurs-in-2015"
