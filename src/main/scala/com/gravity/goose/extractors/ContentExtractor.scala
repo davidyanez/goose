@@ -373,7 +373,7 @@ trait ContentExtractor {
     }
     val text: String = e.text.trim
     val words: Array[String] = SPACE_SPLITTER.split(text)
-    val numberOfWords: Float = words.length
+    val numberOfWords: Float = words.length + e.select("img").length*40 // let each img be equivalent to 40 words.
     val sb: StringBuilder = new StringBuilder
     for (link <- links) {
       sb.append(link.text)
