@@ -256,7 +256,7 @@ class UpgradedImageIExtractor(httpClient: HttpClient, article: Article, config: 
         val imageSource: String = this.buildImagePath(image.attr("src"))
         val local_img = getLocallyStoredImage(buildImagePath(image.attr("src"))).getOrElse(null)
 
-        if ((local_img.width < 150 || local_img.height < 150 || local_img.bytes < config.minBytesForImages)) {
+        if ((local_img.width < 185 || local_img.height < 185 || local_img.bytes < config.minBytesForImages)) {
           image.remove()
         }
 
@@ -707,19 +707,8 @@ class UpgradedImageIExtractor(httpClient: HttpClient, article: Article, config: 
   def RemoveBadImages(article: Article)  {
 
       val allNodes = article.topNode.getAllElements
+      RemoveBadImageCandidates(article.doc)
 
-      for (el <- allNodes) {
-        try {
-          if (el.tagName() == "img" || !el.getElementsByTag("img").isEmpty) {
-            RemoveBadImageCandidates(el)
-          }
-        }
-        catch {
-          case e: IllegalArgumentException => {
-            logger.error(e.getMessage)
-          }
-        }
-      }
   }
 
 }

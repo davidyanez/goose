@@ -689,7 +689,6 @@ class NewExtractionsTest {
 
   @Test
   def qivo_1805() {
-//    Failing because content is wrapped by a div with id containing the word footer.
 
    implicit val config = TestUtils.NO_IMAGE_CONFIG
 
@@ -705,7 +704,6 @@ class NewExtractionsTest {
 
   @Test
   def qivo_1817() {
-  //    Failing because content is wrapped by a div with id containing the word footer.
 
    implicit val config = TestUtils.NO_IMAGE_CONFIG
 
@@ -1360,38 +1358,39 @@ class NewExtractionsTest {
     out_html.close()
   }
 
-  // http://www.cbc.ca/news/technology/how-does-a-computer-problem-shut-down-a-whole-airline-1.3712501
+  // http://aplus.com/a/25-unbelievable-places-on-earth
   @Test
-  def cbc_delta_shutdown() {
+  def aplus_25_unbelievablep_places_on_earth() {
   //
     implicit val config = TestUtils.NO_IMAGE_CONFIG
 
-    val url = "http://www.cbc.ca/news/technology/how-does-a-computer-problem-shut-down-a-whole-airline-1.3712501"
+    val url = "http://aplus.com/a/25-unbelievable-places-on-earth"
     val article = TestUtils.getArticle(url = url)
     println(article.cleanedArticleSimpleHTML)
 
-    val out_html = new PrintWriter(new File("./"+output_folder+"/"+"cbc_delta_shutdown.html"))
+    val out_html = new PrintWriter(new File("./"+output_folder+"/"+"aplus_25_unbelievablep_places_on_earth.html"))
     out_html.write(article.cleanedArticleSimpleHTML)
 
     out_html.close()
   }
 
-//
-
+  //http://www.pcworld.com/article/3108434/computers/intel-doubles-down-on-project-alloy-as-the-savior-of-the-pc.html
   @Test
-  def cyber_war() {
+  def pcworld_intel_alloy_vr() {
   //
     implicit val config = TestUtils.NO_IMAGE_CONFIG
 
-    val url = "http://thescienceexplorer.com/technology/if-two-countries-waged-cyber-war-each-another-here-s-what-expect"
+    val url = "http://www.pcworld.com/article/3108434/computers/intel-doubles-down-on-project-alloy-as-the-savior-of-the-pc.html"
     val article = TestUtils.getArticle(url = url)
     println(article.cleanedArticleSimpleHTML)
 
-    val out_html = new PrintWriter(new File("./"+output_folder+"/"+"cyber_war.html"))
+    val out_html = new PrintWriter(new File("./"+output_folder+"/"+"pcworld_intel_alloy_vr.html"))
     out_html.write(article.cleanedArticleSimpleHTML)
 
     out_html.close()
-  }
+    }
+
+
 
 
   "TODO: NotHtmlException: No HTML returned for url:  http://firstround.com/review/the-30-best-pieces-of-advice-for-entrepreneurs-in-2015"
