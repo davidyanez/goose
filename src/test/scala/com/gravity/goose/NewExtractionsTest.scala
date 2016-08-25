@@ -1374,10 +1374,9 @@ class NewExtractionsTest {
     out_html.close()
   }
 
-  //http://www.pcworld.com/article/3108434/computers/intel-doubles-down-on-project-alloy-as-the-savior-of-the-pc.html
   @Test
   def pcworld_intel_alloy_vr() {
-  //
+
     implicit val config = TestUtils.NO_IMAGE_CONFIG
 
     val url = "http://www.pcworld.com/article/3108434/computers/intel-doubles-down-on-project-alloy-as-the-savior-of-the-pc.html"
@@ -1389,9 +1388,6 @@ class NewExtractionsTest {
 
     out_html.close()
     }
-
-
-
 
   "TODO: NotHtmlException: No HTML returned for url:  http://firstround.com/review/the-30-best-pieces-of-advice-for-entrepreneurs-in-2015"
 
