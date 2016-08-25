@@ -39,7 +39,7 @@ import scala.collection.JavaConverters._
 
 case class CrawlCandidate(config: Configuration, url: String, rawHTML: String = null)
 
-case class HtmlExtractResponse(html: String, status: HTMLExtractStatus.Status, msg: String = "")
+case class HtmlExtractResponse(html: String, status: HTMLExtractStatus.Status, msg: String = "", text: String = "")
 
 object HTMLExtractStatus extends Enumeration {
   type Status = Value
@@ -89,6 +89,7 @@ class Crawler(config: Configuration) {
           article.topNode = node
 
           article.cleanedArticleSimpleHTMLDoc =  outputFormatter.getFormattedHTML(article)
+          article.cleanedArticleText = outputFormatter.getFormattedText(article.topNode)
           article.cleanedArticleSimpleHTML = article.cleanedArticleSimpleHTMLDoc.get.html
 
         }
@@ -151,6 +152,7 @@ class Crawler(config: Configuration) {
             article.topNode = node
 
             article.cleanedArticleSimpleHTMLDoc =  outputFormatter.getFormattedHTML(article)
+            article.cleanedArticleText = outputFormatter.getFormattedText(article.topNode)
             article.cleanedArticleSimpleHTML = article.cleanedArticleSimpleHTMLDoc.get.html
 
           }
@@ -168,7 +170,7 @@ class Crawler(config: Configuration) {
       System.gc()
 
       if (article_found && validArticle){
-        HtmlExtractResponse(html=article.cleanedArticleSimpleHTML, status = HTMLExtractStatus.OK)
+        HtmlExtractResponse(html=article.cleanedArticleSimpleHTML, status = HTMLExtractStatus.OK, text=article.cleanedArticleText)
       }
       else {
         val msg = if (!validArticle) {

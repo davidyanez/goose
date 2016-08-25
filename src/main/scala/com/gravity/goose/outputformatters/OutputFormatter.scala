@@ -74,8 +74,13 @@ trait OutputFormatter {
   */
   def getFormattedText(topNode: Element): String = {
     removeNodesWithNegativeScores(topNode)
+    cleanLinks(topNode)
+    cleanParagraphs(topNode)
     convertLinksToText(topNode)
     replaceTagsWithText(topNode)
+    removeDuplicatedImages(topNode)
+    removeDuplicatedtext(topNode)
+
     removeElementsWithFewWords(topNode)
 
     convertToText(topNode)
